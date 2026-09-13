@@ -1,7 +1,7 @@
 """
 The agent loop.
 
-PS 26117 asks for an assistant that "plans out multi step work, calls local
+ "plans out multi step work, calls local
 tools ... and iterates on a task instead of answering once and stopping",
 and whose output is "real deliverables ... not just chat replies".
 
@@ -30,7 +30,7 @@ from __future__ import annotations
 import re
 import time
 from dataclasses import dataclass, field
-from typing import Any, Iterator
+from typing import Iterator
 
 from core.llm import Client, ModelError
 from ingest import pipeline

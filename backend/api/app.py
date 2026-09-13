@@ -37,7 +37,7 @@ from fastapi import FastAPI, UploadFile, File
 from fastapi.responses import HTMLResponse, StreamingResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
-from core.llm import Client, ModelError
+from core.llm import Client
 from ingest import pipeline
 from api import chats
 from agents.workbench import Agent
@@ -50,48 +50,6 @@ _STATIC = _HERE.parent.parent / "frontend"
 app = FastAPI(title="Sovereign Workbench")
 CLIENT = Client()
 AGENT = Agent(CLIENT)
-
-# Two separate prompts. They used to be one, and that was the bug: "hi" also
-# ran retrieval, pulled the same 4 inspection passages, and the grounded
-# prompt then forced the model to summarise them.
-GROUNDED = (
-    "You are a plant inspection assistant. Answer ONLY from the passages "
-    "provided. Rules:\n"
-    "1. Put a citation like [1] or [2] immediately AFTER each factual claim, "
-    "never at the start of a line.\n"
-    "2. Never state anything that is not in the passages - say 'not in the "
-    "record' instead.\n"
-    "3. Reproduce every number, tag (e.g. TK-4102) and unit exactly as written "
-    "in the passage. Do not round.\n"
-    "4. Keep it short - 4 to 6 lines.\n"
-    "5. Answer in English."
-)
-
-# Nothing relevant in the corpus (or it is chitchat). Citations must not
-# appear here, and inventing inspection data is strictly forbidden.
-NO_CONTEXT = (
-    "You are the Sovereign Workbench assistant - an on-premise system that "
-    "reads plant documents, scans and drawings.\n"
-    "Nothing relevant to this question was found in the corpus.\n"
-    "Rules:\n"
-    "1. For a greeting, reply warmly in one line and say what you can help "
-    "with. Do not fire a question back at the user.\n"
-    "2. If asked what you can do, say it plainly: grounded answers from "
-    "indexed documents, scans (OCR) and reports, with a file and page "
-    "citation on every answer, all running on this machine with no cloud "
-    "calls.\n"
-    "3. NEVER invent an inspection number, tag or finding. You have been "
-    "given no document. If asked for plant data, say nothing matching was "
-    "found in the corpus and suggest dropping the file in.\n"
-    "4. This machine is air-gapped - you have NO real-time access to the "
-    "internet, live data, weather, news or today's date. If asked for any of "
-    "those, say plainly that you do not have it. Inventing a number is the "
-    "worst possible error; 'I do not know' is a correct answer.\n"
-    "5. Do not write citation brackets [1] [2] at all - there is no source.\n"
-    "6. Keep it short - 1 to 3 lines.\n"
-    "7. Answer in English."
-)
-
 
 def _sse(event: str, data: dict) -> str:
     return f"event: {event}\ndata: {json.dumps(data, default=str)}\n\n"

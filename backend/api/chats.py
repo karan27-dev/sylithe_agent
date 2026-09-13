@@ -89,14 +89,6 @@ def append(cid: str, role: str, content: str, extra: dict | None = None) -> None
         _save(db)
 
 
-def rename(cid: str, title: str) -> None:
-    with _lock:
-        db = _load()
-        if cid in db["chats"]:
-            db["chats"][cid]["title"] = title[:80]
-            _save(db)
-
-
 def delete(cid: str) -> None:
     with _lock:
         db = _load()

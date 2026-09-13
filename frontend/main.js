@@ -2,7 +2,7 @@ import { render, esc } from "/static/md.js";
 
 const $ = s => document.querySelector(s);
 const feed = $("#feed"), qEl = $("#q"), sendEl = $("#send"), scroll = $("#scroll");
-let chatId = null, busy = false, pending = [];
+let chatId = null, busy = false;
 
 /* ---------- theme ---------- */
 const root = document.documentElement;
@@ -285,8 +285,6 @@ async function ask(){
     prose.innerHTML = render(answer) + '<span class="caret"></span>';
     stick();
   });
-
-  es.addEventListener("thinking", e => { /* reasoning tokens, not shown */ });
 
   es.addEventListener("file", e => {
     const f = JSON.parse(e.data);

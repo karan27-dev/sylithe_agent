@@ -457,11 +457,6 @@ class Client:
             self.reg.fallback_class
         ) or self.reg.classes[0]
 
-    def route(self, text: str) -> tuple[RoutingClass, Lane]:
-        """classify plus that class's lane - one call for the agent loop."""
-        klass = self.classify(text)
-        return klass, self.reg.profile(self.profile_name).lane(klass.lane)
-
     def embed(
         self, texts: str | Sequence[str], *, profile: str | None = None
     ) -> list[list[float]]:

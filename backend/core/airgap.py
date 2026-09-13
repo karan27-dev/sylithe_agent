@@ -178,7 +178,5 @@ def seal(allow_lan: bool = True) -> Monitor:
     _patch()
     return MONITOR
 
-
-def reset() -> None:
     with _lock:
         MONITOR.attempts.clear()
