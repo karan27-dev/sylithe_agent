@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Local data - regenerate with tools.make_corpus + ingest.pipeline
+backend/data/index/
+backend/data/deliverables/
+backend/data/chats.json
+backend/data/mrpl/
+
+# MRPL's annual report is their copyrighted filing - don't redistribute it.
+# docs/docs_sources.md has the download link.
+backend/data/corpus/MRPL_*
+
+# stray runtime logs
+logs/
+backend/logs/
+
+# Never commit secrets
+.env
+.env.*
+*.key
+*.pem
+
+# OS
+.DS_Store
+Thumbs.db

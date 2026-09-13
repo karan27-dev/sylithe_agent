@@ -1,0 +1,309 @@
+"""
+Sovereign Workbench - local web UI.
+
+Requirement:
+  "...show, through logs or a visible network monitor, that no external
+   calls are made at any point."
+
+So the sovereignty panel is not a sticker. It reads live from
+core.airgap.MONITOR - the same object that intercepts every socket call.
+
+Stack choice (deliberate):
+  - NOT Streamlit/Gradio: both send telemetry by default. During a
+    sovereignty demo our own network log would catch the leak.
+  - NOT Next.js: node + npm install + a build step + CDN fonts. All three
+    are problems on a sealed machine.
+  - FastAPI + plain HTML/CSS/JS: already in the venv, no npm, no CDN, no
+    build. SSE is native to the browser, so streaming needs no library.
+
+Run:
+    python -m api.app           # http://127.0.0.1:8000  (from backend/)
+"""
+
+from __future__ import annotations
+
+import asyncio
+import json
+import shutil
+import time
+from pathlib import Path
+from typing import AsyncIterator
+
+from core import airgap
+
+MONITOR = airgap.seal()          # <- before anything else. Everything is sealed now.
+
+from fastapi import FastAPI, UploadFile, File
+from fastapi.responses import HTMLResponse, StreamingResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
+
+from core.llm import Client, ModelError
+from ingest import pipeline
+from api import chats
+from agents.workbench import Agent
+from tools import deliverables as deliv
+
+_HERE = Path(__file__).resolve().parent
+# The frontend is a sibling of backend/, deployed separately.
+_STATIC = _HERE.parent.parent / "frontend"
+
+app = FastAPI(title="Sovereign Workbench")
+CLIENT = Client()
+AGENT = Agent(CLIENT)
+
+# Two separate prompts. They used to be one, and that was the bug: "hi" also
+# ran retrieval, pulled the same 4 inspection passages, and the grounded
+# prompt then forced the model to summarise them.
+GROUNDED = (
+    "You are a plant inspection assistant. Answer ONLY from the passages "
+    "provided. Rules:\n"
+    "1. Put a citation like [1] or [2] immediately AFTER each factual claim, "
+    "never at the start of a line.\n"
+    "2. Never state anything that is not in the passages - say 'not in the "
+    "record' instead.\n"
+    "3. Reproduce every number, tag (e.g. TK-4102) and unit exactly as written "
+    "in the passage. Do not round.\n"
+    "4. Keep it short - 4 to 6 lines.\n"
+    "5. Answer in English."
+)
+
+# Nothing relevant in the corpus (or it is chitchat). Citations must not
+# appear here, and inventing inspection data is strictly forbidden.
+NO_CONTEXT = (
+    "You are the Sovereign Workbench assistant - an on-premise system that "
+    "reads plant documents, scans and drawings.\n"
+    "Nothing relevant to this question was found in the corpus.\n"
+    "Rules:\n"
+    "1. For a greeting, reply warmly in one line and say what you can help "
+    "with. Do not fire a question back at the user.\n"
+    "2. If asked what you can do, say it plainly: grounded answers from "
+    "indexed documents, scans (OCR) and reports, with a file and page "
+    "citation on every answer, all running on this machine with no cloud "
+    "calls.\n"
+    "3. NEVER invent an inspection number, tag or finding. You have been "
+    "given no document. If asked for plant data, say nothing matching was "
+    "found in the corpus and suggest dropping the file in.\n"
+    "4. This machine is air-gapped - you have NO real-time access to the "
+    "internet, live data, weather, news or today's date. If asked for any of "
+    "those, say plainly that you do not have it. Inventing a number is the "
+    "worst possible error; 'I do not know' is a correct answer.\n"
+    "5. Do not write citation brackets [1] [2] at all - there is no source.\n"
+    "6. Keep it short - 1 to 3 lines.\n"
+    "7. Answer in English."
+)
+
+
+def _sse(event: str, data: dict) -> str:
+    return f"event: {event}\ndata: {json.dumps(data, default=str)}\n\n"
+
+
+# ---------------------------------------------------------------------------
+# boot / status
+# ---------------------------------------------------------------------------
+
+
+@app.get("/api/boot")
+def boot() -> dict:
+    """On page load: what is running, what is indexed, how the seal looks."""
+    health = CLIENT.health()
+    try:
+        idx = pipeline.status()
+    except Exception as exc:
+        idx = {"indexed": False, "chunks": 0, "sources": [], "error": str(exc)}
+    return {
+        "health": health,
+        "index": idx,
+        "sovereignty": MONITOR.summary(),
+        "corpus_dir": str(pipeline.CORPUS_DIR),
+    }
+
+
+@app.get("/api/sovereignty")
+def sovereignty() -> dict:
+    """Live panel - polled every couple of seconds."""
+    recent = [
+        {"host": a.host, "port": a.port, "verdict": a.verdict,
+         "blocked": a.blocked, "hint": a.stack_hint, "ts": a.ts}
+        for a in MONITOR.attempts[-40:]
+    ]
+    return {**MONITOR.summary(), "recent": recent, "total": len(MONITOR.attempts)}
+
+
+# ---------------------------------------------------------------------------
+# ask — poora agent loop, SSE pe
+# ---------------------------------------------------------------------------
+
+
+async def _ask_stream(q: str, k: int, chat_id: str | None = None) -> AsyncIterator[str]:
+    """
+    Bridge the agent's event generator onto SSE.
+
+    The agent is a blocking generator (it calls local models), so it runs in a
+    worker thread and pushes events onto an asyncio queue. Everything the
+    agent yields is forwarded verbatim - the UI renders the activity feed from
+    these events, so the agent stays the single source of truth about what
+    happened.
+    """
+    loop = asyncio.get_running_loop()
+
+    past = chats.history(chat_id) if chat_id else []
+    if chat_id:
+        chats.append(chat_id, "user", q)
+
+    queue: asyncio.Queue = asyncio.Queue()
+    state: dict = {"answer": "", "sources": [], "done": None}
+
+    def produce() -> None:
+        try:
+            for ev in AGENT.run(q, history=past, k=k):
+                if ev["type"] == "token":
+                    state["answer"] += ev["text"]
+                elif ev["type"] == "sources":
+                    state["sources"] = ev["items"]
+                elif ev["type"] == "done":
+                    state["done"] = ev
+                loop.call_soon_threadsafe(queue.put_nowait, ev)
+        except Exception as exc:
+            loop.call_soon_threadsafe(
+                queue.put_nowait, {"type": "error", "message": str(exc)})
+        finally:
+            loop.call_soon_threadsafe(queue.put_nowait, None)
+
+    loop.run_in_executor(None, produce)
+
+    while True:
+        ev = await queue.get()
+        if ev is None:
+            break
+        etype = ev.pop("type")
+        if etype == "done":
+            ev["sovereignty"] = MONITOR.summary()
+        yield _sse(etype, ev)
+
+    d = state["done"]
+    if chat_id and d and state["answer"]:
+        chats.append(chat_id, "assistant", state["answer"], {
+            "model": d.get("model"), "lane": d.get("lane"),
+            "grounded": d.get("grounded"), "files": d.get("files") or [],
+            "sources": state["sources"],
+        })
+
+
+@app.get("/api/ask")
+async def ask(q: str, k: int = 0, chat_id: str = "") -> StreamingResponse:
+    k = k or int(CLIENT.reg.retrieval.get("k", 4))
+    return StreamingResponse(
+        _ask_stream(q, k, chat_id or None),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
+
+
+# ---------------------------------------------------------------------------
+# chats
+# ---------------------------------------------------------------------------
+
+
+@app.get("/api/chats")
+def api_chats() -> dict:
+    return {"chats": chats.list_chats()}
+
+
+@app.post("/api/chats")
+def api_chat_new() -> dict:
+    return {"id": chats.create()}
+
+
+@app.get("/api/chats/{cid}")
+def api_chat_get(cid: str) -> dict:
+    c = chats.get(cid)
+    return c or {"messages": [], "title": "New chat"}
+
+
+@app.delete("/api/chats/{cid}")
+def api_chat_del(cid: str) -> dict:
+    chats.delete(cid)
+    return {"ok": True}
+
+
+# ---------------------------------------------------------------------------
+# corpus management
+# ---------------------------------------------------------------------------
+
+
+@app.post("/api/upload")
+async def upload(file: UploadFile = File(...)) -> JSONResponse:
+    """Drag-drop -> data/corpus -> indexed immediately. Nothing leaves the box."""
+    name = Path(file.filename or "upload").name
+    if Path(name).suffix.lower() not in pipeline.SUPPORTED:
+        return JSONResponse(
+            {"ok": False, "error": f"{Path(name).suffix} is not supported"},
+            status_code=400,
+        )
+    dest = pipeline.CORPUS_DIR / name
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    with dest.open("wb") as f:
+        shutil.copyfileobj(file.file, f)
+
+    loop = asyncio.get_running_loop()
+    stats = await loop.run_in_executor(
+        None, lambda: pipeline.build([dest], client=CLIENT, verbose=False)
+    )
+    return JSONResponse({"ok": True, "file": name, "stats": stats,
+                         "index": pipeline.status()})
+
+
+@app.post("/api/reindex")
+async def reindex(rebuild: bool = False) -> dict:
+    loop = asyncio.get_running_loop()
+    stats = await loop.run_in_executor(
+        None, lambda: pipeline.build(rebuild=rebuild, client=CLIENT, verbose=False)
+    )
+    return {"stats": stats, "index": pipeline.status()}
+
+
+# ---------------------------------------------------------------------------
+# deliverables
+# ---------------------------------------------------------------------------
+
+
+@app.get("/api/deliverables")
+def api_deliverables() -> dict:
+    return {"files": deliv.list_deliverables()}
+
+
+@app.get("/api/deliverables/{name}")
+def api_deliverable_get(name: str):
+    """Serve a generated file. Path is pinned to the output dir on purpose."""
+    from fastapi.responses import FileResponse
+    safe = Path(name).name
+    path = deliv.OUT_DIR / safe
+    if not path.exists() or path.parent != deliv.OUT_DIR:
+        return JSONResponse({"error": "not found"}, status_code=404)
+    return FileResponse(path, filename=safe,
+                        media_type="application/octet-stream")
+
+
+# ---------------------------------------------------------------------------
+# static
+# ---------------------------------------------------------------------------
+
+
+@app.get("/", response_class=HTMLResponse)
+def index() -> str:
+    return (_STATIC / "index.html").read_text()
+
+
+app.mount("/static", StaticFiles(directory=str(_STATIC)), name="static")
+
+
+def main() -> None:
+    import uvicorn
+    pipeline._quiet()
+    print("Sovereign Workbench  ->  http://127.0.0.1:8000")
+    print(f"corpus: {pipeline.CORPUS_DIR}")
+    uvicorn.run(app, host="127.0.0.1", port=8000, log_level="warning")
+
+
+if __name__ == "__main__":
+    main()

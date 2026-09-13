@@ -1,0 +1,202 @@
+# Sovereign Workbench — model registry
+# Adding a new model = 6 lines here. No code changes.
+# PS requirement: "New open weight models should be addable later
+#                  without redesigning the system."
+
+active_profile: tier-S
+
+# ---------------------------------------------------------------------------
+# MEASURED ON THIS MACHINE (MacBook Air M1, 8 GB)
+#   qwen3.5:0.8b  think=default -> 40.8s / 1450 out tokens
+#   qwen3.5:0.8b  think=false   ->  0.53s /   12 out tokens   <- 77x faster
+#   throughput 36 tok/s (Metal is fine - the problem was thinking tokens, not speed)
+# RULE: think=false is the DEFAULT. Turn it on only for planning/final reasoning.
+#
+#   qwen3.5:2b  reason lane, same question, MacBook Air M1 8 GB:
+#     think=false          ->  31.4s /  501 tok / full 1908-char answer
+#     think=true  cap 2048 ->  96.2s / 2048 tok /    0 char  <- EMPTY ANSWER
+#     think=true  cap 4096 -> 117.0s / 2297 tok /  135 char
+#   The 2b model needs ~9000 chars of reasoning before it answers. At cap 2048
+#   that budget is exhausted and content comes back blank - not an error, an
+#   empty string. That is the most dangerous failure in a demo, so the tier-S
+#   reason lane runs think=false too. For deep reasoning, ask per call:
+#       c.chat("reason", q, think=True, max_tokens=4096)
+#   llm.py also detects this as truncation and retries once by itself.
+#
+#   Hot-swap measured (max_loaded_models=1): router 0.8b -> reason 2b = 47.6s,
+#   both 2b (no swap) = 45.5s. A ~2s difference: swapping is cheap, so the
+#   0.8b router stays.
+# ---------------------------------------------------------------------------
+
+defaults:
+  think: false          # <- the single most important line in this project
+  temperature: 0
+  timeout_s: 120
+
+profiles:
+
+  tier-S:                                   # MacBook Air M1 8 GB - demo default
+    endpoint: http://localhost:11434
+    max_loaded_models: 1                    # hot-swap; this is what makes 8 GB work
+    keep_alive: 30s
+    lanes:
+      router:
+        model: qwen3.5:0.8b
+        think: false
+        max_tokens: 32                      # only a JSON classification is needed
+      reason:
+        model: qwen3.5:2b
+        think: false                        # <- changed after measuring, see above
+        max_tokens: 1024
+      code:
+        model: qwen2.5-coder:1.5b
+        think: false
+        max_tokens: 1024
+      vision:
+        model: qwen3.5:2b                   # natively multimodal - no separate VLM needed
+        think: false
+        max_tokens: 1024
+      embed:
+        model: nomic-embed-text
+        dim: 768
+
+  # Same laptop, bigger reason model. Switch with: active_profile: tier-M
+  #
+  # MEASURED (8 GB M1, 3 grounded questions, full retrieve+generate flow):
+  #   tier-S (reason 2b) : 45.3s total, ~15s per answer, swap +855 MB
+  #   tier-M (reason 4b) : 84.0s total, ~28s per answer, swap +462 MB
+  #
+  # Speed is not the real difference - grounding is. Asked whether a
+  # deviation was acceptable, 2b invented a verdict ("exceeds the standard
+  # threshold for immediate action") that appears in no passage and
+  # contradicts the approval note. 4b instead said the acceptance criteria
+  # were not in the documents, which is correct.
+  #
+  # So: tier-S when demo speed matters, tier-M when a wrong answer costs
+  # more than 13 extra seconds. On 8 GB both already push into swap, so do
+  # not run tier-M with a browser full of tabs.
+  tier-M:
+    endpoint: http://localhost:11434
+    max_loaded_models: 1
+    keep_alive: 30s
+    fallback_profile: tier-S
+    lanes:
+      router:  { model: qwen3.5:0.8b,     think: false, max_tokens: 32 }
+      reason:  { model: qwen3.5:4b,       think: false, max_tokens: 1024 }
+      code:    { model: qwen2.5-coder:1.5b, think: false, max_tokens: 1024 }
+      vision:  { model: qwen3.5:4b,       think: false, max_tokens: 1024 }
+      embed:   { model: nomic-embed-text, dim: 768 }
+
+  tier-L:                                   # GPU box - on the LAN or at the venue
+    endpoint: http://192.168.1.50:8000      # vLLM, OpenAI-compatible
+    max_loaded_models: 4                    # all of them can stay resident
+    keep_alive: 60m
+    fallback_profile: tier-S                # if the GPU does not answer in 2s, drop to tier-S
+    lanes:
+      router:  { model: qwen3.5:2b,          think: false, max_tokens: 32 }
+      reason:  { model: qwen3.5:27b,         think: true,  max_tokens: 4096 }
+      code:    { model: qwen3.5:9b,          think: false, max_tokens: 2048 }
+      vision:  { model: qwen3-vl:8b,         think: false, max_tokens: 2048 }
+      embed:   { model: nomic-embed-text,    dim: 768 }
+
+# ---------------------------------------------------------------------------
+# ROUTING - the router lane classifies input into these classes
+# ---------------------------------------------------------------------------
+# The 0.8b router has a natural bias: it used to answer "code" for everything
+# (it was the first class listed, and its hint contained the word
+# "calculation"). Hence 2-3 examples per class - when adding a new class,
+# write examples here too rather than touching code.
+#
+# MEASURED (held-out queries, worded differently from the YAML examples):
+#   without examples       : 83% class accuracy (10/12)
+#   with examples          : 100% (12/12)
+#   after adding chitchat, 15 queries: 93% LANE accuracy (14/15)
+#
+# Note: LANE accuracy matters more than CLASS accuracy. document and reason
+# both map to the reason lane and both retrieve, so confusion between those
+# two changes no observable behaviour. Tune on lanes, not classes.
+routing:
+  classes:
+    - name: document
+      lane: reason
+      hint: "what a file/report/note says - summarise, extract, check against an SOP"
+      examples:
+        - "what deviation was found on TK-4102?"
+        - "summarise the inspection report"
+        - "what does the approval note say"
+    - name: pid
+      lane: reason                          # the pipeline handles P&ID work, not the model
+      pre_tool: analyze_pid                 # <- build the graph first, then the reason lane
+      hint: "engineering drawing, P&ID, piping diagram, line or valve trace"
+      examples:
+        - "trace the path from TK-4102 to the PSV on this P&ID"
+        - "which isolation valves are on the piping diagram"
+    - name: vision
+      lane: vision
+      hint: "a photo, a scan, any image that is not a P&ID"
+      examples:
+        - "what is shown in this photo"
+        - "read this scan"
+    - name: code
+      lane: code
+      hint: "ONLY when the user wants a new program/script/function written.
+             Comparing, choosing, planning, or asking 'how much is it' is NOT
+             code - that is reason."
+      examples:
+        - "write a python script that computes the corrosion rate"
+        - "give me code to calculate remaining life"
+        - "I need a function that plots the thickness trend"
+    - name: reason
+      lane: reason
+      hint: "general question, planning, comparison, with no file or image referenced"
+      examples:
+        - "how should we build the shutdown plan"
+        - "compare these two pieces of equipment"
+        - "which of the two options is better"
+    - name: chitchat
+      lane: router                        # 0.8b is enough; waking the 2b is wasteful
+      retrieval: false                    # <- never search the corpus for a greeting
+      hint: "greeting, thanks, 'what can you do' - not a plant question"
+      examples:
+        - "hi"
+        - "how are you"
+        - "what can you do?"
+        - "thanks"
+  fallback: reason
+
+# ---------------------------------------------------------------------------
+# RETRIEVAL - vector search always returns k results, however poor the match.
+# On a 5-chunk corpus "hi" pulled the same 4 passages as a real question, and
+# the model obediently summarised them. Hence a score floor.
+#
+# MEASURED (5 chunks, nomic-embed-text, score = 1/(1+L2)):
+#   chitchat / off-topic : hi 0.460  "how are you" 0.437  thanks 0.477
+#                          "weather today" 0.451  "capital of France" 0.427
+#   real plant questions : TK-4102 deviation 0.546  PSV set pressure 0.578
+#                          shell thickness 0.586
+#   There is a clean gap between 0.477 and 0.546 -> floor at 0.50.
+# Re-measure this when the corpus changes, which is why it lives here and
+# not in code.
+# ---------------------------------------------------------------------------
+retrieval:
+  min_score: 0.50
+  k: 4
+
+# ---------------------------------------------------------------------------
+# Candidates deliberately NOT taken, with reasons, so nobody re-researches them
+# ---------------------------------------------------------------------------
+rejected:
+  # qwen3.5:4b promoted out of this list - it is now the tier-M profile above.
+  qwen3-vl:2b:       "1.9 GB - qwen3.5:2b is already multimodal. Revisit for dense scans if 6 GB+ free."
+  qwen3-vl:8b:       "6 GB+ - swap thrash on an 8 GB M1. tier-L only."
+  deepseek-ocr:      "6.7 GB. A dedicated OCR VLM would help on hard scans and
+                      handwriting, but it cannot fit beside anything else on
+                      8 GB. RapidOCR (61 MB ONNX) already handles our scans and
+                      qwen3.5 is natively multimodal for the rest. Revisit on
+                      tier-L."
+  glm-ocr:           "Same size class as deepseek-ocr. Same verdict."
+  GOT-OCR2 (580M):   "Small enough, but it is a transformers model not an
+                      ollama one - it would add a second serving path for
+                      marginal gain over RapidOCR. Revisit if handwriting
+                      accuracy becomes the blocker."
+  llama3.2:3b:       "Good general model, but weaker tool-calling than Qwen."

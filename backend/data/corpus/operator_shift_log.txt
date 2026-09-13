@@ -1,0 +1,12 @@
+OPERATOR SHIFT LOG — CDU-II
+Date: 12-Sep-2026    Shift: B (14:00-22:00)    Operator: V. Salunke
+
+14:20  TK-4102 level 71%, temp 58 degC. Normal.
+15:05  Inspection team on site for UT survey at course-1.
+16:40  UT survey complete. Team reported 11.2 mm at course-1,
+       below nominal 12.0 mm. Informed shift in-charge.
+17:15  PSV-2041 inspected. Set pressure observed 12.5 barg.
+       SOP-114 requires 14.0 barg. Raised NCR-2026-0088.
+18:30  P-4110A vibration 3.1 mm/s, within limit.
+20:00  TK-4102 level 76%, temp 61 degC. Holding.
+21:45  Handover to shift C. Open item: PSV reset pending.
