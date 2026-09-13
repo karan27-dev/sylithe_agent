@@ -28,3 +28,15 @@ backend/logs/
 # OS
 .DS_Store
 Thumbs.db
+
+# The unrelated gov-scheme project shares this folder. Its git history is
+# parked at .git-govscheme (restore with: mv .git-govscheme .git).
+backend-govscheme/
+frontend-govscheme/
+docs-govscheme/
+.gitignore-govscheme
+.git-govscheme/
+agent/
+workflows/
+docker-compose.yml
+setup.sh
