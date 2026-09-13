@@ -399,7 +399,9 @@ def build(
 
 
 def search(query: str, k: int = 5, *, client=None,
-           source: str | None = None, min_score: float | None = None) -> list[Hit]:
+           source: str | None = None, sources: list[str] | None = None,
+           min_score: float | None = None,
+           per_source: int = 0) -> list[Hit]:
     """
     Semantic search. Every hit carries a citation.
 
@@ -418,9 +420,16 @@ def search(query: str, k: int = 5, *, client=None,
         min_score = float(client.reg.retrieval.get("min_score", 0.0))
 
     qv = client.embed(query)[0]
-    q = db.open_table(TABLE).search(qv).limit(k)
+    # per_source spreads the budget across documents instead of letting one
+    # file win every slot - needed when the question is about "all the
+    # documents" rather than one fact.
+    limit = k if not per_source else max(k, per_source * 40)
+    q = db.open_table(TABLE).search(qv).limit(limit)
     if source:
         q = q.where(f"source = '{source}'")
+    elif sources:
+        joined = ", ".join(f"'{s}'" for s in sources)
+        q = q.where(f"source IN ({joined})")
 
     hits: list[Hit] = []
     for r in q.to_list():
@@ -435,11 +444,22 @@ def search(query: str, k: int = 5, *, client=None,
                 score=1.0 / (1.0 + dist),       # L2 -> 0..1, for display
             )
         )
-    return [h for h in hits if h.score >= min_score]
+    hits = [h for h in hits if h.score >= min_score]
+    if per_source:
+        seen: dict[str, int] = {}
+        spread = []
+        for h in hits:
+            n = seen.get(h.chunk.source, 0)
+            if n < per_source:
+                seen[h.chunk.source] = n + 1
+                spread.append(h)
+        hits = spread[:k] if k else spread
+    return hits
 
 
 def context(query: str, k: int = 5, *, client=None,
-            min_score: float | None = None) -> tuple[str, list[Hit]]:
+            min_score: float | None = None, sources: list[str] | None = None,
+            per_source: int = 0) -> tuple[str, list[Hit]]:
     """
     A block ready for the reason lane, plus the hits.
     Each passage is numbered [1] [2] so the model can cite it.
@@ -448,7 +468,8 @@ def context(query: str, k: int = 5, *, client=None,
     NOT use the grounded prompt, or the model will turn irrelevant passages
     into an answer.
     """
-    hits = search(query, k, client=client, min_score=min_score)
+    hits = search(query, k, client=client, min_score=min_score,
+                  sources=sources, per_source=per_source)
     blocks = [
         f"[{i}] {h.chunk.cite()}\n{h.chunk.text}"
         for i, h in enumerate(hits, 1)

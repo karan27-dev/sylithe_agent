@@ -49,6 +49,26 @@ ACTION_VERBS = re.compile(
     r"\b(draft|make|create|generate|prepare|write|produce|build|export|"
     r"give me a|need a|want a)\b", re.I)
 
+# Queries that point at a document instead of naming a fact. They carry no
+# content words, so they embed poorly and score BELOW the relevance floor -
+# measured: "what there in this file" 0.473, "summarise this file" 0.491,
+# against a 0.50 floor. Left alone they fall through to the no-context prompt
+# and the model replies "I cannot read files", which is wrong and alarming.
+REFERENTIAL = re.compile(
+    r"\b(this|these|the|that|uploaded|attached|above)\s+"
+    r"(file|files|document|documents|doc|docs|pdf|report|sheet|scan|image|attachment)\b"
+    r"|\bwhat'?s? (is |are )?in (it|this|these|the file|the document)\b"
+    r"|\b(summari[sz]e|summary of|explain|describe|read) (it|this|these|them)\b",
+    re.I)
+
+# Questions about the corpus as a whole - the answer should draw on many
+# files, not let one document win every retrieval slot.
+BROAD = re.compile(
+    r"\b(all|every|each|overall|across)\s+"
+    r"(the\s+)?(file|files|document|documents|doc|docs|report|reports)\b"
+    r"|\b(everything|whole corpus|all of them|summari[sz]e everything)\b",
+    re.I)
+
 GROUNDED_SYS = (
     "You are a plant inspection assistant. Answer ONLY from the passages "
     "provided. Rules:\n"
@@ -71,7 +91,10 @@ NO_CONTEXT_SYS = (
     "indexed documents, scans (OCR) and reports, with a file and page "
     "citation on every answer, and real Word/Excel/PowerPoint deliverables - "
     "all on this machine with no cloud calls.\n"
-    "3. NEVER invent an inspection number, tag or finding.\n"
+    "3. NEVER invent an inspection number, tag or finding. NEVER say you "
+    "cannot read or access files - you DO read indexed documents; this "
+    "particular search simply returned nothing. Ask the user to name the "
+    "equipment tag or the document instead.\n"
     "4. This machine is air-gapped - no internet, live data, weather, news or "
     "today's date. Say plainly that you do not have it. Inventing a number is "
     "the worst possible error.\n"
@@ -102,6 +125,9 @@ class Plan:
     lane: str = "reason"
     klass: str = "reason"
     steps: list[str] = field(default_factory=list)
+    scope: list[str] = field(default_factory=list)   # restrict to these files
+    per_source: int = 0                              # spread hits across files
+    no_floor: bool = False                           # ignore the score floor
 
 
 def detect_deliverable(text: str) -> str | None:
@@ -115,14 +141,26 @@ def detect_deliverable(text: str) -> str | None:
     return None
 
 
+def _how(plan: "Plan", hits: list) -> str:
+    """Explain in the activity feed why retrieval behaved the way it did."""
+    if plan.scope:
+        return f"scoped to {len(plan.scope)} uploaded file(s)"
+    if plan.per_source:
+        return f"spread across {len({h.chunk.source for h in hits})} files"
+    if plan.no_floor:
+        return "relevance floor lifted"
+    return "above threshold"
+
+
 class Agent:
     def __init__(self, client: Client | None = None) -> None:
         self.c = client or Client()
 
     # -- planning ----------------------------------------------------------
 
-    def plan(self, question: str) -> Plan:
+    def plan(self, question: str, recent_files: list[str] | None = None) -> Plan:
         kind = detect_deliverable(question)
+        recent_files = recent_files or []
         klass = self.c.classify(question)
         lane = klass.lane
         # A deliverable always needs the reasoning lane - the router lane is
@@ -138,22 +176,40 @@ class Agent:
         steps.append("Drafting answer" if not kind else "Extracting findings")
         if kind:
             steps += [f"Building {kind.upper()} spec", f"Writing {kind} file"]
+        # "what is in this file" -> look only at what was just uploaded, and
+        # drop the floor: the floor exists to reject chitchat, not to reject a
+        # question that simply has no content words to embed.
+        scope, per_source, no_floor = [], 0, False
+        # BROAD is checked FIRST: "summarise all the documents" also matches
+        # REFERENTIAL (via "the documents"), and scoping that to one uploaded
+        # file is exactly the wrong answer.
+        if klass.retrieval and BROAD.search(question):
+            no_floor, per_source = True, 2
+        elif klass.retrieval and REFERENTIAL.search(question):
+            no_floor = True
+            if recent_files:
+                scope = list(recent_files)
+            else:
+                per_source = 2          # nothing named: sample the corpus
+
         return Plan(question=question, deliverable=kind,
                     retrieve=klass.retrieval, lane=lane, klass=klass_name,
-                    steps=steps)
+                    steps=steps, scope=scope, per_source=per_source,
+                    no_floor=no_floor)
 
     # -- execution ---------------------------------------------------------
 
     def run(self, question: str, history: list[dict] | None = None,
-            k: int = 4) -> Iterator[dict]:
+            k: int = 4, recent_files: list[str] | None = None) -> Iterator[dict]:
         t0 = time.perf_counter()
         history = history or []
+        recent_files = recent_files or []
 
         # 1 -- understand ---------------------------------------------------
         yield {"type": "step", "id": "understand", "status": "running",
                "label": "Understanding request"}
         try:
-            plan = self.plan(question)
+            plan = self.plan(question, recent_files)
         except (ModelError, Exception) as exc:
             yield {"type": "error", "message": f"planning failed: {exc}"}
             return
@@ -183,8 +239,14 @@ class Agent:
             prev = next((m["content"] for m in reversed(history)
                          if m["role"] == "user"), "")
             rq = f"{prev} {question}" if prev and len(question.split()) <= 6 else question
+            kk = max(k, 6) if (plan.per_source or plan.scope) else k
             try:
-                ctx, hits = pipeline.context(rq, k, client=self.c)
+                ctx, hits = pipeline.context(
+                    rq, kk, client=self.c,
+                    sources=plan.scope or None,
+                    per_source=plan.per_source,
+                    min_score=0.0 if plan.no_floor else None,
+                )
             except Exception as exc:
                 yield {"type": "step", "id": "retrieve", "status": "warn",
                        "label": "Searching corpus", "detail": str(exc)}
@@ -192,8 +254,8 @@ class Agent:
             yield {"type": "step", "id": "retrieve",
                    "status": "done" if hits else "warn",
                    "label": "Searching corpus",
-                   "detail": (f"{len(hits)} passages above threshold · {dt:.1f}s"
-                              if hits else f"no match above threshold · {dt:.1f}s")}
+                   "detail": (f"{len(hits)} passages, {_how(plan, hits)} · {dt:.1f}s"
+                              if hits else f"no match · {dt:.1f}s")}
         else:
             yield {"type": "step", "id": "retrieve", "status": "done",
                    "label": "Searching corpus", "detail": "skipped (chitchat)"}

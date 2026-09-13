@@ -51,6 +51,19 @@ app = FastAPI(title="Sovereign Workbench")
 CLIENT = Client()
 AGENT = Agent(CLIENT)
 
+# Files uploaded in this session, newest first. When someone asks "what is in
+# this file" right after dropping one in, retrieval must look THERE rather
+# than run a vague search across the whole corpus and come back empty.
+RECENT_UPLOADS: list[str] = []
+RECENT_MAX = 8
+
+
+def _remember_upload(name: str) -> None:
+    if name in RECENT_UPLOADS:
+        RECENT_UPLOADS.remove(name)
+    RECENT_UPLOADS.insert(0, name)
+    del RECENT_UPLOADS[RECENT_MAX:]
+
 def _sse(event: str, data: dict) -> str:
     return f"event: {event}\ndata: {json.dumps(data, default=str)}\n\n"
 
@@ -113,7 +126,8 @@ async def _ask_stream(q: str, k: int, chat_id: str | None = None) -> AsyncIterat
 
     def produce() -> None:
         try:
-            for ev in AGENT.run(q, history=past, k=k):
+            for ev in AGENT.run(q, history=past, k=k,
+                                recent_files=list(RECENT_UPLOADS)):
                 if ev["type"] == "token":
                     state["answer"] += ev["text"]
                 elif ev["type"] == "sources":
@@ -207,7 +221,14 @@ async def upload(file: UploadFile = File(...)) -> JSONResponse:
     stats = await loop.run_in_executor(
         None, lambda: pipeline.build([dest], client=CLIENT, verbose=False)
     )
+    indexed = stats.get("chunks", 0) > 0
+    if indexed:
+        _remember_upload(name)
     return JSONResponse({"ok": True, "file": name, "stats": stats,
+                         "indexed": indexed,
+                         "note": None if indexed else
+                                 "No text could be extracted (line drawings "
+                                 "and P&IDs are a known gap).",
                          "index": pipeline.status()})
 
 

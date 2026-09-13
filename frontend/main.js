@@ -201,6 +201,10 @@ async function ask(){
 
   busy = true; sendEl.disabled = true;
   qEl.value = ""; qEl.style.height = "auto";
+  // The attached-file chips describe what was just ingested. Once the question
+  // is sent they are stale, and leaving them made it look like the upload had
+  // not finished.
+  filesEl.innerHTML = "";
   addUser(text);
 
   const bot = document.createElement("div");
@@ -387,9 +391,12 @@ async function upload(files){
       const r = await (await fetch("/api/upload", { method:"POST", body: fd })).json();
       if(!r.ok){ toast(r.error || "Ingest failed", 5000); chip.remove(); continue; }
       chip.classList.remove("busy");
+      const okIngest = r.indexed !== false && r.stats.chunks > 0;
       chip.innerHTML = `<span>${esc(f.name)}</span>
-        <span style="color:var(--dim2)">${r.stats.chunks} chunks</span>
+        <span style="color:var(--${okIngest ? "dim2" : "bad"})">${
+          okIngest ? r.stats.chunks + " chunks" : "no text found"}</span>
         <span class="x" title="Remove">✕</span>`;
+      if(!okIngest) toast(r.note || `${f.name}: no text could be extracted`, 6000);
       chip.querySelector(".x").onclick = () => chip.remove();
       $("#pill-index").innerHTML = `<b>${r.index.chunks}</b> chunks`;
       toast(`${f.name} indexed — ${r.stats.chunks} chunks`);

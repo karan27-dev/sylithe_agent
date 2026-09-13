@@ -21,6 +21,9 @@
   --code-bg:#1f1e1d;
 }
 *{box-sizing:border-box}
+/* A class like .nowline{display:flex} outranks the browser's [hidden] rule,
+   so el.hidden silently did nothing. Make hidden always win. */
+[hidden]{display:none !important}
 html,body{height:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
      font-size:15px;line-height:1.6;display:flex;overflow:hidden;
