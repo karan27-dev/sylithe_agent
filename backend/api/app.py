@@ -23,6 +23,7 @@ Run:
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import json
 import shutil
 import time
@@ -268,9 +269,29 @@ def api_deliverable_get(name: str):
 # ---------------------------------------------------------------------------
 
 
+def _asset_version() -> str:
+    """
+    Stamp every asset URL with the newest mtime across the frontend.
+
+    Without this the browser reuses a cached app.css / main.js forever: a fix
+    ships, the page never sees it, and the bug looks unfixed. Ten lines here
+    beats telling everyone to hard-reload.
+    """
+    newest = 0.0
+    for f in _STATIC.iterdir():
+        if f.is_file():
+            newest = max(newest, f.stat().st_mtime)
+    return hashlib.md5(str(newest).encode()).hexdigest()[:8]
+
+
 @app.get("/", response_class=HTMLResponse)
-def index() -> str:
-    return (_STATIC / "index.html").read_text()
+def index() -> HTMLResponse:
+    html = (_STATIC / "index.html").read_text()
+    v = _asset_version()
+    html = html.replace("/static/app.css", f"/static/app.css?v={v}")
+    html = html.replace("/static/main.js", f"/static/main.js?v={v}")
+    # index.html itself must never be cached, or the stamped URLs never arrive
+    return HTMLResponse(html, headers={"Cache-Control": "no-store"})
 
 
 app.mount("/static", StaticFiles(directory=str(_STATIC)), name="static")

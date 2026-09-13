@@ -56,7 +56,8 @@ ACTION_VERBS = re.compile(
 # and the model replies "I cannot read files", which is wrong and alarming.
 REFERENTIAL = re.compile(
     r"\b(this|these|the|that|uploaded|attached|above)\s+"
-    r"(file|files|document|documents|doc|docs|pdf|report|sheet|scan|image|attachment)\b"
+    r"(file|files|document|documents|doc|docs|pdf|report|reports|sheet|scan|"
+    r"image|attachment|data|readings|results|findings|numbers|content|info)\b"
     r"|\bwhat'?s? (is |are )?in (it|this|these|the file|the document)\b"
     r"|\b(summari[sz]e|summary of|explain|describe|read) (it|this|these|them)\b",
     re.I)
@@ -250,6 +251,22 @@ class Agent:
             except Exception as exc:
                 yield {"type": "step", "id": "retrieve", "status": "warn",
                        "label": "Searching corpus", "detail": str(exc)}
+            # Phrasing should not decide whether an upload is readable.
+            # Measured: "...for this data" scores 0.498 and fails the floor,
+            # the same sentence with a "?" scores 0.504 and passes. Rather than
+            # chase every wording, retry scoped to what the user just uploaded
+            # whenever the floor rejected everything. Pattern matching narrows
+            # the odds; this closes the gap.
+            if not hits and recent_files and not plan.scope:
+                plan.scope = list(recent_files)
+                plan.no_floor = True
+                try:
+                    ctx, hits = pipeline.context(
+                        rq, max(k, 6), client=self.c,
+                        sources=plan.scope, min_score=0.0,
+                    )
+                except Exception:
+                    pass
             dt = time.perf_counter() - t_r
             yield {"type": "step", "id": "retrieve",
                    "status": "done" if hits else "warn",

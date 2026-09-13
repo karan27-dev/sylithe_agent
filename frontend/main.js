@@ -1,4 +1,6 @@
-import { render, esc } from "/static/md.js";
+// Versioned by main.js's own URL: the browser refetches this module whenever
+// main.js changes, so md.js can never go stale on its own.
+import { render, esc } from "/static/md.js?v=2";
 
 const $ = s => document.querySelector(s);
 const feed = $("#feed"), qEl = $("#q"), sendEl = $("#send"), scroll = $("#scroll");
@@ -253,9 +255,10 @@ async function ask(){
     row.innerHTML = `<span class="ico">${STEP_ICON[ev.status]}</span>
       <span class="nm">${esc(ev.label)}</span>
       <span class="dt">${ev.detail ? esc(ev.detail) : ""}</span>`;
-    if(ev.status === "running"){
+    // Only update the live line while it still exists. Once tokens start it is
+    // removed for good - a late "running" step must not bring it back.
+    if(ev.status === "running" && now.isConnected){
       now.querySelector(".txt").textContent = ev.label;
-      now.hidden = false;
     }
     body.scrollTop = body.scrollHeight;
   }
@@ -285,7 +288,7 @@ async function ask(){
 
   es.addEventListener("token", e => {
     answer += JSON.parse(e.data).text;
-    now.hidden = true;
+    now.remove();              // the answer is arriving; the status line is done
     prose.innerHTML = render(answer) + '<span class="caret"></span>';
     stick();
   });
@@ -343,7 +346,7 @@ async function ask(){
   function finish(){
     es.close(); clearInterval(tick);
     elEl.textContent = ((Date.now() - t0) / 1000).toFixed(1) + "s";
-    now.hidden = true;
+    now.remove();
     busy = false; sendEl.disabled = false;
     bot.querySelectorAll(".caret").forEach(c => c.remove());
     bot.querySelectorAll(".stp.run").forEach(r => {
