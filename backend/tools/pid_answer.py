@@ -31,9 +31,21 @@ def describe(image: str | Path, conf: float = 0.25) -> dict:
     by_cls: dict[str, list[str]] = {}
     for n, d in g.nodes(data=True):
         by_cls.setdefault(d.get("cls", "unknown"), []).append(n)
-    lines.append("\nEQUIPMENT AND INSTRUMENTS FOUND:")
+    # One item per line, numbered.
+    #
+    # Grouped as "gate_valve: FV-4033, HV-4021" the model read the line as a
+    # single entry and reported only FV-4033 - it dropped a valve from a list
+    # of equipment, which tells the reader that valve is not on the drawing.
+    # A numbered one-per-line list with an explicit total is much harder to
+    # silently shorten than a comma-separated group.
+    total = sum(len(v) for v in by_cls.values())
+    lines.append(f"\nEQUIPMENT AND INSTRUMENTS FOUND ({total} items - "
+                 f"list all {total}):")
+    i = 0
     for cls in sorted(by_cls):
-        lines.append(f"  {cls}: {', '.join(sorted(by_cls[cls]))}")
+        for tag in sorted(by_cls[cls]):
+            i += 1
+            lines.append(f"  {i}. {tag}  ({cls})")
 
     if g.number_of_edges():
         lines.append("\nCONNECTED BY PIPE:")

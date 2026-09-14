@@ -133,7 +133,12 @@ PID_SYS = (
     "valve is the answer. A relief valve (PSV/PRV) is never closed to "
     "isolate equipment.\n"
     "4. If something was not detected, say so plainly.\n"
-    "5. Short answer, English."
+    "5. When asked what is on the drawing, list EVERY item under EQUIPMENT AND "
+    "INSTRUMENTS FOUND - all of them, including every valve. Dropping one from "
+    "the list tells the reader it is not there.\n"
+    "6. Never mention the section names. The reader sees a drawing, not this "
+    "prompt: write 'on the drawing', not 'in the DRAWING section'.\n"
+    "7. Short answer, English."
 )
 
 GROUNDED_SYS = (
