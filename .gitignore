@@ -40,3 +40,8 @@ agent/
 workflows/
 docker-compose.yml
 setup.sh
+
+# P&ID training data and weights - regenerate with tools.pid_dataset + pid_train
+backend/data/pid_yolo/
+backend/data/pid_model/
+backend/data/pid_samples/
