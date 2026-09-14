@@ -36,6 +36,7 @@ from core.llm import Client, ModelError
 from ingest import pipeline
 from tools import deliverables as deliv
 from tools import sandbox
+from tools.brief import context_block
 
 # Words that mean "produce a file", mapped to the writer that should run.
 # Checked before the router, because "draft an approval note as a Word file"
@@ -155,6 +156,9 @@ NO_CONTEXT_SYS = (
     "today's date. Say plainly that you do not have it. Inventing a number is "
     "the worst possible error.\n"
     "5. Do not write citation brackets [1] [2] - there is no source.\n"
+    "6. If a RECENTLY UPLOADED section is present, the user's file IS "
+    "available to you - describe it from that section rather than claiming "
+    "you cannot see uploaded files.\n"
     "6. Keep it short - 1 to 3 lines. Answer in English."
 )
 
@@ -237,9 +241,11 @@ class Agent:
 
     # -- planning ----------------------------------------------------------
 
-    def plan(self, question: str, recent_files: list[str] | None = None) -> Plan:
+    def plan(self, question: str, recent_files: list[str] | None = None,
+             briefs: list | None = None) -> Plan:
         kind = detect_deliverable(question)
         recent_files = recent_files or []
+        briefs = briefs or []
         klass = self.c.classify(question)
         lane = klass.lane
         pre_tool = klass.pre_tool
@@ -256,6 +262,18 @@ class Agent:
         steps.append("Drafting answer" if not kind else "Extracting findings")
         if kind:
             steps += [f"Building {kind.upper()} spec", f"Writing {kind} file"]
+        # What was just uploaded decides how a vague question is answered.
+        # "what is this" straight after dropping in a P&ID used to classify as
+        # "reason", which ignored the drawing entirely and replied that it
+        # could not see any uploaded files. A referential question should
+        # follow the newest upload rather than the wording of the sentence.
+        newest = briefs[0] if briefs else None
+        if newest and REFERENTIAL.search(question) and not BROAD.search(question):
+            if newest.kind == "drawing":
+                klass_name, lane, pre_tool = "pid", "reason", "analyze_pid"
+            elif newest.kind in ("scan", "scanned document"):
+                klass_name, lane = "vision", "vision"
+
         # "what is in this file" -> look only at what was just uploaded, and
         # drop the floor: the floor exists to reject chitchat, not to reject a
         # question that simply has no content words to embed.
@@ -282,23 +300,29 @@ class Agent:
     def run(self, question: str, history: list[dict] | None = None,
             k: int = 4, recent_files: list[str] | None = None,
             drawing: str | None = None,
-            image: str | None = None) -> Iterator[dict]:
+            image: str | None = None,
+            briefs: list | None = None) -> Iterator[dict]:
         t0 = time.perf_counter()
         history = history or []
         recent_files = recent_files or []
+        briefs = briefs or []
+        uploaded = context_block(briefs)
 
         # 1 -- understand ---------------------------------------------------
         yield {"type": "step", "id": "understand", "status": "running",
                "label": "Understanding request"}
         try:
-            plan = self.plan(question, recent_files)
+            plan = self.plan(question, recent_files, briefs)
         except (ModelError, Exception) as exc:
             yield {"type": "error", "message": f"planning failed: {exc}"}
             return
+        bits = []
+        if briefs:
+            bits.append(f"about {briefs[0].name}")
+        bits.append(f"deliverable: {plan.deliverable}" if plan.deliverable
+                    else "answer only")
         yield {"type": "step", "id": "understand", "status": "done",
-               "label": "Understanding request",
-               "detail": (f"deliverable: {plan.deliverable}" if plan.deliverable
-                          else "answer only")}
+               "label": "Understanding request", "detail": " · ".join(bits)}
         klass_pre_tool = plan.pre_tool
         if klass_pre_tool == "analyze_pid" and drawing:
             plan.steps.insert(2, "Analysing drawing")
@@ -418,18 +442,27 @@ class Agent:
         yield {"type": "step", "id": "answer", "status": "running",
                "label": label}
 
+        # The upload brief belongs on a question that is ABOUT the upload -
+        # "what is this", "explain it". Attaching it to every prompt made a
+        # specific question drift: "what deviation was found on TK-4102" came
+        # back describing the last file uploaded instead of answering. So it
+        # goes in when the question is referential, or when there is no
+        # retrieved context to answer from, and stays out otherwise.
+        refers = bool(REFERENTIAL.search(question)) or plan.scope
+        head = f"{uploaded}\n\n" if uploaded and (refers or not ctx) else ""
         if plan.lane == "code":
             system = CODE_SYS
             turn = f"PASSAGES:\n{ctx}\n\nTASK: {question}" if ctx else question
         elif looking:
             system = VISION_SYS
-            turn = question
+            turn = head + question
         elif pid_ctx:
             system = PID_SYS
-            turn = f"{pid_ctx}\n\nQUESTION: {question}"
+            turn = f"{head}{pid_ctx}\n\nQUESTION: {question}"
         else:
             system = GROUNDED_SYS if ctx else NO_CONTEXT_SYS
-            turn = f"PASSAGES:\n{ctx}\n\nQUESTION: {question}" if ctx else question
+            turn = (f"{head}PASSAGES:\n{ctx}\n\nQUESTION: {question}"
+                    if ctx else head + question)
         prompt = history + [{"role": "user", "content": turn}] if history else turn
 
         answer, reply = "", None

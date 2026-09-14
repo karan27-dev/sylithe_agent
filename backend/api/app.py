@@ -71,6 +71,13 @@ DRAWING_EXT = {".png", ".jpg", ".jpeg", ".tiff", ".bmp", ".webp", ".pdf"}
 RECENT_IMAGES: list[str] = []
 IMAGE_EXT = {".png", ".jpg", ".jpeg", ".tiff", ".bmp", ".webp"}
 
+# What each upload actually IS, worked out once at upload time and then carried
+# into every question. Without this the agent held a file path and no idea what
+# was in it, and answered "what is this" with "I cannot see any files you have
+# uploaded" while the file sat in front of it.
+BRIEFS: list = []
+BRIEFS_MAX = 5
+
 
 def _remember_image(path: Path) -> None:
     p = str(path)
@@ -159,7 +166,8 @@ async def _ask_stream(q: str, k: int, chat_id: str | None = None) -> AsyncIterat
             for ev in AGENT.run(q, history=past, k=k,
                                 recent_files=list(RECENT_UPLOADS),
                                 drawing=RECENT_DRAWINGS[0] if RECENT_DRAWINGS else None,
-                                image=RECENT_IMAGES[0] if RECENT_IMAGES else None):
+                                image=RECENT_IMAGES[0] if RECENT_IMAGES else None,
+                                briefs=list(BRIEFS)):
                 if ev["type"] == "token":
                     state["answer"] += ev["text"]
                 elif ev["type"] == "sources":
@@ -253,6 +261,16 @@ async def upload(file: UploadFile = File(...)) -> JSONResponse:
     stats = await loop.run_in_executor(
         None, lambda: pipeline.build([dest], client=CLIENT, verbose=False)
     )
+    chunks = stats.get("chunks", 0)
+    try:
+        from tools.brief import describe
+        b = await loop.run_in_executor(None, lambda: describe(dest, chunks))
+        BRIEFS[:] = [x for x in BRIEFS if x.name != b.name]
+        BRIEFS.insert(0, b)
+        del BRIEFS[BRIEFS_MAX:]
+    except Exception:
+        b = None
+
     indexed = stats.get("chunks", 0) > 0
     if dest.suffix.lower() in IMAGE_EXT:
         _remember_image(dest)
@@ -264,6 +282,8 @@ async def upload(file: UploadFile = File(...)) -> JSONResponse:
         _remember_drawing(dest)
     return JSONResponse({"ok": True, "file": name, "stats": stats,
                          "indexed": indexed,
+                         "brief": b.as_dict() if b else None,
+                         "summary": b.line() if b else None,
                          "note": None if indexed else
                                  "No text extracted - treating this as a "
                                  "drawing. Ask about its equipment, tags or "
