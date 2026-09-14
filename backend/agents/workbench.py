@@ -74,6 +74,12 @@ REFERENTIAL = re.compile(
 
 # Questions about the corpus as a whole - the answer should draw on many
 # files, not let one document win every retrieval slot.
+# Questions whose answer is the drawing's geometry, not its prose.
+DRAWING_TOPIC = re.compile(
+    r"\b(isolat\w*|shut ?off|block in|lock ?out|close|closed|valve|valves|"
+    r"manifold|branch|header|connect\w*|downstream|upstream|trace|path|"
+    r"line up|equipment on|what is on|p&?id|drawing|diagram)\b", re.I)
+
 BROAD = re.compile(
     r"\b(all|every|each|overall|across)\s+"
     r"(the\s+)?(file|files|document|documents|doc|docs|report|reports)\b"
@@ -296,7 +302,7 @@ class Agent:
     # -- planning ----------------------------------------------------------
 
     def plan(self, question: str, recent_files: list[str] | None = None,
-             briefs: list | None = None) -> Plan:
+             briefs: list | None = None, drawing_present: bool = False) -> Plan:
         kind = detect_deliverable(question)
         recent_files = recent_files or []
         briefs = briefs or []
@@ -321,6 +327,14 @@ class Agent:
         # "reason", which ignored the drawing entirely and replied that it
         # could not see any uploaded files. A referential question should
         # follow the newest upload rather than the wording of the sentence.
+        # A question about valves, isolation or what is connected can only be
+        # answered from the geometry. If a drawing is in play, use it - waiting
+        # for the sentence to contain the letters "P&ID" meant that "what must
+        # be closed to isolate T-501" answered "there is no information in the
+        # text", while the drawing sat unread.
+        if drawing_present and DRAWING_TOPIC.search(question):
+            klass_name, lane, pre_tool = "pid", "reason", "analyze_pid"
+
         newest = briefs[0] if briefs else None
         if newest and REFERENTIAL.search(question) and not BROAD.search(question):
             if newest.kind == "drawing":
@@ -366,7 +380,8 @@ class Agent:
         yield {"type": "step", "id": "understand", "status": "running",
                "label": "Understanding request"}
         try:
-            plan = self.plan(question, recent_files, briefs)
+            plan = self.plan(question, recent_files, briefs,
+                             drawing_present=bool(drawing))
         except (ModelError, Exception) as exc:
             yield {"type": "error", "message": f"planning failed: {exc}"}
             return

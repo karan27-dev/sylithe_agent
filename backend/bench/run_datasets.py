@@ -50,6 +50,26 @@ def _drawing(folder: Path) -> str | None:
     return None
 
 
+NEGATORS = ("not ", "n't ", "no ", "never ", "fails", "exceeds", "below ",
+            "does not", "non-compliant", "noncompliant", "outside ")
+
+
+def _asserts(text: str, word: str) -> bool:
+    """
+    Did the answer actually CLAIM this word, rather than deny it?
+
+    Looks at the words immediately before each standalone occurrence. Crude,
+    but it is the difference between "compliant" and "is not compliant", and
+    scoring those the same makes the benchmark worse than useless.
+    """
+    import re as _re
+    for m in _re.finditer(rf"\b{_re.escape(word.lower())}\b", text):
+        before = text[max(0, m.start() - 60):m.start()]
+        if not any(n in before for n in NEGATORS):
+            return True
+    return False
+
+
 def ask(agent, question: str, drawing: str | None) -> dict:
     answer, code_out, files = "", "", []
     for ev in agent.run(question, drawing=drawing):
@@ -75,7 +95,11 @@ def score_set(agent, meta: dict, client) -> dict:
         r = ask(agent, q["ask"], drawing)
         low = r["text"].lower()
         missing = [e for e in q["expect"] if e.lower() not in low]
-        wrong = [x for x in q.get("reject", []) if x.lower() in low]
+        # A reject word must stand alone AND not be negated. Plain substring
+        # matching failed two correct answers: "is not compliant" contains
+        # "compliant", and an answer explaining that 78% exceeds the limit
+        # still contains "within". The check was wrong, not the answer.
+        wrong = [x for x in q.get("reject", []) if _asserts(low, x)]
         ok = not missing and not wrong
         passed += ok
         rows.append({"ask": q["ask"], "passed": ok, "missing": missing,

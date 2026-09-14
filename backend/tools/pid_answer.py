@@ -19,7 +19,10 @@ from pathlib import Path
 from tools.pid_graph import (analyze_pid, isolation_valves, downstream,
                              path_between)
 
-MAX_TAGS_LOOKED_UP = 8
+# Each tag lookup adds several passages. Past a handful the document block
+# drowns the drawing, which is the one thing only the drawing can answer.
+MAX_TAGS_LOOKED_UP = 5
+MAX_BLOCK_CHARS = 1800
 
 
 def describe(image: str | Path, conf: float = 0.25) -> dict:
@@ -87,11 +90,23 @@ def with_values(image: str | Path, client=None, k: int = 3,
         except Exception:
             ctx, hits = "", []
         if ctx:
-            blocks.append(f"--- recorded for {tag} ---\n{ctx}")
+            blocks.append(f"--- recorded for {tag} ---\n{ctx[:MAX_BLOCK_CHARS]}")
             cited.extend(hits)
         else:
             blocks.append(f"--- recorded for {tag} ---\n(nothing in the documents)")
 
-    text = d["text"] + "\n\nFROM THE DOCUMENTS (values are NOT on the drawing):\n" \
-           + "\n\n".join(blocks)
+    # Documents FIRST, drawing LAST.
+    #
+    # With ten tags looked up, the document block runs to thousands of
+    # characters and buried the drawing at the top. Measured: asked what to
+    # close to isolate T-501, the model answered "there is no instruction in
+    # the text" while the graph directly above it said HV-501 - it had read the
+    # reports and never reached the structure. Small models weight the end of a
+    # prompt, so the structure now sits immediately before the question.
+    text = ("FROM THE DOCUMENTS (background values - these are NOT on the "
+            "drawing):\n" + "\n\n".join(blocks)
+            + "\n\n" + "=" * 60 + "\n"
+            + "THE DRAWING ITSELF - answer questions about equipment, valves, "
+              "connections and isolation from THIS section:\n\n"
+            + d["text"])
     return {**d, "text": text, "hits": cited}
