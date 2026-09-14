@@ -35,6 +35,7 @@ from typing import Iterator
 from core.llm import Client, ModelError
 from ingest import pipeline
 from tools import deliverables as deliv
+from tools import sandbox
 
 # Words that mean "produce a file", mapped to the writer that should run.
 # Checked before the router, because "draft an approval note as a Word file"
@@ -69,6 +70,33 @@ BROAD = re.compile(
     r"(the\s+)?(file|files|document|documents|doc|docs|report|reports)\b"
     r"|\b(everything|whole corpus|all of them|summari[sz]e everything)\b",
     re.I)
+
+# Small models obey examples, not prohibitions. Telling qwen2.5-coder:1.5b
+# "do NOT read files" three different ways still produced
+# pd.read_excel('ut_thickness_log.xlsx') every time; showing it one worked
+# example stopped that immediately. This is the same lesson the router taught:
+# few-shot beats rules for this model family.
+CODE_SYS = (
+    "You write short Python that is EXECUTED immediately in a sandbox with no "
+    "network and no files.\n"
+    "Copy the numbers you need from the PASSAGES straight into the code as "
+    "literals, then compute and print with labels.\n\n"
+    "Example of the exact shape required:\n"
+    "```python\n"
+    "# from the passages\n"
+    "nominal_mm  = 12.0\n"
+    "measured_mm = 11.2\n"
+    "months      = 24\n"
+    "min_req_mm  = 10.4\n\n"
+    "loss = nominal_mm - measured_mm\n"
+    "rate = loss / (months / 12)\n"
+    "life = (measured_mm - min_req_mm) / rate\n\n"
+    "print(f'loss           {loss:.2f} mm')\n"
+    "print(f'corrosion rate {rate:.2f} mm/yr')\n"
+    "print(f'remaining life {life:.1f} yr')\n"
+    "```\n\n"
+    "Return ONE python block in that shape and nothing else."
+)
 
 VISION_SYS = (
     "You are reading a photograph or scan of a plant document - often a "
@@ -167,6 +195,21 @@ def detect_deliverable(text: str) -> str | None:
     for pattern, kind in DELIVERABLE_HINTS:
         if re.search(pattern, low, re.I):
             return kind
+    return None
+
+
+CODE_BLOCK = re.compile(r"```(?:python|py)?\s*(.*?)```", re.S)
+
+
+def extract_code(text: str) -> str | None:
+    """The fenced block, or the whole reply if it already looks like code."""
+    m = CODE_BLOCK.search(text or "")
+    if m and m.group(1).strip():
+        return m.group(1).strip()
+    t = (text or "").strip()
+    if t and any(t.startswith(k) for k in
+                 ("import ", "from ", "def ", "print(", "x =", "#")):
+        return t
     return None
 
 
@@ -359,7 +402,10 @@ class Agent:
         yield {"type": "step", "id": "answer", "status": "running",
                "label": label}
 
-        if looking:
+        if plan.lane == "code":
+            system = CODE_SYS
+            turn = f"PASSAGES:\n{ctx}\n\nTASK: {question}" if ctx else question
+        elif looking:
             system = VISION_SYS
             turn = question
         elif pid_ctx:
@@ -384,6 +430,64 @@ class Agent:
         yield {"type": "step", "id": "answer", "status": "done", "label": label,
                "detail": (f"{reply.output_tokens} tokens · "
                           f"{reply.tok_per_s:.1f} tok/s" if reply else "")}
+
+        # 4b -- execute --------------------------------------------------------
+        # "A coding task run and verified in a sandbox" is named in the PS.
+        # Generating code and hoping is not verification; running it is. One
+        # retry on failure is also the smallest honest form of the "iterate
+        # instead of answering once" requirement - the model sees its own
+        # traceback and fixes it.
+        if plan.lane == "code":
+            code = extract_code(answer)
+            if not code:
+                yield {"type": "step", "id": "exec", "status": "warn",
+                       "label": "Running the code",
+                       "detail": "no code block in the reply"}
+            else:
+                for attempt in (1, 2):
+                    yield {"type": "step", "id": "exec", "status": "running",
+                           "label": "Running the code"}
+                    # The retrieved passages go in as a plain text file too.
+                    # The prompt tells the model to inline its numbers, but if
+                    # it insists on reading something, let it read the real
+                    # context rather than crash on a spreadsheet that is not
+                    # there.
+                    res = sandbox.run(
+                        code, timeout=20,
+                        files={"passages.txt": ctx} if ctx else None)
+                    yield {"type": "code_result", "attempt": attempt, **res.as_dict()}
+                    if res.ok:
+                        yield {"type": "step", "id": "exec", "status": "done",
+                               "label": "Running the code",
+                               "detail": f"exit 0 · {res.seconds:.1f}s"
+                                         + (f" · {len(res.files)} file(s)"
+                                            if res.files else "")}
+                        break
+                    detail = res.blocked or f"exit {res.exit_code}"
+                    if attempt == 2 or res.blocked in ("network", "timeout"):
+                        # A blocked network call or a timeout is not a bug the
+                        # model can fix by trying again - it is the sandbox
+                        # doing its job. Stop and say so.
+                        yield {"type": "step", "id": "exec", "status": "fail",
+                               "label": "Running the code", "detail": detail}
+                        break
+                    yield {"type": "step", "id": "exec", "status": "warn",
+                           "label": "Running the code",
+                           "detail": f"{detail} - retrying once"}
+                    fix = self.c.chat(
+                        "code",
+                        f"PASSAGES:\n{ctx}\n\n"
+                        f"This code failed:\n```python\n{code}\n```\n"
+                        f"Error:\n{res.stderr[-600:]}\n\n"
+                        "Remember: no files exist in the sandbox. Put the "
+                        "numbers from the PASSAGES directly in the code. "
+                        "Return the corrected code as ONE python block, "
+                        "nothing else.",
+                        system=CODE_SYS, max_tokens=700)
+                    new_code = extract_code(fix.text)
+                    if not new_code:
+                        break
+                    code = new_code
 
         # 5 -- deliverable ----------------------------------------------------
         files: list[dict] = []
