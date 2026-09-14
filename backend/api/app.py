@@ -64,6 +64,21 @@ RECENT_MAX = 8
 RECENT_DRAWINGS: list[str] = []
 DRAWING_EXT = {".png", ".jpg", ".jpeg", ".tiff", ".bmp", ".webp", ".pdf"}
 
+# Every uploaded image, whether or not OCR found text in it. A handwritten note
+# DOES index (OCR recovers most of it), so it never lands in RECENT_DRAWINGS -
+# but the vision lane still reads it better than OCR does, so the file has to
+# be kept either way.
+RECENT_IMAGES: list[str] = []
+IMAGE_EXT = {".png", ".jpg", ".jpeg", ".tiff", ".bmp", ".webp"}
+
+
+def _remember_image(path: Path) -> None:
+    p = str(path)
+    if p in RECENT_IMAGES:
+        RECENT_IMAGES.remove(p)
+    RECENT_IMAGES.insert(0, p)
+    del RECENT_IMAGES[4:]
+
 
 def _remember_drawing(path: Path) -> None:
     p = str(path)
@@ -143,7 +158,8 @@ async def _ask_stream(q: str, k: int, chat_id: str | None = None) -> AsyncIterat
         try:
             for ev in AGENT.run(q, history=past, k=k,
                                 recent_files=list(RECENT_UPLOADS),
-                                drawing=RECENT_DRAWINGS[0] if RECENT_DRAWINGS else None):
+                                drawing=RECENT_DRAWINGS[0] if RECENT_DRAWINGS else None,
+                                image=RECENT_IMAGES[0] if RECENT_IMAGES else None):
                 if ev["type"] == "token":
                     state["answer"] += ev["text"]
                 elif ev["type"] == "sources":
@@ -238,6 +254,8 @@ async def upload(file: UploadFile = File(...)) -> JSONResponse:
         None, lambda: pipeline.build([dest], client=CLIENT, verbose=False)
     )
     indexed = stats.get("chunks", 0) > 0
+    if dest.suffix.lower() in IMAGE_EXT:
+        _remember_image(dest)
     if indexed:
         _remember_upload(name)
     elif dest.suffix.lower() in DRAWING_EXT:

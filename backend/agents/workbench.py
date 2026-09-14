@@ -70,6 +70,19 @@ BROAD = re.compile(
     r"|\b(everything|whole corpus|all of them|summari[sz]e everything)\b",
     re.I)
 
+VISION_SYS = (
+    "You are reading a photograph or scan of a plant document - often a "
+    "handwritten shift log, a nameplate, or a field note.\n"
+    "Rules:\n"
+    "1. Transcribe what is actually written. Copy every tag and number exactly "
+    "as it appears; do not tidy, round or reformat them.\n"
+    "2. If a character is genuinely ambiguous (I versus 1, O versus 0, 5 "
+    "versus S), say so rather than picking silently - a wrong tag is worse "
+    "than a flagged one.\n"
+    "3. Never fill in a value you cannot see.\n"
+    "4. Answer in English."
+)
+
 PID_SYS = (
     "You are a plant engineer reading a P&ID.\n"
     "The DRAWING section gives structure: what equipment exists, its tag, and "
@@ -218,7 +231,8 @@ class Agent:
 
     def run(self, question: str, history: list[dict] | None = None,
             k: int = 4, recent_files: list[str] | None = None,
-            drawing: str | None = None) -> Iterator[dict]:
+            drawing: str | None = None,
+            image: str | None = None) -> Iterator[dict]:
         t0 = time.perf_counter()
         history = history or []
         recent_files = recent_files or []
@@ -332,11 +346,23 @@ class Agent:
                }
 
         # 4 -- answer --------------------------------------------------------
-        label = "Extracting findings" if plan.deliverable else "Drafting answer"
+        # The vision lane is multimodal and has been routed to since the first
+        # day, but it never actually received a picture - it was answering
+        # image questions from the text index alone. Measured on a handwritten
+        # shift log: the OCR path recovers 12 of 14 lines and mangles
+        # "Raised NCR-2026-0088" into "R-- 88", while the same model LOOKING at
+        # the page gets all 14 including that line. The model was always
+        # capable; the image just never arrived.
+        looking = plan.lane == "vision" and image
+        label = ("Reading the image" if looking else
+                 "Extracting findings" if plan.deliverable else "Drafting answer")
         yield {"type": "step", "id": "answer", "status": "running",
                "label": label}
 
-        if pid_ctx:
+        if looking:
+            system = VISION_SYS
+            turn = question
+        elif pid_ctx:
             system = PID_SYS
             turn = f"{pid_ctx}\n\nQUESTION: {question}"
         else:
@@ -345,7 +371,8 @@ class Agent:
         prompt = history + [{"role": "user", "content": turn}] if history else turn
 
         answer, reply = "", None
-        for ev in self.c.stream(plan.lane, prompt, system=system):
+        for ev in self.c.stream(plan.lane, prompt, system=system,
+                                images=[image] if looking else ()):
             if ev["type"] == "token":
                 answer += ev["text"]
                 yield {"type": "token", "text": ev["text"]}
@@ -417,6 +444,7 @@ class Agent:
             "grounded": bool(ctx) or bool(pid_ctx),
             "deliverable": plan.deliverable,
             "drawing": drawing,
+            "looked_at_image": bool(looking),
             "files": files,
             "total_s": round(time.perf_counter() - t0, 2),
         }
