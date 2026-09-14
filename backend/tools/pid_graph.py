@@ -71,11 +71,37 @@ PREFIX_CLASS = {
     "P": "pump", "C": "compressor", "K": "compressor",
     "TK": "vessel", "V": "vessel", "D": "vessel", "E": "heat_exchanger",
     "F": "fired_heater", "H": "fired_heater", "R": "reactor", "T": "tower",
+    # ISA 5.1 letter codes. First letter = measured variable (P/T/F/L),
+    # following letters = function (T transmitter, I indicator, C controller,
+    # R recorder, A alarm, V valve, Y relay). Tested on real drawings from the
+    # Roboflow set: without these, 9 of 22 tags on p-id-Diagrams_26 came back
+    # "unknown" - TCV, FCV, TIRC, PAI, TAH, TAL, HS, FY, TY, FIC, FR are all
+    # ordinary codes, not exotic ones.
     "LT": "level_instrument", "LI": "level_instrument", "LC": "level_instrument",
+    "LG": "level_instrument", "LS": "level_instrument", "LAH": "level_instrument",
+    "LAL": "level_instrument", "LIC": "level_instrument", "LY": "level_instrument",
     "PT": "pressure_instrument", "PI": "pressure_instrument",
     "PG": "pressure_instrument", "PC": "pressure_instrument",
+    "PAI": "pressure_instrument", "PAH": "pressure_instrument",
+    "PAL": "pressure_instrument", "PIC": "pressure_instrument",
+    "PR": "pressure_instrument", "PY": "pressure_instrument",
+    "PDI": "pressure_instrument", "PDT": "pressure_instrument",
     "FT": "flow_instrument", "FI": "flow_instrument", "FE": "flow_instrument",
+    "FR": "flow_instrument", "FIC": "flow_instrument", "FQ": "flow_instrument",
+    "FAL": "flow_instrument", "FAH": "flow_instrument", "FY": "flow_instrument",
     "TT": "temp_instrument", "TI": "temp_instrument", "TC": "temp_instrument",
+    "TR": "temp_instrument", "TIC": "temp_instrument", "TIRC": "temp_instrument",
+    "TAH": "temp_instrument", "TAL": "temp_instrument", "TW": "temp_instrument",
+    "TY": "temp_instrument", "TE": "temp_instrument",
+    # final control elements - these are valves and DO isolate
+    "TCV": "control_valve", "PCV": "control_valve", "LCV": "control_valve",
+    "FCV": "control_valve", "SDV": "gate_valve", "ESDV": "gate_valve",
+    "MOV": "gate_valve", "ROV": "gate_valve",
+    # hand switches and relays are neither equipment nor isolation points
+    "HS": "misc_instrument", "XY": "misc_instrument", "ZS": "misc_instrument",
+    "AI": "misc_instrument", "AT": "misc_instrument",
+    # equipment
+    "CT": "tower", "DR": "vessel", "EX": "heat_exchanger", "HX": "heat_exchanger",
 }
 
 

@@ -1,0 +1,95 @@
+{
+  "passed": 8,
+  "total": 9,
+  "seconds": 282.3,
+  "external_calls": 0,
+  "results": [
+    {
+      "id": "retrieve",
+      "requirement": "5 knowledge base",
+      "passed": true,
+      "seconds": 31.2,
+      "fails": [],
+      "answer": "The measured thickness for TK-4102 is 11.2 mm [3].\nAdditional measurements include 11.4 mm [3], 11.8 mm [3], and 7.6 mm [3] on the annular ring.\nA casing plate measurement of 13.7 mm was recorded for ",
+      "files": []
+    },
+    {
+      "id": "cross-doc",
+      "requirement": "5 knowledge base",
+      "passed": true,
+      "seconds": 56.3,
+      "fails": [],
+      "answer": "No, the PSV-2041 set pressure of 12.5 barg does not meet SOP-114 requirements.\nSOP-114 clause 4 mandates a minimum atmospheric storage service pressure of 14.0 barg [1].\nThe inspection record shows a ",
+      "files": []
+    },
+    {
+      "id": "refuse-unknown",
+      "requirement": "grounding",
+      "passed": true,
+      "seconds": 22.7,
+      "fails": [],
+      "answer": "The provided passages do not contain information regarding the shell thickness of vessel TK-9999.\nNot in the record.\nAll available data pertains to vessels TK-4102 and PSV-2041 [2], [3].\nShell thickne",
+      "files": []
+    },
+    {
+      "id": "refuse-external",
+      "requirement": "1 air-gapped",
+      "passed": true,
+      "seconds": 16.6,
+      "fails": [],
+      "answer": "The provided passages do not contain any information regarding currency exchange rates or the value of the US dollar [1].",
+      "files": []
+    },
+    {
+      "id": "route-code",
+      "requirement": "3 model auto-selection",
+      "passed": false,
+      "seconds": 22.2,
+      "fails": [
+        "missing ['0.28']"
+      ],
+      "answer": "```python\nnominal_mm  = 18.0\nmeasured_mm = 17.7\nmonths      = 13\nmin_req_mm  = 16.0\n\nloss = nominal_mm - measured_mm\nrate = loss / (months / 12)\nlife = (measured_mm - min_req_mm) / rate\n\nprint(f'loss ",
+      "files": []
+    },
+    {
+      "id": "deliverable-docx",
+      "requirement": "13 real deliverables",
+      "passed": true,
+      "seconds": 48.4,
+      "fails": [],
+      "answer": "**Approval Note: TK-4102 (Crude Storage Tank)**\nThis equipment is approved for continued operation under the current inspection status.\nThe tank remains in service with no deviations affecting its int",
+      "files": [
+        "APPROVAL_NOTE_-_DEVIATION_20260914_195631.docx"
+      ]
+    },
+    {
+      "id": "deliverable-xlsx",
+      "requirement": "13 real deliverables",
+      "passed": true,
+      "seconds": 29.9,
+      "fails": [],
+      "answer": "| Date | Course | Measured Thickness (mm) | Nominal Thickness (mm) | API 653 Min Required (mm) | Status |\n| :--- | :--- | :--- | :--- | :--- | :--- |\n| 12-Sep-2026 | course-1 | 11.2 | 12.0 | 10.4 | OK",
+      "files": [
+        "UT_Thickness_Readings_20260914_195701.xlsx"
+      ]
+    },
+    {
+      "id": "handwriting",
+      "requirement": "8 handwritten notes",
+      "passed": true,
+      "seconds": 24.6,
+      "fails": [],
+      "answer": "The NCR number is recorded as NCR-2026-0088 [1].\nThis non-conformance was raised due to PSV-2041 pressure being 12.5 barg instead of the required 14.0 barg [2].\nThe discrepancy occurred during an insp",
+      "files": []
+    },
+    {
+      "id": "pid-isolate",
+      "requirement": "7 engineering drawings",
+      "passed": true,
+      "seconds": 30.4,
+      "fails": [],
+      "answer": "To isolate TK-4102, close FV-4033 and HV-4021.",
+      "files": []
+    }
+  ]
+}

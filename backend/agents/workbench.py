@@ -198,6 +198,13 @@ def detect_deliverable(text: str) -> str | None:
     return None
 
 
+# Boilerplate that turns a domain question into a code request. Removed before
+# retrieval so the embedding describes the SUBJECT rather than the deliverable.
+CODE_FRAMING = re.compile(
+    r"\b(write|create|make|generate|give me|produce|build)\b|"
+    r"\b(and\s+)?run\b|\bpython\b|\bscript\b|\bprogram\b|\bcode\b|"
+    r"\bfunction\b|\ba\s+snippet\b|\bshow the steps\b", re.I)
+
 CODE_BLOCK = re.compile(r"```(?:python|py)?\s*(.*?)```", re.S)
 
 
@@ -337,9 +344,18 @@ class Agent:
         if plan.retrieve:
             yield {"type": "step", "id": "retrieve", "status": "running",
                    "label": "Searching corpus"}
+            # A code request is mostly boilerplate: "write and run a python
+            # script that calculates the corrosion rate for P-4110A casing"
+            # embeds as a request for code, not as a question about P-4110A,
+            # and the spreadsheet holding 13.7 and 0.28 never surfaces. Strip
+            # the framing and retrieve on the subject.
+            rq_base = question
+            if plan.lane == "code":
+                rq_base = CODE_FRAMING.sub(" ", question).strip() or question
+
             prev = next((m["content"] for m in reversed(history)
                          if m["role"] == "user"), "")
-            rq = f"{prev} {question}" if prev and len(question.split()) <= 6 else question
+            rq = f"{prev} {rq_base}" if prev and len(question.split()) <= 6 else rq_base
             kk = max(k, 6) if (plan.per_source or plan.scope) else k
             try:
                 ctx, hits = pipeline.context(

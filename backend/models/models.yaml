@@ -49,7 +49,16 @@ profiles:
         think: false                        # <- changed after measuring, see above
         max_tokens: 1024
       code:
-        model: qwen2.5-coder:1.5b
+        # Measured, not assumed. Three calculation tasks over the corpus, each
+        # generated then actually EXECUTED in the sandbox:
+        #   qwen2.5-coder:1.5b  runs 3/3  correct 1/3
+        #   qwen3.5:2b          runs 2/3  correct 2/3
+        # The coder model writes code that runs and then quietly uses the wrong
+        # numbers - on one task it took P-4110A's design pressure of 18.0 barg
+        # and used it as a wall thickness. Code that runs with invented inputs
+        # is worse than code that fails, because nothing flags it. The 2b model
+        # reads the passages properly, so it takes the lane.
+        model: qwen3.5:2b
         think: false
         max_tokens: 1024
       vision:
