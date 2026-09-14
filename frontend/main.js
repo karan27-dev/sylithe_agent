@@ -217,8 +217,6 @@ async function ask(){
         <span class="lbl">Working</span><span class="el"></span></div>
       <div class="act-body"></div>
     </div>
-    <div class="nowline"><span class="spin"></span>
-      <span class="txt">Understanding request</span><span class="dots"></span></div>
     <div class="prose"></div>
     <div class="outfiles" hidden></div>
     <div class="meta"></div>`;
@@ -229,7 +227,6 @@ async function ask(){
         head  = bot.querySelector(".act-head"),
         body  = bot.querySelector(".act-body"),
         elEl  = bot.querySelector(".el"),
-        now   = bot.querySelector(".nowline"),
         prose = bot.querySelector(".prose"),
         outEl = bot.querySelector(".outfiles"),
         meta  = bot.querySelector(".meta");
@@ -255,11 +252,9 @@ async function ask(){
     row.innerHTML = `<span class="ico">${STEP_ICON[ev.status]}</span>
       <span class="nm">${esc(ev.label)}</span>
       <span class="dt">${ev.detail ? esc(ev.detail) : ""}</span>`;
-    // Only update the live line while it still exists. Once tokens start it is
-    // removed for good - a late "running" step must not bring it back.
-    if(ev.status === "running" && now.isConnected){
-      now.querySelector(".txt").textContent = ev.label;
-    }
+    // The panel row IS the live indicator - it already carries a spinner and
+    // the current label. A second standalone line below it showed the same
+    // text twice on screen at the same time.
     body.scrollTop = body.scrollHeight;
   }
 
@@ -288,7 +283,6 @@ async function ask(){
 
   es.addEventListener("token", e => {
     answer += JSON.parse(e.data).text;
-    now.remove();              // the answer is arriving; the status line is done
     prose.innerHTML = render(answer) + '<span class="caret"></span>';
     stick();
   });
@@ -346,7 +340,6 @@ async function ask(){
   function finish(){
     es.close(); clearInterval(tick);
     elEl.textContent = ((Date.now() - t0) / 1000).toFixed(1) + "s";
-    now.remove();
     busy = false; sendEl.disabled = false;
     bot.querySelectorAll(".caret").forEach(c => c.remove());
     bot.querySelectorAll(".stp.run").forEach(r => {
@@ -436,3 +429,191 @@ document.addEventListener("keydown", e => {
 });
 
 hero(); boot(); pollSov(); qEl.focus();
+
+
+/* ==================== folder connector ==================== */
+/* PS 26117 asks for "a local knowledge base connector" so the assistant can
+   ground itself in the organisation's own manuals. Uploading files one at a
+   time is not how an engineer works - the manuals are already in a folder. */
+
+const folderPanel = $("#folderpanel"), folderPath = $("#folderpath"),
+      folderPrev = $("#folderprev"), folderBtn = $("#folderbtn"),
+      folderScan = $("#folderscan");
+let folderReady = null;
+
+folderBtn.onclick = () => {
+  const show = folderPanel.hidden;
+  folderPanel.hidden = !show;
+  folderBtn.classList.toggle("on", show);
+  if(show) folderPath.focus();
+};
+
+folderPath.addEventListener("keydown", e => {
+  if(e.key === "Enter"){ e.preventDefault(); scanFolder(); }
+});
+folderScan.onclick = () => folderReady ? ingestFolder() : scanFolder();
+
+async function scanFolder(){
+  const path = folderPath.value.trim();
+  if(!path) return;
+  folderReady = null;
+  folderPrev.hidden = false;
+  folderPrev.className = "fprev";
+  folderPrev.textContent = "Looking...";
+  try{
+    const r = await (await fetch(
+      "/api/folder/preview?path=" + encodeURIComponent(path))).json();
+    if(r.error){
+      folderPrev.className = "fprev err";
+      folderPrev.textContent = r.error;
+      folderScan.textContent = "Scan";
+      return;
+    }
+    const types = Object.entries(r.by_type)
+      .sort((a,b) => b[1]-a[1]).map(([k,v]) => `${v} ${k}`).join("  ");
+    folderPrev.innerHTML = `<b>${r.supported}</b> readable of ${r.found} files
+      <div class="types">${esc(types)}</div>`;
+    folderReady = path;
+    folderScan.textContent = `Index ${r.supported}`;
+  }catch(err){
+    folderPrev.className = "fprev err";
+    folderPrev.textContent = "Could not read that path: " + err.message;
+  }
+}
+
+async function ingestFolder(){
+  const path = folderReady;
+  folderScan.disabled = true;
+  folderScan.textContent = "Indexing...";
+  folderPrev.className = "fprev";
+  folderPrev.innerHTML = `Reading ${esc(path)} - this runs locally and can take
+    a while for scans.<div class="bar"><i style="width:35%"></i></div>`;
+  try{
+    const r = await (await fetch(
+      "/api/folder/ingest?path=" + encodeURIComponent(path),
+      {method:"POST"})).json();
+    if(r.error){
+      folderPrev.className = "fprev err"; folderPrev.textContent = r.error;
+    }else{
+      const extra = r.skipped_self
+        ? ` &middot; skipped ${r.skipped_self} file(s) this system generated` : "";
+      folderPrev.innerHTML =
+        `Indexed <b>${r.indexed}</b> file(s), <b>${r.chunks}</b> passages in
+         ${r.seconds.toFixed(0)}s${extra}`;
+      $("#pill-index").innerHTML = `<b>${r.index.chunks}</b> chunks`;
+      toast(`Folder indexed - ${r.chunks} passages now searchable`);
+      folderReady = null;
+    }
+  }catch(err){
+    folderPrev.className = "fprev err";
+    folderPrev.textContent = "Failed: " + err.message;
+  }finally{
+    folderScan.disabled = false;
+    folderScan.textContent = "Scan";
+  }
+}
+
+// Dragging a folder from Finder gives a directory entry rather than a file.
+document.addEventListener("drop", e => {
+  for(const item of (e.dataTransfer?.items || [])){
+    const entry = item.webkitGetAsEntry?.();
+    if(entry?.isDirectory){
+      folderPanel.hidden = false;
+      folderBtn.classList.add("on");
+      folderPath.value = entry.fullPath || entry.name;
+      folderPrev.hidden = false;
+      folderPrev.className = "fprev";
+      folderPrev.textContent =
+        "The browser only reveals the folder NAME, not its full path. " +
+        "Paste the full path here, then press Scan.";
+      folderPath.focus();
+      return;
+    }
+  }
+}, true);
+
+
+/* ==================== dictation ==================== */
+/* The default Web Speech API streams audio to Google's servers. On this
+   project that is disqualifying - and worse, our own monitor would not even
+   catch it, because the request comes from the browser rather than from our
+   process. Chrome 139+ can run recognition ON DEVICE, so we require that mode
+   and refuse the microphone altogether when it is unavailable, rather than
+   quietly sending someone's plant discussion to a cloud service. */
+
+const micBtn = $("#micbtn"), micLabel = $("#miclabel");
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null, recording = false;
+
+async function micReady(){
+  if(!SR) return { ok:false, why:"This browser has no speech recognition." };
+  if(!SR.available) return { ok:false,
+    why:"This browser cannot confirm on-device speech. Dictation is disabled "
+      + "because the fallback would send your audio to a cloud service." };
+  try{
+    const state = await SR.available({ langs:["en-US"], processLocally:true });
+    if(state === "available") return { ok:true };
+    if(state === "downloadable" || state === "downloading")
+      return { ok:false, downloadable:true,
+        why:"The on-device speech model is not installed yet." };
+    return { ok:false,
+      why:"On-device speech is unavailable here, and the cloud fallback is "
+        + "not acceptable on an air-gapped workbench." };
+  }catch(e){
+    return { ok:false, why:"Could not verify on-device speech: " + e.message };
+  }
+}
+
+micBtn.onclick = async () => {
+  if(recording){ rec?.stop(); return; }
+  const chk = await micReady();
+  if(!chk.ok){
+    toast(chk.why, 7000);
+    if(chk.downloadable){
+      try{
+        toast("Downloading the on-device speech model once...", 8000);
+        await SR.install({ langs:["en-US"], processLocally:true });
+        toast("On-device speech installed - press Speak again.", 5000);
+      }catch(e){ toast("Install failed: " + e.message, 6000); }
+    }
+    return;
+  }
+
+  rec = new SR();
+  rec.lang = "en-US";
+  rec.continuous = true;
+  rec.interimResults = true;
+  rec.processLocally = true;      // the whole point - never leaves the machine
+
+  const before = qEl.value;
+  rec.onstart = () => {
+    recording = true;
+    micBtn.classList.add("rec");
+    micLabel.textContent = "Stop";
+    toast("Listening on-device - audio stays on this machine", 3000);
+  };
+  rec.onresult = ev => {
+    let text = "";
+    for(let i = ev.resultIndex; i < ev.results.length; i++)
+      text += ev.results[i][0].transcript;
+    qEl.value = (before ? before + " " : "") + text;
+    qEl.style.height = "auto";
+    qEl.style.height = Math.min(qEl.scrollHeight, 200) + "px";
+  };
+  rec.onerror = ev => toast("Dictation error: " + ev.error, 5000);
+  rec.onend = () => {
+    recording = false;
+    micBtn.classList.remove("rec");
+    micLabel.textContent = "Speak";
+    qEl.focus();
+  };
+  try{ rec.start(); }catch(e){ toast("Could not start: " + e.message, 5000); }
+};
+
+// Say up front whether dictation is possible, rather than after a click.
+micReady().then(c => {
+  if(!c.ok && !c.downloadable){
+    micBtn.disabled = true;
+    micBtn.title = c.why;
+  }
+});

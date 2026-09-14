@@ -52,9 +52,33 @@
   <div id="composer">
     <div class="cwrap">
       <div class="cbox" id="cbox">
+        <div id="folderpanel" hidden>
+          <div class="folder">
+            <input id="folderpath" spellcheck="false"
+                   placeholder="/Users/you/Documents/Plant Manuals">
+            <button id="folderscan">Scan</button>
+          </div>
+          <div class="fprev" id="folderprev" hidden></div>
+          <div class="hintline">Read in place from this machine - nothing is
+            copied and nothing leaves. Paste a path, or drag a folder from
+            Finder onto this box.</div>
+        </div>
         <div class="files" id="files"></div>
         <textarea id="q" rows="1" placeholder="Ask about your documents..."></textarea>
         <div class="crow">
+          <button class="tool" id="folderbtn" title="Point at a folder on this machine">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+            Folder
+          </button>
+          <button class="tool" id="micbtn" title="Dictate (on-device only)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round">
+              <rect x="9" y="3" width="6" height="11" rx="3"/>
+              <path d="M5 11a7 7 0 0014 0M12 18v3"/></svg>
+            <span id="miclabel">Speak</span>
+          </button>
           <button class="attach" id="attach">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                  stroke-width="2" stroke-linecap="round"><path d="M21.4 11.05l-9.2 9.2a5 5 0 01-7.07-7.07l9.2-9.2a3.5 3.5 0 014.95 4.95l-9.2 9.2a2 2 0 01-2.83-2.83l8.5-8.48"/></svg>

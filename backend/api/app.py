@@ -301,6 +301,38 @@ async def reindex(rebuild: bool = False) -> dict:
 
 
 # ---------------------------------------------------------------------------
+# folder connector
+# ---------------------------------------------------------------------------
+
+
+@app.get("/api/folder/preview")
+def api_folder_preview(path: str) -> dict:
+    """What is in that folder, without reading anything."""
+    from tools import folder
+    return folder.preview(path).as_dict()
+
+
+@app.post("/api/folder/ingest")
+async def api_folder_ingest(path: str) -> dict:
+    """Index a local folder in place. Nothing is copied, nothing leaves."""
+    from tools import folder
+    loop = asyncio.get_running_loop()
+    scan = await loop.run_in_executor(
+        None, lambda: folder.ingest(path, client=CLIENT))
+    if scan.indexed:
+        try:
+            from tools.brief import describe
+            for f in scan.files[:3]:
+                b = describe(Path(f), 1)
+                BRIEFS[:] = [x for x in BRIEFS if x.name != b.name]
+                BRIEFS.insert(0, b)
+            del BRIEFS[BRIEFS_MAX:]
+        except Exception:
+            pass
+    return {**scan.as_dict(), "index": pipeline.status()}
+
+
+# ---------------------------------------------------------------------------
 # deliverables
 # ---------------------------------------------------------------------------
 
