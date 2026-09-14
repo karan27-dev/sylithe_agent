@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import re
 import time
+from pathlib import Path
 from dataclasses import dataclass, field
 from typing import Iterator
 
@@ -270,6 +271,14 @@ def find_folder(text: str) -> str | None:
     return best
 
 
+# Ways of saying "the folder I just picked" without naming it.
+MY_FOLDER = re.compile(
+    r"\b(my|the|this|that|chosen|selected|current)\s+"
+    r"(folder|directory|dir)\b"
+    r"|\bfolder\b.*\b(analys|analyz|scan|read|index|summar|how many)"
+    r"|\b(how many|count)\b.*\b(files?|documents?|docs?)\b"
+    r"|\banalys[ei]\s+(my|the|these|those)\b", re.I)
+
 CODE_BLOCK = re.compile(r"```(?:python|py)?\s*(.*?)```", re.S)
 
 
@@ -370,7 +379,8 @@ class Agent:
             k: int = 4, recent_files: list[str] | None = None,
             drawing: str | None = None,
             image: str | None = None,
-            briefs: list | None = None) -> Iterator[dict]:
+            briefs: list | None = None,
+            folder: str | None = None) -> Iterator[dict]:
         t0 = time.perf_counter()
         history = history or []
         recent_files = recent_files or []
@@ -413,7 +423,11 @@ class Agent:
         # The user can say "analyse everything in ~/Documents/Manuals" instead
         # of opening the picker. Indexing happens before retrieval, so the
         # answer draws on what they just pointed at.
-        folder_path = find_folder(question)
+        # A path typed in the question wins; otherwise "my folder", "the
+        # folder", "these files" mean the one just chosen in the dialog.
+        folder_facts = ""
+        folder_path = find_folder(question) or (
+            folder if MY_FOLDER.search(question) else None)
         if folder_path:
             yield {"type": "step", "id": "folder", "status": "running",
                    "label": "Reading that folder"}
@@ -436,6 +450,20 @@ class Agent:
                     yield {"type": "step", "id": "folder", "status": "done",
                            "label": "Reading that folder", "detail": detail}
                     yield {"type": "folder", **scan.as_dict()}
+                    # "How many files are there" is answered from the scan, not
+                    # from the documents - the count is a fact about the folder.
+                    kinds = ", ".join(f"{v} {k}" for k, v in
+                                      sorted(scan.by_type.items(),
+                                             key=lambda x: -x[1]))
+                    folder_facts = (
+                        f"FOLDER JUST READ: {scan.root}\n"
+                        f"  {scan.found} files in total, {scan.supported} of them "
+                        f"readable by this system.\n"
+                        f"  By type: {kinds}\n"
+                        f"  Newly indexed this time: {scan.indexed} file(s), "
+                        f"{scan.chunks} passages.\n"
+                        f"  Files: "
+                        + ", ".join(Path(f).name for f in scan.files[:25]))
             except Exception as exc:
                 yield {"type": "step", "id": "folder", "status": "fail",
                        "label": "Reading that folder",
@@ -577,6 +605,8 @@ class Agent:
         # retrieved context to answer from, and stays out otherwise.
         refers = bool(REFERENTIAL.search(question)) or plan.scope
         head = f"{uploaded}\n\n" if uploaded and (refers or not ctx) else ""
+        if folder_facts:
+            head += folder_facts + "\n\n"
         if skill_text:
             head += skill_text + "\n\n"
         if lesson_text:
@@ -649,6 +679,19 @@ class Agent:
                                "detail": f"exit 0 · {res.seconds:.1f}s"
                                          + (f" · {len(res.files)} file(s)"
                                             if res.files else "")}
+                        # The code is the working; what it PRINTED is the
+                        # answer. Leaving the reply as a fenced block meant the
+                        # system computed 0.30 mm/yr and then handed back
+                        # source code - correct arithmetic, no answer. The
+                        # printed lines are appended as the result, because
+                        # they are the only numbers here that were executed
+                        # rather than written.
+                        out = (res.stdout or "").strip()
+                        if out:
+                            tail = ("\n\n**Result** (run in the sandbox):\n\n"
+                                    "```\n" + out[:1200] + "\n```\n")
+                            answer += tail
+                            yield {"type": "token", "text": tail}
                         break
                     detail = res.blocked or f"exit {res.exit_code}"
                     if attempt == 2 or res.blocked in ("network", "timeout"):

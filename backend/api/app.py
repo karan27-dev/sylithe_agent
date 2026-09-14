@@ -95,7 +95,8 @@ except Exception:
 def _remember() -> None:
     try:
         from api import memory as _m
-        _m.save(RECENT_UPLOADS, RECENT_DRAWINGS, RECENT_IMAGES, BRIEFS)
+        _m.save(RECENT_UPLOADS, RECENT_DRAWINGS, RECENT_IMAGES, BRIEFS,
+                folder=SELECTED_FOLDER[0] if SELECTED_FOLDER else None)
     except Exception:
         pass
 
@@ -192,7 +193,8 @@ async def _ask_stream(q: str, k: int, chat_id: str | None = None) -> AsyncIterat
                                 recent_files=list(RECENT_UPLOADS),
                                 drawing=RECENT_DRAWINGS[0] if RECENT_DRAWINGS else None,
                                 image=RECENT_IMAGES[0] if RECENT_IMAGES else None,
-                                briefs=list(BRIEFS)):
+                                briefs=list(BRIEFS),
+                                folder=SELECTED_FOLDER[0] if SELECTED_FOLDER else None):
                 if ev["type"] == "token":
                     state["answer"] += ev["text"]
                 elif ev["type"] == "sources":
@@ -349,6 +351,66 @@ def api_folder_choose() -> dict:
     """Ask the OS for a folder. Local process, so it can."""
     from tools import folder
     return folder.choose()
+
+
+# The folder the user last chose. "Analyse my folder" should not require
+# retyping a path that was just picked from a dialog.
+SELECTED_FOLDER: list[str] = []
+try:
+    _sf = _mem.load().get("folder")
+    if _sf and Path(_sf).is_dir():
+        SELECTED_FOLDER.append(_sf)
+except Exception:
+    pass
+
+
+@app.post("/api/folder/select")
+def api_folder_select(path: str) -> dict:
+    p = Path(path).expanduser()
+    if not p.is_dir():
+        return {"ok": False, "error": f"Not a folder: {p}"}
+    SELECTED_FOLDER[:] = [str(p)]
+    _remember()
+    return {"ok": True, "path": str(p)}
+
+
+async def _folder_stream(path: str) -> AsyncIterator[str]:
+    """Bridge the folder agent onto SSE, same shape as /api/ask."""
+    loop = asyncio.get_running_loop()
+    queue: asyncio.Queue = asyncio.Queue()
+
+    def produce() -> None:
+        try:
+            from agents.folder_agent import analyse
+            for ev in analyse(path, client=CLIENT):
+                loop.call_soon_threadsafe(queue.put_nowait, ev)
+        except Exception as exc:
+            loop.call_soon_threadsafe(
+                queue.put_nowait, {"type": "error", "message": str(exc)})
+        finally:
+            loop.call_soon_threadsafe(queue.put_nowait, None)
+
+    loop.run_in_executor(None, produce)
+    while True:
+        ev = await queue.get()
+        if ev is None:
+            break
+        etype = ev.pop("type")
+        if etype == "done":
+            ev["sovereignty"] = MONITOR.summary()
+        yield _sse(etype, ev)
+
+
+@app.get("/api/folder/analyse")
+async def api_folder_analyse(path: str) -> StreamingResponse:
+    """Chosen a folder? Then say what is in it, without being asked."""
+    p = Path(path).expanduser()
+    if p.is_dir():
+        SELECTED_FOLDER[:] = [str(p)]
+        _remember()
+    return StreamingResponse(
+        _folder_stream(str(p)), media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
 
 
 @app.get("/api/folder/preview")

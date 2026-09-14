@@ -49,11 +49,13 @@ def load() -> dict:
         d[key] = [p for p in d.get(key, []) if Path(p).exists()]
     d["briefs"] = [b for b in d.get("briefs", [])
                    if b.get("path") and Path(b["path"]).exists()]
+    if d.get("folder") and not Path(d["folder"]).is_dir():
+        d["folder"] = None
     return d
 
 
 def save(uploads: list[str], drawings: list[str], images: list[str],
-         briefs: list) -> None:
+         briefs: list, folder: str | None = None) -> None:
     with _lock:
         STORE.parent.mkdir(parents=True, exist_ok=True)
         payload = {
@@ -63,6 +65,7 @@ def save(uploads: list[str], drawings: list[str], images: list[str],
             "images": list(images),
             "briefs": [asdict(b) if is_dataclass(b) else dict(b)
                        for b in briefs],
+            "folder": folder,
         }
         tmp = STORE.with_suffix(".tmp")
         tmp.write_text(json.dumps(payload, indent=1))

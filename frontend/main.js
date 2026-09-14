@@ -441,11 +441,37 @@ const folderPanel = $("#folderpanel"), folderPath = $("#folderpath"),
       folderScan = $("#folderscan");
 let folderReady = null;
 
-folderBtn.onclick = () => {
-  const show = folderPanel.hidden;
-  folderPanel.hidden = !show;
-  folderBtn.classList.toggle("on", show);
-  if(show) folderPath.focus();
+// Clicking Folder opens the MACHINE's folder chooser, not ours. Our own
+// browser was a workaround for the browser being unable to return a real path;
+// the backend is a local process and can ask the OS directly, so that is what
+// the button should do. The in-page browser stays as a fallback for when the
+// native dialog is unavailable.
+folderBtn.onclick = async () => {
+  folderBtn.disabled = true;
+  folderBtn.classList.add("on");
+  try{
+    const r = await (await fetch("/api/folder/choose", {method:"POST"})).json();
+    if(r.cancelled){ folderBtn.classList.remove("on"); return; }
+    if(r.path){
+      // Chosen a folder? Then say what is in it. Asking the user to press
+      // Scan and then ask "what is in here" is a step with only one possible
+      // outcome, so the agent just does it.
+      folderPanel.hidden = true;
+      folderBtn.classList.remove("on");
+      analyseFolder(r.path);
+      return;
+    }
+    // No native dialog here - fall back to browsing in the page.
+    toast(r.error || "Opening the in-page browser instead", 4000);
+    folderPanel.hidden = false;
+    loadPlaces(); browse("");
+  }catch(e){
+    toast("Could not open the chooser: " + e.message, 5000);
+    folderPanel.hidden = false;
+    loadPlaces(); browse("");
+  }finally{
+    folderBtn.disabled = false;
+  }
 };
 
 folderPath.addEventListener("keydown", e => {
@@ -475,6 +501,10 @@ async function scanFolder(){
       <div class="types">${esc(types)}</div>`;
     folderReady = path;
     folderScan.textContent = `Index ${r.supported}`;
+    // Remember it server-side, so "analyse my folder" needs no path typed.
+    fetch("/api/folder/select?path=" + encodeURIComponent(path), {method:"POST"})
+      .catch(() => {});
+    toast(`${r.supported} readable file(s) in ${path.split("/").pop()}`, 4000);
   }catch(err){
     folderPrev.className = "fprev err";
     folderPrev.textContent = "Could not read that path: " + err.message;
@@ -696,7 +726,6 @@ async function browse(path){
   }
 }
 
-pickUse.onclick = () => { folderPath.value = pickPath; scanFolder(); };
 
 // The real macOS folder chooser. The browser cannot open one that returns a
 // path, but the backend is a local process and can - so the native dialog is
@@ -712,8 +741,114 @@ $("#picknative").onclick = async () => {
   finally{ btn.disabled = false; btn.textContent = "Browse…"; }
 };
 
-const _origFolderClick = folderBtn.onclick;
-folderBtn.onclick = () => {
-  _origFolderClick();
-  if(!folderPanel.hidden && !pickPath){ loadPlaces(); browse(""); }
+
+
+
+/* ==================== folder analysis ==================== */
+
+function analyseFolder(path){
+  if(busy) { toast("Still working on the last question", 3000); return; }
+  busy = true; sendEl.disabled = true;
+  if(feed.querySelector(".hero")) feed.innerHTML = "";
+
+  const name = path.split("/").filter(Boolean).pop() || path;
+  addUser(`Analyse the folder ${name}`);
+
+  const bot = document.createElement("div");
+  bot.className = "msg bot";
+  bot.innerHTML = `
+    <div class="activity open">
+      <div class="act-head"><span class="chev">\u203a</span>
+        <span class="lbl">Reading ${esc(name)}</span><span class="el"></span></div>
+      <div class="act-body"></div>
+    </div>
+    <div class="fprev" id="fscan" hidden></div>
+    <div class="prose"><span class="caret"></span></div>
+    <div class="meta"></div>`;
+  feed.appendChild(bot);
+  scroll.scrollTop = scroll.scrollHeight;
+
+  const act = bot.querySelector(".activity"), head = bot.querySelector(".act-head"),
+        body = bot.querySelector(".act-body"), elEl = bot.querySelector(".el"),
+        fscan = bot.querySelector("#fscan"), prose = bot.querySelector(".prose"),
+        meta = bot.querySelector(".meta");
+  head.onclick = () => act.classList.toggle("open");
+
+  const t0 = Date.now();
+  const tick = setInterval(() =>
+    elEl.textContent = ((Date.now() - t0) / 1000).toFixed(1) + "s", 100);
+
+  let answer = "", srcItems = [];
+  function putStep(ev){
+    let row = body.querySelector(`[data-step="${ev.id}"]`);
+    if(!row){ row = document.createElement("div"); row.dataset.step = ev.id;
+              body.appendChild(row); }
+    row.className = "stp " + ({running:"run",done:"done",warn:"warn",fail:"fail"}[ev.status]);
+    row.innerHTML = `<span class="ico">${STEP_ICON[ev.status]}</span>
+      <span class="nm">${esc(ev.label)}</span>
+      <span class="dt">${ev.detail ? esc(ev.detail) : ""}</span>`;
+  }
+
+  const es = new EventSource("/api/folder/analyse?path=" + encodeURIComponent(path));
+  es.addEventListener("step", e => putStep(JSON.parse(e.data)));
+
+  es.addEventListener("folder_scan", e => {
+    const d = JSON.parse(e.data);
+    const types = Object.entries(d.by_type).sort((a,b)=>b[1]-a[1])
+      .map(([k,v]) => `${v} ${k}`).join("  ");
+    fscan.hidden = false;
+    fscan.innerHTML = `<b>${d.supported}</b> readable of <b>${d.found}</b> files
+      in ${esc(d.root)}<div class="types">${esc(types)}</div>`;
+    $("#pill-index").title = d.root;
+  });
+
+  es.addEventListener("sources", e => { srcItems = JSON.parse(e.data).items; });
+  es.addEventListener("token", e => {
+    answer += JSON.parse(e.data).text;
+    prose.innerHTML = render(answer) + '<span class="caret"></span>';
+    const near = scroll.scrollHeight - scroll.scrollTop - scroll.clientHeight < 160;
+    if(near) scroll.scrollTop = scroll.scrollHeight;
+  });
+  es.addEventListener("error", e => {
+    let m = "connection lost";
+    try{ m = JSON.parse(e.data).message; }catch(_){}
+    if(!answer) prose.innerHTML = `<p style="color:var(--bad)">${esc(m)}</p>`;
+    finish();
+  });
+  es.addEventListener("done", e => {
+    const d = JSON.parse(e.data);
+    prose.innerHTML = d.empty
+      ? "<p>No readable documents in that folder.</p>" : render(answer);
+    if(srcItems.length)
+      bot.querySelector(".prose").insertAdjacentHTML("beforebegin", sourcesHTML(srcItems));
+    const bits = [`<span>${esc(d.model || "")}</span>`,
+                  `<span>${d.total_s}s</span>`,
+                  `<span>${d.files || 0} file(s)</span>`];
+    if(d.chunks) bits.push(`<span>${d.chunks} passages</span>`);
+    bits.push(`<span class="ok">${d.sovereignty.external_calls} external calls</span>`);
+    meta.innerHTML = bits.map(b => `<span>${b}</span>`).join("");
+    wireSources(bot);
+    act.classList.remove("open");
+    head.querySelector(".lbl").textContent = `${esc(name)} \u00b7 ${d.files || 0} files`;
+    finish(); pollSov();
+  });
+
+  function finish(){
+    es.close(); clearInterval(tick);
+    elEl.textContent = ((Date.now() - t0) / 1000).toFixed(1) + "s";
+    busy = false; sendEl.disabled = false;
+    bot.querySelectorAll(".caret").forEach(c => c.remove());
+    bot.querySelectorAll(".stp.run").forEach(r => {
+      r.className = "stp done";
+      r.querySelector(".ico").textContent = "\u2713";
+    });
+    qEl.focus();
+  }
+}
+
+// "Use this folder" in the fallback browser does the same thing.
+pickUse.onclick = () => {
+  folderPanel.hidden = true;
+  folderBtn.classList.remove("on");
+  analyseFolder(pickPath);
 };

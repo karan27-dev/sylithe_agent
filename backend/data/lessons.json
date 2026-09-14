@@ -1,0 +1,108 @@
+[
+ {
+  "question": "What is the long-term corrosion rate of V-801 using the full history?",
+  "was_wrong": "```python\n# from the passages\nnominal_mm = 18.0\nmeasured_2018 = 17.4\nmeasured_2022 = 16.2\nmeasured_2026 = 15.0\nmin_req_mm = 13.8\n\n# Calculate loss between first two recorded measur",
+  "correct": "2.4 mm between 2018 and 2026 is 8 years, not the latest interval.",
+  "why": "",
+  "tags": [
+   "V-801",
+   "AND-2026"
+  ],
+  "keywords": [
+   "between",
+   "corrosion",
+   "full",
+   "history",
+   "interval",
+   "latest",
+   "long",
+   "not",
+   "rate",
+   "term",
+   "using",
+   "years"
+  ],
+  "source": "benchmark",
+  "ts": 1789407802.594984,
+  "hits": 0
+ },
+ {
+  "question": "Is the PSV-601 setting acceptable?",
+  "was_wrong": "The PSV-601 setting is not acceptable because it falls below the required value [3].\nThe governing SOP-601 requires a relief setting of 18.0 barg for reactor feed drums [3].\nThe cu",
+  "correct": "17.5 is below the SOP's 18.0, but DA-2026-114 approves it until 31-Mar-2027. The naive answer is 'non-compliant' and it is wrong.",
+  "why": "",
+  "tags": [
+   "PSV-601",
+   "S-18",
+   "DA-2026",
+   "MAR-2027"
+  ],
+  "keywords": [
+   "acceptable",
+   "answer",
+   "approves",
+   "below",
+   "but",
+   "compliant",
+   "mar",
+   "naive",
+   "non",
+   "psv",
+   "setting",
+   "sop",
+   "until",
+   "wrong"
+  ],
+  "source": "benchmark",
+  "ts": 1789407802.5946848,
+  "hits": 0
+ },
+ {
+  "question": "What must be closed to isolate E-401?",
+  "was_wrong": "The drawing does not show any equipment connected to E-401. Therefore, the drawing does not show a path out of E-401.",
+  "correct": "Two paths reach the exchanger, so both valves are required.",
+  "why": "",
+  "tags": [
+   "E-401"
+  ],
+  "keywords": [
+   "both",
+   "closed",
+   "exchanger",
+   "isolate",
+   "paths",
+   "reach",
+   "required",
+   "two",
+   "valves"
+  ],
+  "source": "benchmark",
+  "ts": 1789407802.594365,
+  "hits": 0
+ },
+ {
+  "question": "Can P-301B be isolated while P-301A is running?",
+  "was_wrong": "No. According to the drawing, P-301A and P-301B are connected in series (P-301A -- P-301B). To isolate P-301B, you must close both CV-301A and HV-301. Since these valves are on the",
+  "correct": "SOP-301 clause 7 forbids it - the answer is in the SOP, not the drawing.",
+  "why": "",
+  "tags": [
+   "P-301B",
+   "P-301A",
+   "SOP-301"
+  ],
+  "keywords": [
+   "answer",
+   "clause",
+   "drawing",
+   "forbids",
+   "isolated",
+   "not",
+   "running",
+   "sop",
+   "while"
+  ],
+  "source": "benchmark",
+  "ts": 1789407802.594037,
+  "hits": 0
+ }
+]

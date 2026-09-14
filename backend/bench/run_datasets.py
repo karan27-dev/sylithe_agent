@@ -107,12 +107,20 @@ def score_set(agent, meta: dict, client, learn: bool = False) -> dict:
         # itself, which is what makes reflective memory dangerous.
         if not ok and learn:
             from tools import lessons as _lessons
-            _lessons.record(
-                question=q["ask"],
-                was_wrong=(r["answer"] or "").strip()[:180] or "(no answer)",
-                correct=("must state " + ", ".join(q["expect"])
-                         + ("; must not claim " + ", ".join(wrong) if wrong else "")),
-                why=q.get("why", ""), source="benchmark")
+            # Record the PRINCIPLE, never the expected strings.
+            #
+            # The first version wrote "must state DA-2026-114" - which is the
+            # answer key. Replaying the same question then looked like learning
+            # and was really a lookup. A lesson has to be something that
+            # transfers to a question it has not seen, so only the human-written
+            # reason is kept, and questions with no stated reason teach nothing
+            # and are skipped.
+            why = (q.get("why") or "").strip()
+            if why:
+                _lessons.record(
+                    question=q["ask"],
+                    was_wrong=(r["answer"] or "").strip()[:180] or "(no answer)",
+                    correct=why, why="", source="benchmark")
 
         rows.append({"ask": q["ask"], "passed": ok, "missing": missing,
                      "wrongly_said": wrong, "why": q.get("why", ""),
