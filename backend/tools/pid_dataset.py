@@ -263,13 +263,13 @@ def main() -> int:
         rs = resplit()
         print(f"\nre-split: moved {rs['moved']} images, "
               f"validation now {rs['val_images']} images")
+    coco = write_coco()
+    print(f"\nCOCO written (for RF-DETR): {coco}")
     print(f"\nboxes written: {res['written']}")
     print(f"dataset yaml : {res['yaml']}")
     return 0
 
 
-if __name__ == "__main__":
-    raise SystemExit(main())
 
 
 # ---------------------------------------------------------------------------
@@ -349,3 +349,62 @@ def resplit(out: Path = OUT, val_frac: float = 0.15, min_per_class: int = 8,
 
     return {"moved": moved, "val_images": len(val_set),
             "val_boxes": dict(have), "targets": target}
+
+
+# ---------------------------------------------------------------------------
+# COCO export
+# ---------------------------------------------------------------------------
+
+def write_coco(out: Path = OUT) -> dict:
+    """
+    Emit the merged dataset in COCO form as well.
+
+    Ultralytics wants YOLO txt; RF-DETR wants COCO json. Training both on the
+    SAME splits is the only way a comparison means anything - different splits
+    and you are comparing luck, not architectures. So this derives COCO from
+    the YOLO labels already on disk rather than re-deriving from the raw export.
+    """
+    import yaml
+    from PIL import Image
+
+    names = yaml.safe_load((out / "data.yaml").read_text())["names"]
+    written = {}
+    for sp in ("train", "valid", "test"):
+        img_dir, lbl_dir = out / sp / "images", out / sp / "labels"
+        if not img_dir.exists():
+            continue
+        images, anns = [], []
+        ann_id = 1
+        for i, imf in enumerate(sorted(img_dir.iterdir()), 1):
+            if imf.name.startswith("."):
+                continue
+            with Image.open(imf) as im:
+                W, H = im.size
+            images.append({"id": i, "file_name": imf.name, "width": W, "height": H})
+            lf = lbl_dir / (imf.stem + ".txt")
+            if not lf.exists():
+                continue
+            for line in lf.read_text().splitlines():
+                if not line.strip():
+                    continue
+                c, cx, cy, w, h = line.split()
+                cx, cy, w, h = float(cx), float(cy), float(w), float(h)
+                # YOLO normalised centre -> COCO absolute top-left xywh
+                x, y = (cx - w / 2) * W, (cy - h / 2) * H
+                bw, bh = w * W, h * H
+                anns.append({"id": ann_id, "image_id": i,
+                             "category_id": int(c) + 1,     # COCO ids start at 1
+                             "bbox": [round(x, 2), round(y, 2),
+                                      round(bw, 2), round(bh, 2)],
+                             "area": round(bw * bh, 2), "iscrowd": 0})
+                ann_id += 1
+        coco = {"images": images, "annotations": anns,
+                "categories": [{"id": i + 1, "name": n, "supercategory": "pid"}
+                               for i, n in names.items()]}
+        (out / sp / "_annotations.coco.json").write_text(json.dumps(coco))
+        written[sp] = (len(images), len(anns))
+    return written
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

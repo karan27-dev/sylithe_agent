@@ -45,3 +45,4 @@ setup.sh
 backend/data/pid_yolo/
 backend/data/pid_model/
 backend/data/pid_samples/
+backend/data/pid_dataset_colab.zip
