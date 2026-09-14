@@ -224,6 +224,44 @@ CODE_FRAMING = re.compile(
     r"\b(and\s+)?run\b|\bpython\b|\bscript\b|\bprogram\b|\bcode\b|"
     r"\bfunction\b|\ba\s+snippet\b|\bshow the steps\b", re.I)
 
+# A filesystem path mentioned in the question itself. "analyse the documents in
+# ~/Documents/Plant Manuals" should just work - making someone open a picker to
+# repeat a path they already typed is busywork.
+#
+# Folder names contain spaces ("Sylithe Agent", "Plant Manuals"), so a regex
+# that stops at whitespace truncates exactly the paths people actually have.
+# Instead: find where a path starts, then extend it a word at a time and keep
+# the longest run that is a real directory. The filesystem settles it.
+PATH_START = re.compile(r"(~|/Users/|/Volumes/|/home/|\./|/)", re.I)
+
+
+def find_folder(text: str) -> str | None:
+    from pathlib import Path as _P
+    text = text or ""
+    best = None
+    for m in PATH_START.finditer(text):
+        words = text[m.start():].split()
+        if not words:
+            continue
+        candidate = ""
+        for w in words:
+            candidate = f"{candidate} {w}".strip() if candidate else w
+            trimmed = candidate.rstrip(".,;:?!)\"'")
+            try:
+                q = _P(trimmed).expanduser()
+            except Exception:
+                break
+            if q.is_dir() and (best is None or len(str(q)) > len(best)):
+                best = str(q)
+            # Stop extending once nothing further down this line can exist.
+            if not q.exists() and not any(
+                    _P(f"{trimmed} {n}").expanduser().exists()
+                    for n in words[:3]):
+                if best:
+                    break
+    return best
+
+
 CODE_BLOCK = re.compile(r"```(?:python|py)?\s*(.*?)```", re.S)
 
 
@@ -353,6 +391,38 @@ class Agent:
                "label": "Selecting model", "detail": f"{model} · {why}"}
         yield {"type": "route", "class": plan.klass, "lane": plan.lane,
                "model": model, "why": why}
+
+        # 2a -- a folder named in the question --------------------------------
+        # The user can say "analyse everything in ~/Documents/Manuals" instead
+        # of opening the picker. Indexing happens before retrieval, so the
+        # answer draws on what they just pointed at.
+        folder_path = find_folder(question)
+        if folder_path:
+            yield {"type": "step", "id": "folder", "status": "running",
+                   "label": "Reading that folder"}
+            try:
+                from tools import folder as folder_tool
+                scan = folder_tool.ingest(folder_path, client=self.c)
+                if scan.error:
+                    yield {"type": "step", "id": "folder", "status": "warn",
+                           "label": "Reading that folder", "detail": scan.error[:70]}
+                else:
+                    # "0 files, 0 passages" reads like a failure when it
+                    # actually means every file was already indexed and
+                    # unchanged - which is the fast path working, not a fault.
+                    if scan.indexed:
+                        detail = (f"{scan.indexed} new file(s), {scan.chunks} "
+                                  f"passages · {scan.seconds:.0f}s")
+                    else:
+                        detail = (f"{scan.supported} file(s) already indexed - "
+                                  "nothing changed")
+                    yield {"type": "step", "id": "folder", "status": "done",
+                           "label": "Reading that folder", "detail": detail}
+                    yield {"type": "folder", **scan.as_dict()}
+            except Exception as exc:
+                yield {"type": "step", "id": "folder", "status": "fail",
+                       "label": "Reading that folder",
+                       "detail": f"{type(exc).__name__}: {exc}"}
 
         # 2b -- pre_tool -----------------------------------------------------
         # models.yaml has declared pre_tool: analyze_pid on the pid class from

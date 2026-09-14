@@ -305,6 +305,19 @@ async def reindex(rebuild: bool = False) -> dict:
 # ---------------------------------------------------------------------------
 
 
+@app.get("/api/folder/places")
+def api_folder_places() -> dict:
+    from tools import folder
+    return {"places": folder.places()}
+
+
+@app.get("/api/folder/list")
+def api_folder_list(path: str = "") -> dict:
+    """Browse the local filesystem. The backend runs here, so it can."""
+    from tools import folder
+    return folder.listdir(path or str(Path.home()))
+
+
 @app.get("/api/folder/preview")
 def api_folder_preview(path: str) -> dict:
     """What is in that folder, without reading anything."""

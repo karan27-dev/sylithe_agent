@@ -112,3 +112,67 @@ def ingest(folder: str | Path, client=None, progress=None) -> Scan:
             s.failed += 1
     s.seconds = time.perf_counter() - t0
     return s
+
+
+
+# ---------------------------------------------------------------------------
+# browsing
+# ---------------------------------------------------------------------------
+
+def places() -> list[dict]:
+    """Obvious starting points, so nobody has to type a path from memory."""
+    home = Path.home()
+    out = []
+    for label, path in [("Home", home), ("Desktop", home / "Desktop"),
+                        ("Documents", home / "Documents"),
+                        ("Downloads", home / "Downloads")]:
+        if path.exists():
+            out.append({"label": label, "path": str(path)})
+    return out
+
+
+def listdir(folder: str | Path) -> dict:
+    """
+    One level of a directory, for the picker.
+
+    A browser file picker cannot hand back a real filesystem path - that is a
+    deliberate security boundary, and it is why typing the path was the only
+    option at first. But this backend runs on the same machine, so it can list
+    directories directly and the picker gets real paths without uploading or
+    copying anything.
+    """
+    root = Path(folder).expanduser()
+    if not root.exists():
+        return {"error": f"No such folder: {root}"}
+    if not root.is_dir():
+        return {"error": f"Not a folder: {root}"}
+
+    dirs, n_supported, n_files = [], 0, 0
+    try:
+        for p in sorted(root.iterdir(), key=lambda x: x.name.lower()):
+            if p.name.startswith("."):
+                continue
+            if p.is_dir():
+                if p.name in SKIP_DIRS:
+                    continue
+                # how many readable documents sit directly inside, so the user
+                # can see which branch is worth opening
+                try:
+                    inside = sum(1 for c in p.iterdir()
+                                 if c.is_file()
+                                 and c.suffix.lower() in pipeline.SUPPORTED)
+                except PermissionError:
+                    inside = -1
+                dirs.append({"name": p.name, "path": str(p), "docs": inside})
+            elif p.is_file():
+                n_files += 1
+                if p.suffix.lower() in pipeline.SUPPORTED:
+                    n_supported += 1
+    except PermissionError:
+        return {"error": f"No permission to read {root}"}
+
+    parent = str(root.parent) if root.parent != root else None
+    return {"path": str(root), "parent": parent, "dirs": dirs[:200],
+            "files": n_files, "supported": n_supported,
+            "crumbs": [{"name": q.name or "/", "path": str(q)}
+                       for q in reversed([root, *root.parents])][-6:]}

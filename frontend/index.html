@@ -53,6 +53,18 @@
     <div class="cwrap">
       <div class="cbox" id="cbox">
         <div id="folderpanel" hidden>
+          <div class="pickwrap" id="pickwrap">
+            <div class="pickbar">
+              <div class="places" id="places"></div>
+              <div id="crumbs" style="display:flex;align-items:center;gap:2px;
+                   flex-wrap:wrap;width:100%"></div>
+            </div>
+            <div class="picklist" id="picklist"></div>
+            <div class="pickfoot">
+              <span class="here" id="pickhere"></span>
+              <button id="pickuse">Use this folder</button>
+            </div>
+          </div>
           <div class="folder">
             <input id="folderpath" spellcheck="false"
                    placeholder="/Users/you/Documents/Plant Manuals">
@@ -60,8 +72,9 @@
           </div>
           <div class="fprev" id="folderprev" hidden></div>
           <div class="hintline">Read in place from this machine - nothing is
-            copied and nothing leaves. Paste a path, or drag a folder from
-            Finder onto this box.</div>
+            copied and nothing leaves. Browse above, or paste a path.
+            You can also just say it in the chat: "analyse the documents in
+            ~/Documents/Plant Manuals".</div>
         </div>
         <div class="files" id="files"></div>
         <textarea id="q" rows="1" placeholder="Ask about your documents..."></textarea>

@@ -617,3 +617,79 @@ micReady().then(c => {
     micBtn.title = c.why;
   }
 });
+
+
+/* ==================== folder picker ==================== */
+/* A browser file picker cannot return a real filesystem path - that is a
+   deliberate security boundary, which is why typing one was the only option at
+   first. The backend runs on this same machine though, so it can list
+   directories and the picker gets real paths without uploading or copying. */
+
+const pickList = $("#picklist"), pickHere = $("#pickhere"),
+      pickUse = $("#pickuse"), crumbs = $("#crumbs"), placesEl = $("#places");
+let pickPath = "";
+
+const ICON_DIR = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+  stroke="currentColor" stroke-width="2" stroke-linecap="round"
+  stroke-linejoin="round"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2
+  2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>`;
+
+async function loadPlaces(){
+  try{
+    const r = await (await fetch("/api/folder/places")).json();
+    placesEl.innerHTML = r.places
+      .map(p => `<button data-go="${esc(p.path)}">${esc(p.label)}</button>`).join("");
+    placesEl.querySelectorAll("[data-go]").forEach(b =>
+      b.onclick = () => browse(b.dataset.go));
+  }catch(e){}
+}
+
+async function browse(path){
+  pickList.innerHTML = `<div class="pickrow"><span class="nm">Loading…</span></div>`;
+  try{
+    const r = await (await fetch(
+      "/api/folder/list?path=" + encodeURIComponent(path || ""))).json();
+    if(r.error){
+      pickList.innerHTML =
+        `<div class="pickrow"><span class="nm" style="color:var(--bad)">${esc(r.error)}</span></div>`;
+      return;
+    }
+    pickPath = r.path;
+    pickHere.textContent = r.path;
+    pickUse.disabled = false;
+    pickUse.textContent = r.supported
+      ? `Use this folder (${r.supported} readable)` : "Use this folder";
+
+    crumbs.innerHTML = r.crumbs.map((c,i) =>
+      `${i ? '<span class="crumbsep">/</span>' : ""}`
+      + `<button class="crumb" data-go="${esc(c.path)}">${esc(c.name)}</button>`).join("");
+    crumbs.querySelectorAll("[data-go]").forEach(b =>
+      b.onclick = () => browse(b.dataset.go));
+
+    const rows = [];
+    if(r.parent) rows.push(
+      `<div class="pickrow" data-go="${esc(r.parent)}">
+         <span class="ic">${ICON_DIR}</span><span class="nm">..</span></div>`);
+    for(const d of r.dirs) rows.push(
+      `<div class="pickrow" data-go="${esc(d.path)}">
+         <span class="ic">${ICON_DIR}</span>
+         <span class="nm">${esc(d.name)}</span>
+         <span class="ct ${d.docs > 0 ? "has" : ""}">${
+           d.docs > 0 ? d.docs + " docs" : d.docs < 0 ? "locked" : ""}</span></div>`);
+    if(!r.dirs.length && !r.parent) rows.push(
+      `<div class="pickrow"><span class="nm">No sub-folders</span></div>`);
+    pickList.innerHTML = rows.join("");
+    pickList.querySelectorAll("[data-go]").forEach(el =>
+      el.onclick = () => browse(el.dataset.go));
+  }catch(e){
+    pickList.innerHTML = `<div class="pickrow"><span class="nm">${esc(e.message)}</span></div>`;
+  }
+}
+
+pickUse.onclick = () => { folderPath.value = pickPath; scanFolder(); };
+
+const _origFolderClick = folderBtn.onclick;
+folderBtn.onclick = () => {
+  _origFolderClick();
+  if(!folderPanel.hidden && !pickPath){ loadPlaces(); browse(""); }
+};
