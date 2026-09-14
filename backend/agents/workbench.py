@@ -37,6 +37,7 @@ from ingest import pipeline
 from tools import deliverables as deliv
 from tools import sandbox
 from tools.brief import context_block
+from tools import skills as skill_lib
 
 # Words that mean "produce a file", mapped to the writer that should run.
 # Checked before the router, because "draft an approval note as a Word file"
@@ -513,6 +514,17 @@ class Agent:
                    for i, h in enumerate(hits, 1)],
                }
 
+        # 3b -- skills ---------------------------------------------------------
+        # Domain knowledge the passages do not carry: which formula applies,
+        # what the standard requires, the mistakes common to this question.
+        chosen = skill_lib.select(question)
+        if chosen:
+            yield {"type": "step", "id": "skills", "status": "done",
+                   "label": "Applying skills",
+                   "detail": ", ".join(s.name for s in chosen)}
+            yield {"type": "skills", "names": [s.name for s in chosen]}
+        skill_text = skill_lib.block(chosen)
+
         # 4 -- answer --------------------------------------------------------
         # The vision lane is multimodal and has been routed to since the first
         # day, but it never actually received a picture - it was answering
@@ -535,6 +547,8 @@ class Agent:
         # retrieved context to answer from, and stays out otherwise.
         refers = bool(REFERENTIAL.search(question)) or plan.scope
         head = f"{uploaded}\n\n" if uploaded and (refers or not ctx) else ""
+        if skill_text:
+            head += skill_text + "\n\n"
         if plan.lane == "code":
             system = CODE_SYS
             turn = f"PASSAGES:\n{ctx}\n\nTASK: {question}" if ctx else question
@@ -564,6 +578,13 @@ class Agent:
         yield {"type": "step", "id": "answer", "status": "done", "label": label,
                "detail": (f"{reply.output_tokens} tokens · "
                           f"{reply.tok_per_s:.1f} tok/s" if reply else "")}
+
+        # What a skill expected and did not find. Surfaced, never silently
+        # patched - an answer quietly rewritten to satisfy our own check is
+        # harder to trust than one that says what looked wrong.
+        for note in skill_lib.verify(answer, chosen):
+            yield {"type": "step", "id": "verify", "status": "warn",
+                   "label": "Skill check", "detail": note[:80]}
 
         # 4b -- execute --------------------------------------------------------
         # "A coding task run and verified in a sandbox" is named in the PS.

@@ -1,0 +1,29 @@
+name: corrosion-rate
+title: Corrosion rate and remaining life
+when: ["corrosion rate", "remaining life", "thickness loss", "wall loss",
+       "how long", "mm/yr", "metal loss"]
+rules:
+  - "Corrosion rate = (nominal thickness - measured thickness) divided by the
+     inspection interval expressed in YEARS. An interval given in months must
+     be divided by 12 first."
+  - "Remaining life = (measured thickness - minimum required thickness) divided
+     by the corrosion rate. Use the MINIMUM REQUIRED thickness from the
+     approval note or API 653 calculation, never the nominal."
+  - "Every thickness is in mm and every rate is in mm/yr. Never mix a pressure
+     in barg into a thickness calculation - they are different quantities that
+     happen to be similar numbers."
+  - "Use the figures for the equipment that was asked about. A passage may hold
+     rows for several tags."
+example: |
+  # TK-4102, from the passages
+  nominal_mm  = 12.0
+  measured_mm = 11.2
+  months      = 24
+  min_req_mm  = 10.4
+
+  loss = nominal_mm - measured_mm          # 0.8 mm
+  rate = loss / (months / 12)              # 0.40 mm/yr
+  life = (measured_mm - min_req_mm) / rate # 2.0 yr
+checks:
+  - pattern: "mm/yr"
+    why: "A corrosion rate without its unit is not an answer."

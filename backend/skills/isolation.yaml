@@ -1,0 +1,17 @@
+name: isolation
+title: Isolating equipment from a P&ID
+when: ["isolate", "isolation", "shut off", "block in", "what to close",
+       "take out of service", "lock out"]
+rules:
+  - "Copy the valve list from the TO ISOLATE line exactly. Do not add a valve
+     that is not on it, and do not invent roles like 'secondary isolation
+     valve' - if one valve is listed, one valve is the answer."
+  - "Never list a PSV or PRV. A relief device protects the equipment and is not
+     an isolation point."
+  - "Instruments (LT, PT, FT, TI) are not valves and cannot isolate anything."
+  - "If the drawing shows no path out, say the drawing does not show one rather
+     than guessing."
+example: |
+  The drawing gives: TO ISOLATE TK-4102, CLOSE exactly 1 valve(s): HV-4021
+  Answer: Close HV-4021. It is the only valve on the path out of the tank.
+  PSV-2041 is a relief device and is not closed for isolation.

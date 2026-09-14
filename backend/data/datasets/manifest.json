@@ -1,0 +1,264 @@
+[
+  {
+    "id": "set-1",
+    "level": "easy",
+    "title": "One drum, one valve, one relief device",
+    "questions": [
+      {
+        "ask": "What is the shell thickness of V-101 and how does it compare to nominal?",
+        "expect": [
+          "9.4",
+          "10.0"
+        ],
+        "reject": [],
+        "why": ""
+      },
+      {
+        "ask": "Does the PSV-101 set pressure meet SOP-201?",
+        "expect": [
+          "9.0",
+          "10.0"
+        ],
+        "reject": [
+          "meets",
+          "compliant"
+        ],
+        "why": "9.0 against a required 10.0 is a non-conformance."
+      },
+      {
+        "ask": "What must be closed to isolate V-101 on this P&ID?",
+        "expect": [
+          "HV-101"
+        ],
+        "reject": [
+          "PSV-101"
+        ],
+        "why": "One valve on the path out. A relief device is never an isolation point."
+      },
+      {
+        "ask": "Calculate the corrosion rate for V-101.",
+        "expect": [
+          "0.30"
+        ],
+        "reject": [],
+        "why": ""
+      }
+    ],
+    "folder": "/Users/karan/Desktop/Sylithe Agent/backend/data/datasets/set-1"
+  },
+  {
+    "id": "set-2",
+    "level": "easy",
+    "title": "Pump and filter in series",
+    "questions": [
+      {
+        "ask": "Which equipment is on this drawing?",
+        "expect": [
+          "T-201",
+          "P-201",
+          "HV-201",
+          "HV-202"
+        ],
+        "reject": [],
+        "why": "All four must be listed - dropping one reads as 'not present'."
+      },
+      {
+        "ask": "What is the corrosion rate of P-201 casing?",
+        "expect": [
+          "0.20"
+        ],
+        "reject": [],
+        "why": ""
+      },
+      {
+        "ask": "What must be closed to isolate T-201?",
+        "expect": [
+          "HV-201"
+        ],
+        "reject": [],
+        "why": ""
+      },
+      {
+        "ask": "What pressure does PI-201 read and what is the design pressure?",
+        "expect": [
+          "4.2",
+          "6.0"
+        ],
+        "reject": [],
+        "why": ""
+      }
+    ],
+    "folder": "/Users/karan/Desktop/Sylithe Agent/backend/data/datasets/set-2"
+  },
+  {
+    "id": "set-3",
+    "level": "medium",
+    "title": "Two parallel pumps, shared header",
+    "questions": [
+      {
+        "ask": "What is the corrosion rate of T-301?",
+        "expect": [
+          "0.40"
+        ],
+        "reject": [],
+        "why": ""
+      },
+      {
+        "ask": "Which of the two pumps is corroding faster, P-301A or P-301B?",
+        "expect": [
+          "P-301A"
+        ],
+        "reject": [],
+        "why": "0.40 against 0.13 mm/yr - it must compare, not just recite."
+      },
+      {
+        "ask": "Does PSV-301 meet SOP-301?",
+        "expect": [
+          "11.5",
+          "12.0"
+        ],
+        "reject": [
+          "meets",
+          "compliant"
+        ],
+        "why": ""
+      },
+      {
+        "ask": "What must be closed to isolate T-301?",
+        "expect": [
+          "HV-301"
+        ],
+        "reject": [
+          "PSV-301"
+        ],
+        "why": ""
+      },
+      {
+        "ask": "Can P-301B be isolated while P-301A is running?",
+        "expect": [
+          "spare",
+          "not"
+        ],
+        "reject": [],
+        "why": "SOP-301 clause 7 forbids it - the answer is in the SOP, not the drawing."
+      }
+    ],
+    "folder": "/Users/karan/Desktop/Sylithe Agent/backend/data/datasets/set-3"
+  },
+  {
+    "id": "set-4",
+    "level": "medium",
+    "title": "Exchanger train, cross-document spec",
+    "questions": [
+      {
+        "ask": "What is the corrosion rate and remaining life of E-401?",
+        "expect": [
+          "0.45"
+        ],
+        "reject": [],
+        "why": "1.8 mm over 4 years. Remaining life uses the 15.0 mm minimum."
+      },
+      {
+        "ask": "Is the TI-401 temperature within the SOP limit?",
+        "expect": [
+          "168",
+          "160"
+        ],
+        "reject": [
+          "within",
+          "acceptable"
+        ],
+        "why": "168 exceeds 160 - the limit is in the SOP, the reading in the report."
+      },
+      {
+        "ask": "Does PSV-401 meet SOP-401?",
+        "expect": [
+          "7.4",
+          "8.0"
+        ],
+        "reject": [
+          "meets"
+        ],
+        "why": ""
+      },
+      {
+        "ask": "What must be closed to isolate E-401?",
+        "expect": [
+          "HV-401",
+          "HV-402"
+        ],
+        "reject": [
+          "PSV-401"
+        ],
+        "why": "Two paths reach the exchanger, so both valves are required."
+      }
+    ],
+    "folder": "/Users/karan/Desktop/Sylithe Agent/backend/data/datasets/set-4"
+  },
+  {
+    "id": "set-5",
+    "level": "complex",
+    "title": "Three-branch manifold, two relief devices, conflicting specs",
+    "questions": [
+      {
+        "ask": "What is the corrosion rate of T-501?",
+        "expect": [
+          "0.48"
+        ],
+        "reject": [],
+        "why": ""
+      },
+      {
+        "ask": "Which relief valve is non-compliant, PSV-501 or PSV-502?",
+        "expect": [
+          "PSV-501",
+          "14.8",
+          "15.0"
+        ],
+        "reject": [],
+        "why": "PSV-501 at 14.8 against 15.0 fails; PSV-502 at 6.2 against 6.0 does not. Two devices, two different limits in the same SOP."
+      },
+      {
+        "ask": "Is the LT-501 level within the SOP limit?",
+        "expect": [
+          "78",
+          "75"
+        ],
+        "reject": [
+          "within",
+          "acceptable"
+        ],
+        "why": ""
+      },
+      {
+        "ask": "What must be closed to isolate T-501?",
+        "expect": [
+          "HV-501"
+        ],
+        "reject": [
+          "PSV-501"
+        ],
+        "why": ""
+      },
+      {
+        "ask": "Which branch valves are on the manifold?",
+        "expect": [
+          "HV-502",
+          "HV-503",
+          "HV-504"
+        ],
+        "reject": [],
+        "why": "All three branches, not just the first."
+      },
+      {
+        "ask": "Which corrodes faster, T-501 or E-501?",
+        "expect": [
+          "T-501"
+        ],
+        "reject": [],
+        "why": "0.48 against 0.44 - close enough that it must actually compute both."
+      }
+    ],
+    "folder": "/Users/karan/Desktop/Sylithe Agent/backend/data/datasets/set-5"
+  }
+]

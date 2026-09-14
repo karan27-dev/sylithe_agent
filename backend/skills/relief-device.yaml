@@ -1,0 +1,21 @@
+name: relief-device
+title: Relief device compliance
+when: ["psv", "prv", "relief valve", "set pressure", "barg", "sop-114",
+       "relief device", "safety valve"]
+rules:
+  - "Compare the AS-FOUND set pressure against the requirement in the governing
+     SOP. Those two numbers usually live in different documents - state both
+     and cite each."
+  - "A set pressure below the requirement is a non-conformance, not a pass.
+     Say so plainly and give the NCR number if the passages carry one."
+  - "A relief valve is NEVER closed to isolate equipment. If asked what to
+     close, exclude every PSV and PRV."
+  - "Do not describe a deviation as acceptable unless a passage explicitly
+     approves it."
+example: |
+  PSV-2041 was found at 12.5 barg [1].
+  SOP-114 requires 14.0 barg for atmospheric storage service [2].
+  12.5 < 14.0, so this is a non-conformance - raised as NCR-2026-0088 [2].
+checks:
+  - pattern: "barg"
+    why: "A set pressure without its unit cannot be checked against a spec."

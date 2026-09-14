@@ -1,0 +1,55 @@
+{
+  "overall_percent": 100.0,
+  "passed": 4,
+  "total": 4,
+  "external_calls": 0,
+  "sets": [
+    {
+      "id": "set-1",
+      "level": "easy",
+      "title": "One drum, one valve, one relief device",
+      "chunks": 3,
+      "passed": 4,
+      "total": 4,
+      "percent": 100.0,
+      "questions": [
+        {
+          "ask": "What is the shell thickness of V-101 and how does it compare to nominal?",
+          "passed": true,
+          "missing": [],
+          "wrongly_said": [],
+          "why": "",
+          "seconds": 24.7,
+          "answer": "The shell thickness of V-101 is measured at 9.4 mm [1]. This value is below the nominal dimension of 10.0 mm [1]. The inspection interval since the last survey was 24 months [2]. A"
+        },
+        {
+          "ask": "Does the PSV-101 set pressure meet SOP-201?",
+          "passed": true,
+          "missing": [],
+          "wrongly_said": [],
+          "why": "9.0 against a required 10.0 is a non-conformance.",
+          "seconds": 21.5,
+          "answer": "No, the PSV-101 set pressure does not meet SOP-201 [1]. The as-found value of 9.0 barg is below the required 10.0 barg [1], resulting in a non-conformance [1]. This issue was raise"
+        },
+        {
+          "ask": "What must be closed to isolate V-101 on this P&ID?",
+          "passed": true,
+          "missing": [],
+          "wrongly_said": [],
+          "why": "One valve on the path out. A relief device is never an isolation point.",
+          "seconds": 23.0,
+          "answer": "Close HV-101."
+        },
+        {
+          "ask": "Calculate the corrosion rate for V-101.",
+          "passed": true,
+          "missing": [],
+          "wrongly_said": [],
+          "why": "",
+          "seconds": 26.9,
+          "answer": "```python\n# from the passages\nnominal_mm = 10.0\nmeasured_mm = 9.4\nmonths = 24\nmin_req_mm = 8.6\n\nloss = nominal_mm - measured_mm\nrate = loss / (months / 12)\nlife = (measured_mm - mi"
+        }
+      ]
+    }
+  ]
+}
