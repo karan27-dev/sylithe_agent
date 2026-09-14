@@ -232,10 +232,27 @@ def build_graph(symbols: list[Symbol], segments: list[Segment]):
             for seg in run:
                 if any(math.hypot(p[0] - s.cx, p[1] - s.cy) <= reach
                        for p in seg.ends()):
-                    touching.append(name)
+                    touching.append((s, name))
                     break
-        for i, a in enumerate(touching):
-            for b in touching[i + 1:]:
+        if len(touching) < 2:
+            continue
+
+        # Connect them as a CHAIN, not all-to-all.
+        #
+        # A pipe run is a line, and the things on it sit in order along it -
+        # tank, then valve, then pump. Joining every pair instead produced a
+        # complete graph: measured on a symbol-legend sheet, 7 symbols became
+        # 21 edges, which says everything is connected to everything and
+        # therefore says nothing. Ordering along the run's dominant axis and
+        # linking only neighbours gives 6 edges and an isolation answer that
+        # means something.
+        xs = [abs(sg.x2 - sg.x1) for sg in run]
+        ys = [abs(sg.y2 - sg.y1) for sg in run]
+        horizontal = sum(xs) >= sum(ys)
+        touching.sort(key=lambda t: t[0].cx if horizontal else t[0].cy)
+
+        for (s_a, a), (s_b, b) in zip(touching, touching[1:]):
+            if a != b:
                 g.add_edge(a, b, run=len(run))
     return g
 
