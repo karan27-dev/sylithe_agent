@@ -70,6 +70,20 @@ BROAD = re.compile(
     r"|\b(everything|whole corpus|all of them|summari[sz]e everything)\b",
     re.I)
 
+PID_SYS = (
+    "You are a plant engineer reading a P&ID.\n"
+    "The DRAWING section gives structure: what equipment exists, its tag, and "
+    "what is connected to what. The DOCUMENTS section gives recorded values.\n"
+    "Rules:\n"
+    "1. A P&ID never states a set pressure, thickness or temperature. If a "
+    "number is asked for, take it from the DOCUMENTS section only.\n"
+    "2. Never invent a connection that is not listed, and never invent a tag.\n"
+    "3. For isolation, list exactly the valves given. A relief valve (PSV/PRV) "
+    "is never closed to isolate equipment.\n"
+    "4. If something was not detected, say so plainly.\n"
+    "5. Short answer, English."
+)
+
 GROUNDED_SYS = (
     "You are a plant inspection assistant. Answer ONLY from the passages "
     "provided. Rules:\n"
@@ -129,6 +143,7 @@ class Plan:
     scope: list[str] = field(default_factory=list)   # restrict to these files
     per_source: int = 0                              # spread hits across files
     no_floor: bool = False                           # ignore the score floor
+    pre_tool: str | None = None                      # e.g. analyze_pid
 
 
 def detect_deliverable(text: str) -> str | None:
@@ -164,6 +179,7 @@ class Agent:
         recent_files = recent_files or []
         klass = self.c.classify(question)
         lane = klass.lane
+        pre_tool = klass.pre_tool
         # A deliverable always needs the reasoning lane - the router lane is
         # 32 tokens and cannot emit a JSON document spec.
         if kind and lane == "router":
@@ -196,12 +212,13 @@ class Agent:
         return Plan(question=question, deliverable=kind,
                     retrieve=klass.retrieval, lane=lane, klass=klass_name,
                     steps=steps, scope=scope, per_source=per_source,
-                    no_floor=no_floor)
+                    no_floor=no_floor, pre_tool=pre_tool)
 
     # -- execution ---------------------------------------------------------
 
     def run(self, question: str, history: list[dict] | None = None,
-            k: int = 4, recent_files: list[str] | None = None) -> Iterator[dict]:
+            k: int = 4, recent_files: list[str] | None = None,
+            drawing: str | None = None) -> Iterator[dict]:
         t0 = time.perf_counter()
         history = history or []
         recent_files = recent_files or []
@@ -218,6 +235,9 @@ class Agent:
                "label": "Understanding request",
                "detail": (f"deliverable: {plan.deliverable}" if plan.deliverable
                           else "answer only")}
+        klass_pre_tool = plan.pre_tool
+        if klass_pre_tool == "analyze_pid" and drawing:
+            plan.steps.insert(2, "Analysing drawing")
         yield {"type": "plan", "steps": plan.steps,
                "deliverable": plan.deliverable}
 
@@ -230,6 +250,29 @@ class Agent:
                "label": "Selecting model", "detail": f"{model} · {why}"}
         yield {"type": "route", "class": plan.klass, "lane": plan.lane,
                "model": model, "why": why}
+
+        # 2b -- pre_tool -----------------------------------------------------
+        # models.yaml has declared pre_tool: analyze_pid on the pid class from
+        # the start. This is where it finally runs: a drawing is not answerable
+        # from the text index, because a P&ID's content is its geometry.
+        pid_ctx = ""
+        if klass_pre_tool == "analyze_pid" and drawing:
+            yield {"type": "step", "id": "pid", "status": "running",
+                   "label": "Analysing drawing"}
+            try:
+                from tools.pid_answer import with_values
+                pid = with_values(drawing, client=self.c)
+                pid_ctx = pid["text"]
+                g = pid["graph"]
+                yield {"type": "step", "id": "pid", "status": "done",
+                       "label": "Analysing drawing",
+                       "detail": (f"{g.number_of_nodes()} items, "
+                                  f"{g.number_of_edges()} connections, "
+                                  f"{len(pid['tags'])} tags")}
+            except Exception as exc:
+                yield {"type": "step", "id": "pid", "status": "fail",
+                       "label": "Analysing drawing",
+                       "detail": f"{type(exc).__name__}: {exc}"}
 
         # 3 -- retrieve ------------------------------------------------------
         ctx, hits = "", []
@@ -293,8 +336,12 @@ class Agent:
         yield {"type": "step", "id": "answer", "status": "running",
                "label": label}
 
-        system = GROUNDED_SYS if ctx else NO_CONTEXT_SYS
-        turn = f"PASSAGES:\n{ctx}\n\nQUESTION: {question}" if ctx else question
+        if pid_ctx:
+            system = PID_SYS
+            turn = f"{pid_ctx}\n\nQUESTION: {question}"
+        else:
+            system = GROUNDED_SYS if ctx else NO_CONTEXT_SYS
+            turn = f"PASSAGES:\n{ctx}\n\nQUESTION: {question}" if ctx else question
         prompt = history + [{"role": "user", "content": turn}] if history else turn
 
         answer, reply = "", None
@@ -367,8 +414,9 @@ class Agent:
             "output_tokens": reply.output_tokens if reply else 0,
             "fell_back": reply.fell_back if reply else False,
             "retried": reply.retried_for_truncation if reply else 0,
-            "grounded": bool(ctx),
+            "grounded": bool(ctx) or bool(pid_ctx),
             "deliverable": plan.deliverable,
+            "drawing": drawing,
             "files": files,
             "total_s": round(time.perf_counter() - t0, 2),
         }

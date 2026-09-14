@@ -27,7 +27,17 @@ from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parent.parent
 OCR_MODELS = Path.home() / ".cache" / "docling" / "models" / "RapidOcr"
-WEIGHTS = _ROOT / "data" / "pid_model" / "train" / "weights" / "best.pt"
+# Trained on Colab (T4, 60 epochs @1024): mAP50 0.890, mAP50-95 0.600.
+# ONNX is preferred here - this machine has no CUDA but already runs
+# onnxruntime with a CoreML provider, so there is no new runtime to install
+# and nothing is fetched at inference time.
+WEIGHTS_ONNX = _ROOT / "data" / "pid_model" / "best.onnx"
+WEIGHTS_PT = _ROOT / "data" / "pid_model" / "best.pt"
+WEIGHTS = WEIGHTS_ONNX if WEIGHTS_ONNX.exists() else WEIGHTS_PT
+
+# The detector was trained at 1024. Running it at a smaller size shrinks a
+# 24 px ball valve back below what it learned to see.
+IMGSZ = 1024
 
 # ISA-style equipment and instrument tags: letters, then a loop number,
 # optionally a suffix letter for duplicates (P-4110A vs P-4110B).
@@ -173,7 +183,8 @@ def detect(image: str | Path, weights: Path = WEIGHTS,
     os.environ.setdefault("YOLO_OFFLINE", "1")
     from ultralytics import YOLO
 
-    res = YOLO(str(weights)).predict(str(image), conf=conf, verbose=False)
+    res = YOLO(str(weights), task="detect").predict(
+        str(image), imgsz=IMGSZ, conf=conf, verbose=False)
     out = []
     for r in res:
         for b in r.boxes:

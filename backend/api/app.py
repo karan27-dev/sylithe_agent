@@ -58,6 +58,20 @@ AGENT = Agent(CLIENT)
 RECENT_UPLOADS: list[str] = []
 RECENT_MAX = 8
 
+# Drawings are tracked separately. A P&ID yields zero chunks - its content is
+# geometry, not text - so it never reaches the index and the ordinary
+# "recent uploads" path cannot help. The agent needs the FILE.
+RECENT_DRAWINGS: list[str] = []
+DRAWING_EXT = {".png", ".jpg", ".jpeg", ".tiff", ".bmp", ".webp", ".pdf"}
+
+
+def _remember_drawing(path: Path) -> None:
+    p = str(path)
+    if p in RECENT_DRAWINGS:
+        RECENT_DRAWINGS.remove(p)
+    RECENT_DRAWINGS.insert(0, p)
+    del RECENT_DRAWINGS[4:]
+
 
 def _remember_upload(name: str) -> None:
     if name in RECENT_UPLOADS:
@@ -128,7 +142,8 @@ async def _ask_stream(q: str, k: int, chat_id: str | None = None) -> AsyncIterat
     def produce() -> None:
         try:
             for ev in AGENT.run(q, history=past, k=k,
-                                recent_files=list(RECENT_UPLOADS)):
+                                recent_files=list(RECENT_UPLOADS),
+                                drawing=RECENT_DRAWINGS[0] if RECENT_DRAWINGS else None):
                 if ev["type"] == "token":
                     state["answer"] += ev["text"]
                 elif ev["type"] == "sources":
@@ -225,11 +240,16 @@ async def upload(file: UploadFile = File(...)) -> JSONResponse:
     indexed = stats.get("chunks", 0) > 0
     if indexed:
         _remember_upload(name)
+    elif dest.suffix.lower() in DRAWING_EXT:
+        # Zero chunks from an image is the signature of a drawing, so keep the
+        # path for analyze_pid instead of treating it as a failed upload.
+        _remember_drawing(dest)
     return JSONResponse({"ok": True, "file": name, "stats": stats,
                          "indexed": indexed,
                          "note": None if indexed else
-                                 "No text could be extracted (line drawings "
-                                 "and P&IDs are a known gap).",
+                                 "No text extracted - treating this as a "
+                                 "drawing. Ask about its equipment, tags or "
+                                 "isolation and it will be analysed.",
                          "index": pipeline.status()})
 
 
