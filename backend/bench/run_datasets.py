@@ -83,7 +83,7 @@ def ask(agent, question: str, drawing: str | None) -> dict:
     return {"answer": answer, "text": answer + "\n" + code_out, "files": files}
 
 
-def score_set(agent, meta: dict, client) -> dict:
+def score_set(agent, meta: dict, client, learn: bool = False) -> dict:
     folder = Path(meta["folder"])
     _reset_index()
     chunks = _index(folder, client)
@@ -102,6 +102,18 @@ def score_set(agent, meta: dict, client) -> dict:
         wrong = [x for x in q.get("reject", []) if _asserts(low, x)]
         ok = not missing and not wrong
         passed += ok
+        # Turn a verified failure into a lesson. Safe to do here precisely
+        # because the ground truth is known - the agent is never grading
+        # itself, which is what makes reflective memory dangerous.
+        if not ok and learn:
+            from tools import lessons as _lessons
+            _lessons.record(
+                question=q["ask"],
+                was_wrong=(r["answer"] or "").strip()[:180] or "(no answer)",
+                correct=("must state " + ", ".join(q["expect"])
+                         + ("; must not claim " + ", ".join(wrong) if wrong else "")),
+                why=q.get("why", ""), source="benchmark")
+
         rows.append({"ask": q["ask"], "passed": ok, "missing": missing,
                      "wrongly_said": wrong, "why": q.get("why", ""),
                      "seconds": round(time.perf_counter() - t0, 1),
@@ -115,6 +127,8 @@ def score_set(agent, meta: dict, client) -> dict:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--set", dest="only")
+    ap.add_argument("--learn", action="store_true",
+                    help="write a lesson for each verified failure")
     a = ap.parse_args()
 
     from core import airgap
@@ -134,7 +148,7 @@ def main() -> int:
 
     for meta in manifest:
         print(f"\n=== {meta['id']}  [{meta['level']}]  {meta['title']}")
-        r = score_set(agent, meta, client)
+        r = score_set(agent, meta, client, learn=a.learn)
         results.append(r)
         for q in r["questions"]:
             mark = "PASS" if q["passed"] else "FAIL"
@@ -160,7 +174,7 @@ def main() -> int:
     for r in results:
         print(f"{r['id']:8} {r['level']:9} {r['percent']:7.0f}%  {r['title'][:44]}")
     print("-" * 70)
-    for lvl in ("easy", "medium", "complex"):
+    for lvl in ("easy", "medium", "complex", "hard", "very hard"):
         rs = by_level.get(lvl)
         if rs:
             p = sum(x["passed"] for x in rs)

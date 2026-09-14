@@ -38,6 +38,7 @@ from tools import deliverables as deliv
 from tools import sandbox
 from tools.brief import context_block
 from tools import skills as skill_lib
+from tools import lessons as lesson_lib
 
 # Words that mean "produce a file", mapped to the writer that should run.
 # Checked before the router, because "draft an approval note as a Word file"
@@ -540,6 +541,20 @@ class Agent:
             yield {"type": "skills", "names": [s.name for s in chosen]}
         skill_text = skill_lib.block(chosen)
 
+        # Verified past mistakes on questions like this one. Only written where
+        # the right answer was known, never from the model grading itself -
+        # the documented failure mode of reflective memory is an agent that
+        # confidently remembers a wrong rule and never revisits it.
+        past = lesson_lib.select(question)
+        if past:
+            yield {"type": "step", "id": "lessons", "status": "done",
+                   "label": "Recalling past mistakes",
+                   "detail": f"{len(past)} similar correction(s)"}
+            yield {"type": "lessons",
+                   "items": [{"question": l.question, "correct": l.correct}
+                             for l in past]}
+        lesson_text = lesson_lib.block(past)
+
         # 4 -- answer --------------------------------------------------------
         # The vision lane is multimodal and has been routed to since the first
         # day, but it never actually received a picture - it was answering
@@ -564,6 +579,8 @@ class Agent:
         head = f"{uploaded}\n\n" if uploaded and (refers or not ctx) else ""
         if skill_text:
             head += skill_text + "\n\n"
+        if lesson_text:
+            head += lesson_text + "\n\n"
         if plan.lane == "code":
             system = CODE_SYS
             turn = f"PASSAGES:\n{ctx}\n\nTASK: {question}" if ctx else question

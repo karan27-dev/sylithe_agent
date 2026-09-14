@@ -447,5 +447,231 @@ def main() -> int:
     return 0
 
 
+
+
+# ---------------------------------------------------------------------------
+# sets 6-10: hard and very hard
+# ---------------------------------------------------------------------------
+
+def set6(d: Path) -> DataSet:
+    """Hard: a documented deviation that makes a failing number acceptable."""
+    img, dr = _canvas(title="P&ID - R-601 REACTOR FEED", dwg="DWG: SET6-002 REV 5")
+    _tank(dr, 120, 360, 340, 680, "V-601", "FEED DRUM")
+    _psv(dr, 230, 360, "PSV-601")
+    dr.line((340, 560, 430, 560), fill=(20, 20, 20), width=3)
+    _valve(dr, 520, 560, "HV-601")
+    dr.line((590, 560, 680, 560), fill=(20, 20, 20), width=3)
+    _pump(dr, 750, 560, "P-601")
+    dr.line((802, 560, 900, 560), fill=(20, 20, 20), width=3)
+    _valve(dr, 990, 560, "HV-602")
+    dr.line((1060, 560, 1160, 560), fill=(20, 20, 20), width=3)
+    dr.rectangle((1160, 440, 1360, 680), outline=(20, 20, 20), width=3)
+    dr.text((1210, 540), "R-601", font=_f(24, True), fill=(20, 20, 20))
+    _instr(dr, 900, 380, "PT", "PT-601")
+    img.save(d / "PID-SET6.png")
+
+    _report(d / "inspection_SET6.docx", "SET-6",
+            [("V-601", "Feed Drum", 15.0, 13.1), ("R-601", "Reactor", 20.0, 19.2)],
+            ["V-601 course-1 measured 13.1 mm against nominal 15.0 mm over "
+             "38 months. Minimum required 12.6 mm.",
+             "PSV-601 as-found 17.5 barg.",
+             "PT-601 reads 16.9 barg at normal operation."])
+    _sop(d / "SOP-601.docx", "SOP-601 - Reactor Feed Relief",
+         [("4. Relief setting",
+           "Relief valves on reactor feed drums shall be set at 18.0 barg.")])
+    from docx import Document
+    doc = Document()
+    doc.add_heading("DEVIATION APPROVAL DA-2026-114", 0)
+    doc.add_paragraph("Ref: PSV-601    Approved: 02-Aug-2026")
+    doc.add_paragraph(
+        "PSV-601 is approved to remain at 17.5 barg until the next turnaround "
+        "on 31-Mar-2027. SOP-601 clause 4 requires 18.0 barg; this deviation "
+        "is documented and approved by the Head of Inspection, and is "
+        "therefore acceptable until that date.", style="List Bullet")
+    doc.save(d / "deviation_DA-2026-114.docx")
+    # V-601: 1.9 / 3.1667 yr = 0.60
+    return DataSet("set-6", "hard", "A documented deviation overrides the SOP", [
+        Q("Is the PSV-601 setting acceptable?",
+          ["17.5", "DA-2026-114"], [],
+          "17.5 is below the SOP's 18.0, but DA-2026-114 approves it until "
+          "31-Mar-2027. The naive answer is 'non-compliant' and it is wrong."),
+        Q("What is the corrosion rate of V-601?", ["0.60"]),
+        Q("What must be closed to isolate V-601?", ["HV-601"], ["PSV-601"]),
+    ])
+
+
+def set7(d: Path) -> DataSet:
+    """Hard: the same tag prefix on two different units."""
+    img, dr = _canvas(1600, 1000, title="P&ID - UNITS A AND B",
+                      dwg="DWG: SET7-018 REV 2")
+    dr.line((800, 110, 800, 940), fill=(120, 120, 120), width=2)
+    dr.text((300, 130), "UNIT A", font=_f(20, True), fill=(20, 20, 20))
+    dr.text((1100, 130), "UNIT B", font=_f(20, True), fill=(20, 20, 20))
+    _tank(dr, 110, 330, 300, 620, "TK-701", "UNIT A")
+    dr.line((300, 500, 380, 500), fill=(20, 20, 20), width=3)
+    _valve(dr, 470, 500, "HV-701")
+    dr.line((540, 500, 700, 500), fill=(20, 20, 20), width=3)
+    _tank(dr, 900, 330, 1090, 620, "TK-702", "UNIT B")
+    dr.line((1090, 500, 1170, 500), fill=(20, 20, 20), width=3)
+    _valve(dr, 1260, 500, "HV-702")
+    dr.line((1330, 500, 1450, 500), fill=(20, 20, 20), width=3)
+    _psv(dr, 205, 330, "PSV-701")
+    _psv(dr, 995, 330, "PSV-702")
+    img.save(d / "PID-SET7.png")
+
+    _report(d / "inspection_SET7.docx", "SET-7",
+            [("TK-701", "Unit A Tank", 13.0, 12.1), ("TK-702", "Unit B Tank", 13.0, 11.4)],
+            ["TK-701 measured 12.1 mm against nominal 13.0 mm over 30 months. "
+             "Minimum required 11.0 mm.",
+             "TK-702 measured 11.4 mm against nominal 13.0 mm over 30 months. "
+             "Minimum required 11.0 mm.",
+             "PSV-701 as-found 9.5 barg. PSV-702 as-found 9.5 barg."])
+    _sop(d / "SOP-701.docx", "SOP-701 - Unit Relief Settings",
+         [("4. Unit A", "Relief valves in Unit A shall be set at 9.5 barg."),
+          ("5. Unit B", "Relief valves in Unit B shall be set at 11.0 barg.")])
+    # TK-701: 0.9/2.5 = 0.36 ; TK-702: 1.6/2.5 = 0.64
+    return DataSet("set-7", "hard", "Same prefix, two units, two different limits", [
+        Q("Which tank is corroding faster, TK-701 or TK-702?", ["TK-702"]),
+        Q("Which relief valve is non-compliant, PSV-701 or PSV-702?",
+          ["PSV-702"], [],
+          "Both are set at 9.5. Unit A requires 9.5 (pass), Unit B requires "
+          "11.0 (fail). The same number is right in one unit and wrong in the other."),
+        Q("What must be closed to isolate TK-702?", ["HV-702"], ["HV-701"]),
+    ])
+
+
+def set8(d: Path) -> DataSet:
+    """Very hard: figures only reachable by arithmetic across two documents."""
+    img, dr = _canvas(title="P&ID - V-801 SEPARATOR", dwg="DWG: SET8-031 REV 7")
+    _tank(dr, 140, 340, 400, 680, "V-801", "SEPARATOR")
+    _psv(dr, 270, 340, "PSV-801")
+    _instr(dr, 470, 400, "LT", "LT-801")
+    dr.line((400, 580, 480, 580), fill=(20, 20, 20), width=3)
+    _valve(dr, 570, 580, "HV-801")
+    dr.line((640, 580, 740, 580), fill=(20, 20, 20), width=3)
+    _pump(dr, 810, 580, "P-801")
+    dr.line((862, 580, 980, 580), fill=(20, 20, 20), width=3)
+    _valve(dr, 1070, 580, "HV-802")
+    _arrow(dr, 1140, 580, 1350, 580, "TO STORAGE")
+    img.save(d / "PID-SET8.png")
+
+    _sheet(d / "history_V-801.xlsx",
+           ["Tag", "Survey year", "Measured mm"],
+           [("V-801", 2018, 17.4), ("V-801", 2022, 16.2), ("V-801", 2026, 15.0)],
+           ["Nominal thickness 18.0 mm", "Minimum required 13.8 mm"])
+    _sop(d / "SOP-801.docx", "SOP-801 - Re-inspection Intervals",
+         [("6. Interval",
+           "Re-inspection interval shall be half the calculated remaining "
+           "life, and shall never exceed 5 years.")])
+    _report(d / "inspection_V-801.docx", "SET-8",
+            [("V-801", "Separator", 18.0, 15.0)],
+            ["Latest survey 2026 recorded 15.0 mm.",
+             "PSV-801 as-found 22.0 barg; SOP requires 22.0 barg.",
+             "Refer to the thickness history sheet for previous surveys."])
+    # 2018->2026: 2.4 mm over 8 yr = 0.30 mm/yr ; life (15.0-13.8)/0.30 = 4.0 yr
+    # interval = half of 4.0 = 2.0 yr
+    return DataSet("set-8", "very hard", "Rate from a history table, then an interval", [
+        Q("What is the long-term corrosion rate of V-801 using the full history?",
+          ["0.30"], [],
+          "2.4 mm between 2018 and 2026 is 8 years, not the latest interval."),
+        Q("What is the remaining life of V-801?", ["4"], [],
+          "(15.0 - 13.8) / 0.30. The minimum is on the history sheet, not the report."),
+        Q("What re-inspection interval does SOP-801 require for V-801?",
+          ["2"], [],
+          "Half of the remaining life - three documents chained together."),
+    ])
+
+
+def set9(d: Path) -> DataSet:
+    """Very hard: two documents disagree and the newer one governs."""
+    img, dr = _canvas(title="P&ID - C-901 COMPRESSOR", dwg="DWG: SET9-044 REV 9")
+    _tank(dr, 110, 380, 300, 660, "V-901", "SUCTION DRUM")
+    _psv(dr, 205, 380, "PSV-901")
+    dr.line((300, 540, 390, 540), fill=(20, 20, 20), width=3)
+    _valve(dr, 480, 540, "HV-901")
+    dr.line((550, 540, 650, 540), fill=(20, 20, 20), width=3)
+    _pump(dr, 720, 540, "C-901")
+    dr.line((772, 540, 880, 540), fill=(20, 20, 20), width=3)
+    _valve(dr, 970, 540, "CV-901")
+    _instr(dr, 880, 370, "PT", "PT-901")
+    _arrow(dr, 1040, 540, 1340, 540, "TO DISCHARGE")
+    img.save(d / "PID-SET9.png")
+
+    _report(d / "inspection_SET9.docx", "SET-9",
+            [("V-901", "Suction Drum", 22.0, 20.8)],
+            ["V-901 measured 20.8 mm against nominal 22.0 mm over 24 months.",
+             "PSV-901 as-found 31.0 barg.",
+             "PT-901 reads 28.4 barg."])
+    _sop(d / "SOP-901-rev3.docx", "SOP-901 Rev 3 - Compressor Relief (SUPERSEDED)",
+         [("Status", "This revision was superseded on 01-Jun-2026 by Rev 4."),
+          ("4. Relief setting",
+           "Compressor suction drum relief valves shall be set at 30.0 barg.")])
+    _sop(d / "SOP-901-rev4.docx", "SOP-901 Rev 4 - Compressor Relief (CURRENT)",
+         [("Status", "Effective 01-Jun-2026. Supersedes Rev 3."),
+          ("4. Relief setting",
+           "Compressor suction drum relief valves shall be set at 32.0 barg.")])
+    # V-901: 1.2 / 2 yr = 0.60
+    return DataSet("set-9", "very hard", "Superseded revision must not be used", [
+        Q("Does PSV-901 meet the current SOP?",
+          ["32.0", "31.0"], [],
+          "Rev 4 is current and requires 32.0, so 31.0 fails. Rev 3's 30.0 "
+          "would make it pass - using the superseded document inverts the answer."),
+        Q("What is the corrosion rate of V-901?", ["0.60"]),
+        Q("What must be closed to isolate V-901?", ["HV-901"], ["PSV-901"]),
+    ])
+
+
+def set10(d: Path) -> DataSet:
+    """Very hard: a missing figure must be refused, not guessed."""
+    img, dr = _canvas(1600, 1020, title="P&ID - U-1000 CRUDE TRAIN",
+                      dwg="DWG: SET10-077 REV 11")
+    _tank(dr, 100, 360, 300, 680, "T-1001", "CRUDE FEED")
+    _psv(dr, 200, 360, "PSV-1001")
+    dr.line((300, 540, 390, 540), fill=(20, 20, 20), width=3)
+    _valve(dr, 480, 540, "HV-1001")
+    dr.line((550, 540, 640, 540), fill=(20, 20, 20), width=3)
+    _pump(dr, 710, 540, "P-1001")
+    dr.line((762, 540, 860, 540), fill=(20, 20, 20), width=3)
+    dr.line((860, 340, 860, 760), fill=(20, 20, 20), width=3)
+    for y, tag in ((340, "HV-1002"), (760, "HV-1003")):
+        dr.line((860, y, 950, y), fill=(20, 20, 20), width=3)
+        _valve(dr, 1040, y, tag)
+        dr.line((1110, y, 1220, y), fill=(20, 20, 20), width=3)
+    dr.rectangle((1220, 260, 1420, 420), outline=(20, 20, 20), width=3)
+    dr.text((1265, 330), "E-1001", font=_f(20, True), fill=(20, 20, 20))
+    dr.rectangle((1220, 680, 1420, 840), outline=(20, 20, 20), width=3)
+    dr.text((1265, 750), "E-1002", font=_f(20, True), fill=(20, 20, 20))
+    _instr(dr, 660, 360, "FT", "FT-1001")
+    img.save(d / "PID-SET10.png")
+
+    _report(d / "inspection_SET10.docx", "U-1000",
+            [("T-1001", "Crude Feed Tank", 20.0, 18.4),
+             ("E-1001", "Preheat Exchanger", 14.0, 13.1)],
+            ["T-1001 measured 18.4 mm against nominal 20.0 mm over 40 months. "
+             "Minimum required 17.2 mm.",
+             "E-1001 measured 13.1 mm against nominal 14.0 mm over 40 months.",
+             "E-1002 was not surveyed during this campaign.",
+             "PSV-1001 as-found 26.0 barg."])
+    _sop(d / "SOP-1001.docx", "SOP-1001 - Crude Train",
+         [("4. Relief", "Crude feed tank relief shall be set at 26.0 barg."),
+          ("9. Survey", "Any exchanger not surveyed in a campaign shall be "
+                        "scheduled within the following 6 months.")])
+    # T-1001: 1.6 / 3.3333 = 0.48
+    return DataSet("set-10", "very hard", "Refuse what is absent; act on what is stated", [
+        Q("What is the corrosion rate of T-1001?", ["0.48"]),
+        Q("What is the measured thickness of E-1002?",
+          ["not"], ["13.1", "14.0"],
+          "E-1002 was not surveyed. Inventing a thickness here is the single "
+          "most dangerous failure the system can make."),
+        Q("What must be closed to isolate T-1001?", ["HV-1001"], ["PSV-1001"]),
+        Q("Does PSV-1001 meet SOP-1001?", ["26.0"], ["non-compliant", "fails"],
+          "26.0 against a required 26.0 - this one PASSES. A system tuned to "
+          "find deviations must still recognise compliance."),
+    ])
+
+
+BUILDERS += [set6, set7, set8, set9, set10]
+
+
 if __name__ == "__main__":
     raise SystemExit(main())

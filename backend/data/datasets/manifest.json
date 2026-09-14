@@ -260,5 +260,189 @@
       }
     ],
     "folder": "/Users/karan/Desktop/Sylithe Agent/backend/data/datasets/set-5"
+  },
+  {
+    "id": "set-6",
+    "level": "hard",
+    "title": "A documented deviation overrides the SOP",
+    "questions": [
+      {
+        "ask": "Is the PSV-601 setting acceptable?",
+        "expect": [
+          "17.5",
+          "DA-2026-114"
+        ],
+        "reject": [],
+        "why": "17.5 is below the SOP's 18.0, but DA-2026-114 approves it until 31-Mar-2027. The naive answer is 'non-compliant' and it is wrong."
+      },
+      {
+        "ask": "What is the corrosion rate of V-601?",
+        "expect": [
+          "0.60"
+        ],
+        "reject": [],
+        "why": ""
+      },
+      {
+        "ask": "What must be closed to isolate V-601?",
+        "expect": [
+          "HV-601"
+        ],
+        "reject": [
+          "PSV-601"
+        ],
+        "why": ""
+      }
+    ],
+    "folder": "/Users/karan/Desktop/Sylithe Agent/backend/data/datasets/set-6"
+  },
+  {
+    "id": "set-7",
+    "level": "hard",
+    "title": "Same prefix, two units, two different limits",
+    "questions": [
+      {
+        "ask": "Which tank is corroding faster, TK-701 or TK-702?",
+        "expect": [
+          "TK-702"
+        ],
+        "reject": [],
+        "why": ""
+      },
+      {
+        "ask": "Which relief valve is non-compliant, PSV-701 or PSV-702?",
+        "expect": [
+          "PSV-702"
+        ],
+        "reject": [],
+        "why": "Both are set at 9.5. Unit A requires 9.5 (pass), Unit B requires 11.0 (fail). The same number is right in one unit and wrong in the other."
+      },
+      {
+        "ask": "What must be closed to isolate TK-702?",
+        "expect": [
+          "HV-702"
+        ],
+        "reject": [
+          "HV-701"
+        ],
+        "why": ""
+      }
+    ],
+    "folder": "/Users/karan/Desktop/Sylithe Agent/backend/data/datasets/set-7"
+  },
+  {
+    "id": "set-8",
+    "level": "very hard",
+    "title": "Rate from a history table, then an interval",
+    "questions": [
+      {
+        "ask": "What is the long-term corrosion rate of V-801 using the full history?",
+        "expect": [
+          "0.30"
+        ],
+        "reject": [],
+        "why": "2.4 mm between 2018 and 2026 is 8 years, not the latest interval."
+      },
+      {
+        "ask": "What is the remaining life of V-801?",
+        "expect": [
+          "4"
+        ],
+        "reject": [],
+        "why": "(15.0 - 13.8) / 0.30. The minimum is on the history sheet, not the report."
+      },
+      {
+        "ask": "What re-inspection interval does SOP-801 require for V-801?",
+        "expect": [
+          "2"
+        ],
+        "reject": [],
+        "why": "Half of the remaining life - three documents chained together."
+      }
+    ],
+    "folder": "/Users/karan/Desktop/Sylithe Agent/backend/data/datasets/set-8"
+  },
+  {
+    "id": "set-9",
+    "level": "very hard",
+    "title": "Superseded revision must not be used",
+    "questions": [
+      {
+        "ask": "Does PSV-901 meet the current SOP?",
+        "expect": [
+          "32.0",
+          "31.0"
+        ],
+        "reject": [],
+        "why": "Rev 4 is current and requires 32.0, so 31.0 fails. Rev 3's 30.0 would make it pass - using the superseded document inverts the answer."
+      },
+      {
+        "ask": "What is the corrosion rate of V-901?",
+        "expect": [
+          "0.60"
+        ],
+        "reject": [],
+        "why": ""
+      },
+      {
+        "ask": "What must be closed to isolate V-901?",
+        "expect": [
+          "HV-901"
+        ],
+        "reject": [
+          "PSV-901"
+        ],
+        "why": ""
+      }
+    ],
+    "folder": "/Users/karan/Desktop/Sylithe Agent/backend/data/datasets/set-9"
+  },
+  {
+    "id": "set-10",
+    "level": "very hard",
+    "title": "Refuse what is absent; act on what is stated",
+    "questions": [
+      {
+        "ask": "What is the corrosion rate of T-1001?",
+        "expect": [
+          "0.48"
+        ],
+        "reject": [],
+        "why": ""
+      },
+      {
+        "ask": "What is the measured thickness of E-1002?",
+        "expect": [
+          "not"
+        ],
+        "reject": [
+          "13.1",
+          "14.0"
+        ],
+        "why": "E-1002 was not surveyed. Inventing a thickness here is the single most dangerous failure the system can make."
+      },
+      {
+        "ask": "What must be closed to isolate T-1001?",
+        "expect": [
+          "HV-1001"
+        ],
+        "reject": [
+          "PSV-1001"
+        ],
+        "why": ""
+      },
+      {
+        "ask": "Does PSV-1001 meet SOP-1001?",
+        "expect": [
+          "26.0"
+        ],
+        "reject": [
+          "non-compliant",
+          "fails"
+        ],
+        "why": "26.0 against a required 26.0 - this one PASSES. A system tuned to find deviations must still recognise compliance."
+      }
+    ],
+    "folder": "/Users/karan/Desktop/Sylithe Agent/backend/data/datasets/set-10"
   }
 ]
