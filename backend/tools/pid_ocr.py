@@ -227,6 +227,11 @@ def analyze(image: str | Path, weights: Path = WEIGHTS,
         "image": str(image),
         "symbols": [s.as_dict() for s in symbols],
         "tags": [t.text for t in tags],
+        # positions too: a caller that re-runs OCR sees the UNcorrected text
+        # and cannot match it back ("PSV-241" != "PSV-2041"), which silently
+        # dropped the relief valve from the graph.
+        "tag_boxes": [{"text": t.text, "cx": t.cx, "cy": t.cy,
+                       "score": t.score} for t in tags],
         "unmatched_tags": [t.text for t in tags if t.text not in claimed],
         "text_boxes": len(boxes),
         "corrections": corrections,
