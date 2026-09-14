@@ -344,34 +344,3 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
        transition:width .3s ease}
 
 
-/* ---- folder picker ---- */
-.pickwrap{border:1px solid var(--line);border-radius:10px;background:var(--surface);
-          margin-bottom:8px;overflow:hidden}
-.pickbar{display:flex;align-items:center;gap:6px;padding:8px 10px;
-         border-bottom:1px solid var(--line);flex-wrap:wrap}
-.crumb{font-size:11.5px;color:var(--dim);background:none;border:none;padding:2px 5px;
-       border-radius:5px;font-family:var(--mono)}
-.crumb:hover{background:var(--side);color:var(--ink)}
-.crumb:last-child{color:var(--ink);font-weight:500}
-.crumbsep{color:var(--dim2);font-size:10px}
-.picklist{max-height:210px;overflow-y:auto}
-.pickrow{display:flex;align-items:center;gap:9px;padding:8px 12px;cursor:pointer;
-         font-size:13px;border-bottom:1px solid var(--line)}
-.pickrow:last-child{border-bottom:none}
-.pickrow:hover{background:var(--side)}
-.pickrow .ic{color:var(--dim2);flex:none;line-height:0}
-.pickrow .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;
-             white-space:nowrap}
-.pickrow .ct{font-family:var(--mono);font-size:11px;color:var(--dim2);flex:none}
-.pickrow .ct.has{color:var(--ok)}
-.pickfoot{display:flex;align-items:center;gap:8px;padding:9px 11px;
-          border-top:1px solid var(--line);background:var(--side)}
-.pickfoot .here{flex:1;font-family:var(--mono);font-size:11.5px;color:var(--dim);
-                overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pickfoot button{background:var(--accent);color:var(--accent-ink);border:none;
-                 border-radius:8px;padding:7px 14px;font-size:12.5px;font-weight:500}
-.pickfoot button[disabled]{background:var(--line2);cursor:not-allowed}
-.places{display:flex;gap:6px;flex-wrap:wrap}
-.places button{font-size:11.5px;padding:4px 9px;border-radius:14px;
-               border:1px solid var(--line);background:var(--surface);color:var(--dim)}
-.places button:hover{border-color:var(--accent);color:var(--accent)}

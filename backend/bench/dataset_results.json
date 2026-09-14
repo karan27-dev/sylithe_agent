@@ -1,6 +1,6 @@
 {
-  "overall_percent": 92.3,
-  "passed": 36,
+  "overall_percent": 76.9,
+  "passed": 30,
   "total": 39,
   "external_calls": 0,
   "sets": [
@@ -19,7 +19,7 @@
           "missing": [],
           "wrongly_said": [],
           "why": "",
-          "seconds": 30.9,
+          "seconds": 16.4,
           "answer": "The shell thickness of V-101 is measured at 9.4 mm [1]. This value is below the nominal dimension of 10.0 mm [1]. The inspection interval since the last survey was 24 months [2]. A"
         },
         {
@@ -28,8 +28,8 @@
           "missing": [],
           "wrongly_said": [],
           "why": "9.0 against a required 10.0 is a non-conformance.",
-          "seconds": 29.9,
-          "answer": "The PSV-101 set pressure of 9.0 barg does not meet the requirement in SOP-201, which mandates 10.0 barg [1][3]. This discrepancy results in a non-conformance that must be raised as"
+          "seconds": 16.2,
+          "answer": "No, the PSV-101 set pressure does not meet SOP-201 [1]. The as-found value of 9.0 barg is below the required 10.0 barg [1], resulting in a non-conformance [1]. This issue was raise"
         },
         {
           "ask": "What must be closed to isolate V-101 on this P&ID?",
@@ -37,7 +37,7 @@
           "missing": [],
           "wrongly_said": [],
           "why": "One valve on the path out. A relief device is never an isolation point.",
-          "seconds": 35.8,
+          "seconds": 32.6,
           "answer": "Close HV-101."
         },
         {
@@ -46,7 +46,7 @@
           "missing": [],
           "wrongly_said": [],
           "why": "",
-          "seconds": 32.4,
+          "seconds": 19.9,
           "answer": "```python\n# from the passages\nnominal_mm = 10.0\nmeasured_mm = 9.4\nmonths = 24\nmin_req_mm = 8.6\n\nloss = nominal_mm - measured_mm\nrate = loss / (months / 12)\nlife = (measured_mm - mi"
         }
       ]
@@ -66,7 +66,7 @@
           "missing": [],
           "wrongly_said": [],
           "why": "All four must be listed - dropping one reads as 'not present'.",
-          "seconds": 32.8,
+          "seconds": 19.8,
           "answer": "HV-201, HV-202, PI-201, P-201, T-201"
         },
         {
@@ -75,7 +75,7 @@
           "missing": [],
           "wrongly_said": [],
           "why": "",
-          "seconds": 31.7,
+          "seconds": 16.8,
           "answer": "```python\n# from the passages\nnominal_mm  = 14.0\nmeasured_mm = 13.4\nmonths      = 36\nmin_req_mm  = 12.5\n\nloss = nominal_mm - measured_mm\nrate = loss / (months / 12)\nlife = (measure"
         },
         {
@@ -84,7 +84,7 @@
           "missing": [],
           "wrongly_said": [],
           "why": "",
-          "seconds": 25.8,
+          "seconds": 18.8,
           "answer": "Close HV-201."
         },
         {
@@ -93,7 +93,7 @@
           "missing": [],
           "wrongly_said": [],
           "why": "",
-          "seconds": 21.2,
+          "seconds": 13.2,
           "answer": "PI-201 reads 4.2 barg [1]. The design pressure for PI-201 is 6.0 barg [1]."
         }
       ]
@@ -113,7 +113,7 @@
           "missing": [],
           "wrongly_said": [],
           "why": "",
-          "seconds": 25.1,
+          "seconds": 14.5,
           "answer": "```python\n# from the passages\nnominal_mm = 14.0\nmeasured_mm = 12.9\nmonths = 33\nmin_req_mm = 11.8\n\nloss = nominal_mm - measured_mm\nrate = loss / (months / 12)\nlife = (measured_mm - "
         },
         {
@@ -122,8 +122,8 @@
           "missing": [],
           "wrongly_said": [],
           "why": "0.40 against 0.13 mm/yr - it must compare, not just recite.",
-          "seconds": 28.1,
-          "answer": "P-301A is corroding faster because its casing measured 15.1 mm against a nominal 16.0 mm [2], whereas P-301B measured only 15.7 mm [2].\nThe inspection report confirms that P-301A h"
+          "seconds": 19.8,
+          "answer": "P-301A is corroding faster because it has a measured casing diameter of 15.1 mm against a nominal 16.0 mm [2].\nP-301B shows less corrosion with a measured diameter of 15.7 mm again"
         },
         {
           "ask": "Does PSV-301 meet SOP-301?",
@@ -131,8 +131,8 @@
           "missing": [],
           "wrongly_said": [],
           "why": "",
-          "seconds": 34.3,
-          "answer": "PSV-301 as-found pressure is 11.5 barg [1].\nSOP-301 requires a minimum of 12.0 barg for this equipment [1].\nThe measured value (11.5 barg) is below the requirement (12.0 barg).\nThi"
+          "seconds": 21.2,
+          "answer": "PSV-301 is not compliant with SOP-301 as the set pressure of 11.5 barg falls below the required 12.0 barg [1]. This non-conformance was recorded as NCR-2026-0088 [2].\nThe relief va"
         },
         {
           "ask": "What must be closed to isolate T-301?",
@@ -140,7 +140,7 @@
           "missing": [],
           "wrongly_said": [],
           "why": "",
-          "seconds": 28.6,
+          "seconds": 23.4,
           "answer": "Close HV-301."
         },
         {
@@ -152,8 +152,8 @@
           ],
           "wrongly_said": [],
           "why": "SOP-301 clause 7 forbids it - the answer is in the SOP, not the drawing.",
-          "seconds": 28.3,
-          "answer": "No. According to the SOP-301 clause 7, this action is forbidden."
+          "seconds": 28.2,
+          "answer": "No. According to SOP-301 clause 7, this action is forbidden."
         }
       ]
     },
@@ -162,9 +162,9 @@
       "level": "medium",
       "title": "Exchanger train, cross-document spec",
       "chunks": 3,
-      "passed": 3,
+      "passed": 2,
       "total": 4,
-      "percent": 75.0,
+      "percent": 50.0,
       "questions": [
         {
           "ask": "What is the corrosion rate and remaining life of E-401?",
@@ -172,7 +172,7 @@
           "missing": [],
           "wrongly_said": [],
           "why": "1.8 mm over 4 years. Remaining life uses the 15.0 mm minimum.",
-          "seconds": 24.2,
+          "seconds": 25.3,
           "answer": "```python\n# from the passages\nnominal_mm = 18.0\nmeasured_mm = 16.2\nmonths = 48\nmin_req_mm = 15.0\n\nloss = nominal_mm - measured_mm\nrate = loss / (months / 12)\nlife = (measured_mm - "
         },
         {
@@ -181,28 +181,32 @@
           "missing": [],
           "wrongly_said": [],
           "why": "168 exceeds 160 - the limit is in the SOP, the reading in the report.",
-          "seconds": 17.0,
+          "seconds": 18.2,
           "answer": "The TI-401 outlet temperature is 168 degC [1], which exceeds the SOP limit of 160 degC [2]. Immediate review is required for this reading."
         },
         {
           "ask": "Does PSV-401 meet SOP-401?",
           "passed": false,
           "missing": [
+            "7.4",
             "8.0"
           ],
           "wrongly_said": [],
           "why": "",
-          "seconds": 23.6,
-          "answer": "PSV-401 as-found pressure is 7.4 barg [1].\nSOP-401 requires a minimum of 12.5 barg for this equipment [2].\nThe measured value (7.4 barg) is below the requirement (12.5 barg).\nThis "
+          "seconds": 17.6,
+          "answer": "I cannot answer your question because I do not have access to the specific documents containing the data for PSV-401 or SOP-401. Please provide the relevant document text or tag, a"
         },
         {
           "ask": "What must be closed to isolate E-401?",
-          "passed": true,
-          "missing": [],
+          "passed": false,
+          "missing": [
+            "HV-401",
+            "HV-402"
+          ],
           "wrongly_said": [],
           "why": "Two paths reach the exchanger, so both valves are required.",
-          "seconds": 22.5,
-          "answer": "Must close HV-401 and HV-402."
+          "seconds": 24.2,
+          "answer": "Two paths reach the exchanger, so both valves are required."
         }
       ]
     },
@@ -211,9 +215,9 @@
       "level": "complex",
       "title": "Three-branch manifold, two relief devices, conflicting specs",
       "chunks": 4,
-      "passed": 6,
+      "passed": 4,
       "total": 6,
-      "percent": 100.0,
+      "percent": 66.7,
       "questions": [
         {
           "ask": "What is the corrosion rate of T-501?",
@@ -221,7 +225,7 @@
           "missing": [],
           "wrongly_said": [],
           "why": "",
-          "seconds": 19.0,
+          "seconds": 25.9,
           "answer": "```python\n# from the passages\nnominal_mm = 16.0\nmeasured_mm = 14.2\nmonths = 45\nmin_req_mm = 12.4\n\nloss = nominal_mm - measured_mm\nrate = loss / (months / 12)\nlife = (measured_mm - "
         },
         {
@@ -230,17 +234,20 @@
           "missing": [],
           "wrongly_said": [],
           "why": "PSV-501 at 14.8 against 15.0 fails; PSV-502 at 6.2 against 6.0 does not. Two devices, two different limits in the same SOP.",
-          "seconds": 31.6,
-          "answer": "**PSV-501** is the non-compliant relief valve.\n\n*   **Requirement:** SOP-501 states that the PSV protecting the surge drum (T-501) shall be set at **15.0 barg**.\n*   **As-found:** "
+          "seconds": 33.0,
+          "answer": "**PSV-501 is non-compliant.**\n\n*   **Requirement:** SOP-501 requires a set pressure of 15.0 barg for the surge drum relief [3].\n*   **Found Value:** PSV-501 as-found is 14.8 barg ["
         },
         {
           "ask": "Is the LT-501 level within the SOP limit?",
-          "passed": true,
-          "missing": [],
+          "passed": false,
+          "missing": [
+            "78",
+            "75"
+          ],
           "wrongly_said": [],
           "why": "",
-          "seconds": 18.8,
-          "answer": "LT-501 indicates 78 percent level [1].\nSOP-501 states surge drum level shall not exceed 75 percent [2].\nThe measured value of 78 percent exceeds the 75 percent limit [3].\nTherefore"
+          "seconds": 16.0,
+          "answer": "The LT-501 level is not in the record [2]. The provided passages only contain data for T-301, P-301A, P-301B, and PSV-301. No information regarding an LT-501 tank or its operationa"
         },
         {
           "ask": "What must be closed to isolate T-501?",
@@ -248,17 +255,21 @@
           "missing": [],
           "wrongly_said": [],
           "why": "",
-          "seconds": 32.6,
+          "seconds": 30.1,
           "answer": "Close HV-501."
         },
         {
           "ask": "Which branch valves are on the manifold?",
-          "passed": true,
-          "missing": [],
+          "passed": false,
+          "missing": [
+            "HV-502",
+            "HV-503",
+            "HV-504"
+          ],
           "wrongly_said": [],
           "why": "All three branches, not just the first.",
-          "seconds": 28.3,
-          "answer": "Branch valves on the manifold:\nHV-501, HV-502, HV-503, HV-504"
+          "seconds": 25.1,
+          "answer": "Branch valves on the manifold: None."
         },
         {
           "ask": "Which corrodes faster, T-501 or E-501?",
@@ -266,8 +277,8 @@
           "missing": [],
           "wrongly_said": [],
           "why": "0.48 against 0.44 - close enough that it must actually compute both.",
-          "seconds": 26.7,
-          "answer": "T-501 corrodes faster as its measured thickness (14.2 mm) is closer to the nominal value (16.0 mm) than E-501's measured thickness (11.9 mm) against its nominal value (13.0 mm). [1"
+          "seconds": 17.1,
+          "answer": "T-501 is not in the record; only T-301 and P-301A/B are listed [2].\nE-501 is not in the record; only T-301, P-301A, and P-301B are listed [2].\nBoth T-301 and P-301A/B were inspecte"
         }
       ]
     },
@@ -276,9 +287,9 @@
       "level": "hard",
       "title": "A documented deviation overrides the SOP",
       "chunks": 4,
-      "passed": 3,
+      "passed": 2,
       "total": 3,
-      "percent": 100.0,
+      "percent": 66.7,
       "questions": [
         {
           "ask": "Is the PSV-601 setting acceptable?",
@@ -286,17 +297,19 @@
           "missing": [],
           "wrongly_said": [],
           "why": "17.5 is below the SOP's 18.0, but DA-2026-114 approves it until 31-Mar-2027. The naive answer is 'non-compliant' and it is wrong.",
-          "seconds": 20.0,
+          "seconds": 17.0,
           "answer": "The PSV-601 setting of 17.5 barg is not immediately non-compliant as it falls below the SOP requirement of 18.0 barg [3]. However, DA-2026-114 explicitly approves this deviation un"
         },
         {
           "ask": "What is the corrosion rate of V-601?",
-          "passed": true,
-          "missing": [],
+          "passed": false,
+          "missing": [
+            "0.60"
+          ],
           "wrongly_said": [],
           "why": "",
-          "seconds": 23.0,
-          "answer": "```python\n# from the passages\nnominal_mm = 15.0\nmeasured_mm = 13.1\nmonths = 38\nmin_req_mm = 12.6\n\nloss = nominal_mm - measured_mm\nrate = loss / (months / 12)\nlife = (measured_mm - "
+          "seconds": 20.3,
+          "answer": "```python\n# from the passages\nnominal_mm  = 12.0\nmeasured_mm = 11.2\nmonths      = 24\nmin_req_mm  = 10.4\n\nloss = nominal_mm - measured_mm\nrate = loss / (months / 12)\nlife = (measure"
         },
         {
           "ask": "What must be closed to isolate V-601?",
@@ -304,7 +317,7 @@
           "missing": [],
           "wrongly_said": [],
           "why": "",
-          "seconds": 20.8,
+          "seconds": 21.5,
           "answer": "Close HV-601."
         }
       ]
@@ -324,7 +337,7 @@
           "missing": [],
           "wrongly_said": [],
           "why": "",
-          "seconds": 19.1,
+          "seconds": 24.3,
           "answer": "TK-701 is corroding faster as it has a measured diameter of 12.1 mm compared to the minimum required 11.0 mm [1].\nTK-702 is also corroding at a rate exceeding its minimum requireme"
         },
         {
@@ -333,8 +346,8 @@
           "missing": [],
           "wrongly_said": [],
           "why": "Both are set at 9.5. Unit A requires 9.5 (pass), Unit B requires 11.0 (fail). The same number is right in one unit and wrong in the other.",
-          "seconds": 29.3,
-          "answer": "PSV-701 is non-compliant.\n\n**Reasoning:**\n*   **Requirement:** SOP-701 (Document) states that Relief valves in Unit A shall be set at **9.5 barg**.\n*   **Finding:** PSV-701 was fou"
+          "seconds": 36.9,
+          "answer": "**PSV-701** is non-compliant.\n\n*   **Requirement:** SOP-701 requires a set pressure of 9.5 barg [1].\n*   **Found Setting:** PSV-701 is set at 9.5 barg [2].\n*   **Status:** The sett"
         },
         {
           "ask": "What must be closed to isolate TK-702?",
@@ -342,7 +355,7 @@
           "missing": [],
           "wrongly_said": [],
           "why": "",
-          "seconds": 22.0,
+          "seconds": 28.3,
           "answer": "Close HV-702."
         }
       ]
@@ -352,9 +365,9 @@
       "level": "very hard",
       "title": "Rate from a history table, then an interval",
       "chunks": 4,
-      "passed": 2,
+      "passed": 1,
       "total": 3,
-      "percent": 66.7,
+      "percent": 33.3,
       "questions": [
         {
           "ask": "What is the long-term corrosion rate of V-801 using the full history?",
@@ -364,16 +377,18 @@
           ],
           "wrongly_said": [],
           "why": "2.4 mm between 2018 and 2026 is 8 years, not the latest interval.",
-          "seconds": 24.7,
+          "seconds": 29.4,
           "answer": "```python\n# from the passages\nnominal_mm = 18.0\nmeasured_2018 = 17.4\nmeasured_2022 = 16.2\nmeasured_2026 = 15.0\nmin_req_mm = 13.8\n\n# Calculate loss between first two recorded measur"
         },
         {
           "ask": "What is the remaining life of V-801?",
-          "passed": true,
-          "missing": [],
+          "passed": false,
+          "missing": [
+            "4"
+          ],
           "wrongly_said": [],
           "why": "(15.0 - 13.8) / 0.30. The minimum is on the history sheet, not the report.",
-          "seconds": 21.3,
+          "seconds": 26.3,
           "answer": "The remaining life is calculated as (measured thickness - minimum required thickness) divided by corrosion rate [2].\nUsing measured_mm = 15.0 mm and min_req_mm = 13.8 mm gives a lo"
         },
         {
@@ -382,8 +397,8 @@
           "missing": [],
           "wrongly_said": [],
           "why": "Half of the remaining life - three documents chained together.",
-          "seconds": 20.9,
-          "answer": "The SOP-801 requires a re-inspection interval of half the calculated remaining life [3].\nThis interval must never exceed 5 years [3].\nFor V-801, the nominal thickness is 18.0 mm [2"
+          "seconds": 27.0,
+          "answer": "The SOP-801 requires a re-inspection interval of half the calculated remaining life [3].\nThis interval shall never exceed 5 years [3].\nFor V-801, the nominal thickness is 18.0 mm ["
         }
       ]
     },
@@ -402,8 +417,8 @@
           "missing": [],
           "wrongly_said": [],
           "why": "Rev 4 is current and requires 32.0, so 31.0 fails. Rev 3's 30.0 would make it pass - using the superseded document inverts the answer.",
-          "seconds": 19.3,
-          "answer": "PSV-901 as-found pressure is 31.0 barg [1].\nSOP-901-rev4 requires a setting of 32.0 barg [3].\nThe measured value (31.0 barg) is below the requirement (32.0 barg).\nThis constitutes "
+          "seconds": 24.5,
+          "answer": "PSV-901 is at 31.0 barg [1], which does not meet the requirement in SOP-901-rev4.docx of 32.0 barg [3].\nThis discrepancy results in a non-conformance, raising NCR-2026-0088 [2] for"
         },
         {
           "ask": "What is the corrosion rate of V-901?",
@@ -411,8 +426,8 @@
           "missing": [],
           "wrongly_said": [],
           "why": "",
-          "seconds": 22.6,
-          "answer": "```python\n# from the passages\nnominal_mm = 22.0\nmeasured_mm = 20.8\nmonths = 24\nmin_req_mm = 10.4\n\nloss = nominal_mm - measured_mm\nrate = loss / (months / 12)\nlife = (measured_mm - "
+          "seconds": 19.2,
+          "answer": "```python\n# from the passages\nnominal_mm = 15.0\nmeasured_mm = 13.1\nmonths = 38\nmin_req_mm = 12.6\n\nloss = nominal_mm - measured_mm\nrate = loss / (months / 12)\nlife = (measured_mm - "
         },
         {
           "ask": "What must be closed to isolate V-901?",
@@ -420,7 +435,7 @@
           "missing": [],
           "wrongly_said": [],
           "why": "",
-          "seconds": 21.7,
+          "seconds": 32.3,
           "answer": "Close HV-901."
         }
       ]
@@ -430,9 +445,9 @@
       "level": "very hard",
       "title": "Refuse what is absent; act on what is stated",
       "chunks": 3,
-      "passed": 4,
+      "passed": 3,
       "total": 4,
-      "percent": 100.0,
+      "percent": 75.0,
       "questions": [
         {
           "ask": "What is the corrosion rate of T-1001?",
@@ -440,7 +455,7 @@
           "missing": [],
           "wrongly_said": [],
           "why": "",
-          "seconds": 18.4,
+          "seconds": 22.0,
           "answer": "```python\n# from the passages\nnominal_mm = 20.0\nmeasured_mm = 18.4\nmonths = 40\nmin_req_mm = 17.2\n\nloss = nominal_mm - measured_mm\nrate = loss / (months / 12)\nlife = (measured_mm - "
         },
         {
@@ -449,8 +464,8 @@
           "missing": [],
           "wrongly_said": [],
           "why": "E-1002 was not surveyed. Inventing a thickness here is the single most dangerous failure the system can make.",
-          "seconds": 22.2,
-          "answer": "E-1002 was not surveyed during this campaign [1]. Not in the record."
+          "seconds": 23.7,
+          "answer": "The provided passages do not contain information regarding equipment E-1002.\nNot in the record.\nNo measurements or specifications for E-1002 are listed in the inspection reports or"
         },
         {
           "ask": "What must be closed to isolate T-1001?",
@@ -458,17 +473,19 @@
           "missing": [],
           "wrongly_said": [],
           "why": "",
-          "seconds": 24.7,
+          "seconds": 38.1,
           "answer": "Close HV-1001."
         },
         {
           "ask": "Does PSV-1001 meet SOP-1001?",
-          "passed": true,
-          "missing": [],
+          "passed": false,
+          "missing": [
+            "26.0"
+          ],
           "wrongly_said": [],
           "why": "26.0 against a required 26.0 - this one PASSES. A system tuned to find deviations must still recognise compliance.",
-          "seconds": 21.5,
-          "answer": "PSV-1001 as-found pressure is 26.0 barg [1].\nSOP-1001 requires a minimum of 24.0 barg for this equipment [2].\n26.0 > 24.0, so the device meets the requirement [2]."
+          "seconds": 15.3,
+          "answer": "PSV-1001 is not in the provided record; no observations or settings are listed for this specific valve [1].\nThe available document, inspection_SET7.docx, only covers valves TK-701 "
         }
       ]
     }

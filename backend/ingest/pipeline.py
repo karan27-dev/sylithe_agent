@@ -348,10 +348,21 @@ def _tables(db) -> list[str]:
     right thing but is deprecated. Normalise both in one place.
     """
     lt = getattr(db, "list_tables", None)
-    if lt is not None:
-        res = lt()
-        return list(getattr(res, "tables", res) or [])
-    return list(db.table_names())
+    names = list(getattr(lt(), "tables", lt()) or []) if lt else list(db.table_names())
+
+    # The listing lies after a table directory is deleted underneath it: it
+    # still returns "corpus" while open_table raises "Table 'corpus' was not
+    # found". Everything downstream then believed an index existed - build()
+    # skipped every file as already ingested, status() crashed, and a folder
+    # summary came back blank against an empty index. Verify by opening.
+    ok = []
+    for n in names:
+        try:
+            db.open_table(n)
+            ok.append(n)
+        except Exception:
+            continue
+    return ok
 
 
 def _files(paths: Iterable[Path] | None = None) -> list[Path]:
@@ -379,6 +390,18 @@ def build(
     _quiet()
     client = client or Client()
     manifest = {} if rebuild else _load_manifest()
+
+    # The manifest records what has been ingested; the index holds the result.
+    # They can drift apart - delete the index and the manifest survives, so
+    # every file is "already indexed" and nothing is ever read again. Seen for
+    # real: a folder reported "11 already indexed - nothing changed" against an
+    # empty index, and the summary came back blank. If the index is gone, the
+    # manifest is describing something that no longer exists.
+    try:
+        if TABLE not in _tables(_db()):
+            manifest = {}          # no index means nothing is really ingested
+    except Exception:
+        manifest = {}
     db = _db()
     converter = None
 

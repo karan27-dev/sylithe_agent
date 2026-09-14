@@ -461,14 +461,14 @@ folderBtn.onclick = async () => {
       analyseFolder(r.path);
       return;
     }
-    // No native dialog here - fall back to browsing in the page.
-    toast(r.error || "Opening the in-page browser instead", 4000);
+    // No native dialog here - fall back to typing a path.
+    toast(r.error || "Type the folder path below", 5000);
     folderPanel.hidden = false;
-    loadPlaces(); browse("");
+    folderPath.focus();
   }catch(e){
     toast("Could not open the chooser: " + e.message, 5000);
     folderPanel.hidden = false;
-    loadPlaces(); browse("");
+    folderPath.focus();
   }finally{
     folderBtn.disabled = false;
   }
@@ -477,7 +477,13 @@ folderBtn.onclick = async () => {
 folderPath.addEventListener("keydown", e => {
   if(e.key === "Enter"){ e.preventDefault(); scanFolder(); }
 });
-folderScan.onclick = () => folderReady ? ingestFolder() : scanFolder();
+folderScan.onclick = () => {
+  const path = folderPath.value.trim();
+  if(!path) return;
+  folderPanel.hidden = true;
+  folderBtn.classList.remove("on");
+  analyseFolder(path);
+};
 
 async function scanFolder(){
   const path = folderPath.value.trim();
@@ -659,90 +665,113 @@ micReady().then(c => {
 });
 
 
+/* The in-page folder browser is gone.
+   It existed because a browser cannot return a real filesystem path, but the
+   backend is a local process and opens the machine's own dialog - so the page
+   was showing a second, worse picker behind the real one. The typed path stays
+   as the fallback for when no native dialog is available. */
+
+/* ==================== dictation ==================== */
+/* The default Web Speech API streams audio to Google's servers. On this
+   project that is disqualifying - and worse, our own monitor would not even
+   catch it, because the request comes from the browser rather than from our
+   process. Chrome 139+ can run recognition ON DEVICE, so we require that mode
+   and refuse the microphone altogether when it is unavailable, rather than
+   quietly sending someone's plant discussion to a cloud service. */
+
+const micBtn = $("#micbtn"), micLabel = $("#miclabel");
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null, recording = false;
+
+async function micReady(){
+  if(!SR) return { ok:false, why:"This browser has no speech recognition." };
+  if(!SR.available) return { ok:false,
+    why:"This browser cannot confirm on-device speech. Dictation is disabled "
+      + "because the fallback would send your audio to a cloud service." };
+  try{
+    const state = await SR.available({ langs:["en-US"], processLocally:true });
+    if(state === "available") return { ok:true };
+    if(state === "downloadable" || state === "downloading")
+      return { ok:false, downloadable:true,
+        why:"The on-device speech model is not installed yet." };
+    return { ok:false,
+      why:"On-device speech is unavailable here, and the cloud fallback is "
+        + "not acceptable on an air-gapped workbench." };
+  }catch(e){
+    return { ok:false, why:"Could not verify on-device speech: " + e.message };
+  }
+}
+
+micBtn.onclick = async () => {
+  if(recording){ rec?.stop(); return; }
+  const chk = await micReady();
+  if(!chk.ok){
+    toast(chk.why, 7000);
+    if(chk.downloadable){
+      try{
+        toast("Downloading the on-device speech model once...", 8000);
+        await SR.install({ langs:["en-US"], processLocally:true });
+        toast("On-device speech installed - press Speak again.", 5000);
+      }catch(e){ toast("Install failed: " + e.message, 6000); }
+    }
+    return;
+  }
+
+  rec = new SR();
+  rec.lang = "en-US";
+  rec.continuous = true;
+  rec.interimResults = true;
+  rec.processLocally = true;      // the whole point - never leaves the machine
+
+  const before = qEl.value;
+  rec.onstart = () => {
+    recording = true;
+    micBtn.classList.add("rec");
+    micLabel.textContent = "Stop";
+    toast("Listening on-device - audio stays on this machine", 3000);
+  };
+  // ev.resultIndex points at the first CHANGED result, not at the start. Once
+  // a phrase is finalised the next event begins at a higher index, so reading
+  // from resultIndex gives only the newest fragment - and writing
+  // `before + fragment` threw away everything said earlier. That is why a
+  // pause made the sentence restart. Keep finalised text separately and add
+  // only the still-changing tail.
+  let finalText = "";
+  rec.onresult = ev => {
+    let interim = "";
+    for(let i = ev.resultIndex; i < ev.results.length; i++){
+      const r = ev.results[i];
+      if(r.isFinal) finalText += r[0].transcript;
+      else interim += r[0].transcript;
+    }
+    qEl.value = (before ? before + " " : "") + finalText + interim;
+    qEl.style.height = "auto";
+    qEl.style.height = Math.min(qEl.scrollHeight, 200) + "px";
+  };
+  rec.onerror = ev => toast("Dictation error: " + ev.error, 5000);
+  rec.onend = () => {
+    recording = false;
+    micBtn.classList.remove("rec");
+    micLabel.textContent = "Speak";
+    qEl.focus();
+  };
+  try{ rec.start(); }catch(e){ toast("Could not start: " + e.message, 5000); }
+};
+
+// Say up front whether dictation is possible, rather than after a click.
+micReady().then(c => {
+  if(!c.ok && !c.downloadable){
+    micBtn.disabled = true;
+    micBtn.title = c.why;
+  }
+});
+
+
 /* ==================== folder picker ==================== */
 /* A browser file picker cannot return a real filesystem path - that is a
    deliberate security boundary, which is why typing one was the only option at
    first. The backend runs on this same machine though, so it can list
    directories and the picker gets real paths without uploading or copying. */
-
-const pickList = $("#picklist"), pickHere = $("#pickhere"),
-      pickUse = $("#pickuse"), crumbs = $("#crumbs"), placesEl = $("#places");
-let pickPath = "";
-
-const ICON_DIR = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-  stroke="currentColor" stroke-width="2" stroke-linecap="round"
-  stroke-linejoin="round"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2
-  2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>`;
-
-async function loadPlaces(){
-  try{
-    const r = await (await fetch("/api/folder/places")).json();
-    placesEl.innerHTML = r.places
-      .map(p => `<button data-go="${esc(p.path)}">${esc(p.label)}</button>`).join("");
-    placesEl.querySelectorAll("[data-go]").forEach(b =>
-      b.onclick = () => browse(b.dataset.go));
-  }catch(e){}
-}
-
-async function browse(path){
-  pickList.innerHTML = `<div class="pickrow"><span class="nm">Loading…</span></div>`;
-  try{
-    const r = await (await fetch(
-      "/api/folder/list?path=" + encodeURIComponent(path || ""))).json();
-    if(r.error){
-      pickList.innerHTML =
-        `<div class="pickrow"><span class="nm" style="color:var(--bad)">${esc(r.error)}</span></div>`;
-      return;
-    }
-    pickPath = r.path;
-    pickHere.textContent = r.path;
-    pickUse.disabled = false;
-    pickUse.textContent = r.supported
-      ? `Use this folder (${r.supported} readable)` : "Use this folder";
-
-    crumbs.innerHTML = r.crumbs.map((c,i) =>
-      `${i ? '<span class="crumbsep">/</span>' : ""}`
-      + `<button class="crumb" data-go="${esc(c.path)}">${esc(c.name)}</button>`).join("");
-    crumbs.querySelectorAll("[data-go]").forEach(b =>
-      b.onclick = () => browse(b.dataset.go));
-
-    const rows = [];
-    if(r.parent) rows.push(
-      `<div class="pickrow" data-go="${esc(r.parent)}">
-         <span class="ic">${ICON_DIR}</span><span class="nm">..</span></div>`);
-    for(const d of r.dirs) rows.push(
-      `<div class="pickrow" data-go="${esc(d.path)}">
-         <span class="ic">${ICON_DIR}</span>
-         <span class="nm">${esc(d.name)}</span>
-         <span class="ct ${d.docs > 0 ? "has" : ""}">${
-           d.docs > 0 ? d.docs + " docs" : d.docs < 0 ? "locked" : ""}</span></div>`);
-    if(!r.dirs.length && !r.parent) rows.push(
-      `<div class="pickrow"><span class="nm">No sub-folders</span></div>`);
-    pickList.innerHTML = rows.join("");
-    pickList.querySelectorAll("[data-go]").forEach(el =>
-      el.onclick = () => browse(el.dataset.go));
-  }catch(e){
-    pickList.innerHTML = `<div class="pickrow"><span class="nm">${esc(e.message)}</span></div>`;
-  }
-}
-
-
-// The real macOS folder chooser. The browser cannot open one that returns a
-// path, but the backend is a local process and can - so the native dialog is
-// one request away, and it is what people expect from "choose a folder".
-$("#picknative").onclick = async () => {
-  const btn = $("#picknative");
-  btn.disabled = true; btn.textContent = "Choose…";
-  try{
-    const r = await (await fetch("/api/folder/choose", {method:"POST"})).json();
-    if(r.path){ folderPath.value = r.path; browse(r.path); scanFolder(); }
-    else if(r.error) toast(r.error, 5000);
-  }catch(e){ toast("Could not open the chooser: " + e.message, 5000); }
-  finally{ btn.disabled = false; btn.textContent = "Browse…"; }
-};
-
-
-
 
 /* ==================== folder analysis ==================== */
 
@@ -846,9 +875,3 @@ function analyseFolder(path){
   }
 }
 
-// "Use this folder" in the fallback browser does the same thing.
-pickUse.onclick = () => {
-  folderPanel.hidden = true;
-  folderBtn.classList.remove("on");
-  analyseFolder(pickPath);
-};
