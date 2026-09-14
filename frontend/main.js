@@ -592,11 +592,21 @@ micBtn.onclick = async () => {
     micLabel.textContent = "Stop";
     toast("Listening on-device - audio stays on this machine", 3000);
   };
+  // ev.resultIndex points at the first CHANGED result, not at the start. Once
+  // a phrase is finalised the next event begins at a higher index, so reading
+  // from resultIndex gives only the newest fragment - and writing
+  // `before + fragment` threw away everything said earlier. That is why a
+  // pause made the sentence restart. Keep finalised text separately and add
+  // only the still-changing tail.
+  let finalText = "";
   rec.onresult = ev => {
-    let text = "";
-    for(let i = ev.resultIndex; i < ev.results.length; i++)
-      text += ev.results[i][0].transcript;
-    qEl.value = (before ? before + " " : "") + text;
+    let interim = "";
+    for(let i = ev.resultIndex; i < ev.results.length; i++){
+      const r = ev.results[i];
+      if(r.isFinal) finalText += r[0].transcript;
+      else interim += r[0].transcript;
+    }
+    qEl.value = (before ? before + " " : "") + finalText + interim;
     qEl.style.height = "auto";
     qEl.style.height = Math.min(qEl.scrollHeight, 200) + "px";
   };
@@ -687,6 +697,20 @@ async function browse(path){
 }
 
 pickUse.onclick = () => { folderPath.value = pickPath; scanFolder(); };
+
+// The real macOS folder chooser. The browser cannot open one that returns a
+// path, but the backend is a local process and can - so the native dialog is
+// one request away, and it is what people expect from "choose a folder".
+$("#picknative").onclick = async () => {
+  const btn = $("#picknative");
+  btn.disabled = true; btn.textContent = "Choose…";
+  try{
+    const r = await (await fetch("/api/folder/choose", {method:"POST"})).json();
+    if(r.path){ folderPath.value = r.path; browse(r.path); scanFolder(); }
+    else if(r.error) toast(r.error, 5000);
+  }catch(e){ toast("Could not open the chooser: " + e.message, 5000); }
+  finally{ btn.disabled = false; btn.textContent = "Browse…"; }
+};
 
 const _origFolderClick = folderBtn.onclick;
 folderBtn.onclick = () => {

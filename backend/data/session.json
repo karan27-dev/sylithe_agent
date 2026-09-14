@@ -1,0 +1,28 @@
+{
+ "saved": 1789401888.158108,
+ "uploads": [],
+ "drawings": [
+  "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-CDU2-004.png"
+ ],
+ "images": [
+  "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-CDU2-004.png"
+ ],
+ "briefs": [
+  {
+   "name": "PID-CDU2-004.png",
+   "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-CDU2-004.png",
+   "kind": "drawing",
+   "chunks": 0,
+   "tags": [
+    "PSV-2041",
+    "LT-4102",
+    "TK-4102",
+    "HV-4021",
+    "FV-4033",
+    "P-4110A"
+   ],
+   "preview": "",
+   "detail": "engineering drawing, 2 symbols detected, 6 tags read"
+  }
+ ]
+}

@@ -78,6 +78,27 @@ IMAGE_EXT = {".png", ".jpg", ".jpeg", ".tiff", ".bmp", ".webp"}
 BRIEFS: list = []
 BRIEFS_MAX = 5
 
+# Bring the last session back. The index and chats were always on disk; this is
+# the working context - what was uploaded, which drawing is in play - which
+# used to vanish with the process.
+try:
+    from api import memory as _mem
+    _saved = _mem.load()
+    RECENT_UPLOADS[:] = _saved.get("uploads", [])
+    RECENT_DRAWINGS[:] = _saved.get("drawings", [])
+    RECENT_IMAGES[:] = _saved.get("images", [])
+    BRIEFS[:] = _mem.restore_briefs(_saved.get("briefs", []))
+except Exception:
+    pass
+
+
+def _remember() -> None:
+    try:
+        from api import memory as _m
+        _m.save(RECENT_UPLOADS, RECENT_DRAWINGS, RECENT_IMAGES, BRIEFS)
+    except Exception:
+        pass
+
 
 def _remember_image(path: Path) -> None:
     p = str(path)
@@ -85,6 +106,7 @@ def _remember_image(path: Path) -> None:
         RECENT_IMAGES.remove(p)
     RECENT_IMAGES.insert(0, p)
     del RECENT_IMAGES[4:]
+    _remember()
 
 
 def _remember_drawing(path: Path) -> None:
@@ -93,6 +115,7 @@ def _remember_drawing(path: Path) -> None:
         RECENT_DRAWINGS.remove(p)
     RECENT_DRAWINGS.insert(0, p)
     del RECENT_DRAWINGS[4:]
+    _remember()
 
 
 def _remember_upload(name: str) -> None:
@@ -100,6 +123,7 @@ def _remember_upload(name: str) -> None:
         RECENT_UPLOADS.remove(name)
     RECENT_UPLOADS.insert(0, name)
     del RECENT_UPLOADS[RECENT_MAX:]
+    _remember()
 
 def _sse(event: str, data: dict) -> str:
     return f"event: {event}\ndata: {json.dumps(data, default=str)}\n\n"
@@ -119,6 +143,7 @@ def boot() -> dict:
     except Exception as exc:
         idx = {"indexed": False, "chunks": 0, "sources": [], "error": str(exc)}
     return {
+        "remembered": [b.line() for b in BRIEFS[:3]],
         "health": health,
         "index": idx,
         "sovereignty": MONITOR.summary(),
@@ -268,6 +293,7 @@ async def upload(file: UploadFile = File(...)) -> JSONResponse:
         BRIEFS[:] = [x for x in BRIEFS if x.name != b.name]
         BRIEFS.insert(0, b)
         del BRIEFS[BRIEFS_MAX:]
+        _remember()
     except Exception:
         b = None
 
@@ -316,6 +342,13 @@ def api_folder_list(path: str = "") -> dict:
     """Browse the local filesystem. The backend runs here, so it can."""
     from tools import folder
     return folder.listdir(path or str(Path.home()))
+
+
+@app.post("/api/folder/choose")
+def api_folder_choose() -> dict:
+    """Ask the OS for a folder. Local process, so it can."""
+    from tools import folder
+    return folder.choose()
 
 
 @app.get("/api/folder/preview")

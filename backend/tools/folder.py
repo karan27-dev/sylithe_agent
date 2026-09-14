@@ -176,3 +176,34 @@ def listdir(folder: str | Path) -> dict:
             "files": n_files, "supported": n_supported,
             "crumbs": [{"name": q.name or "/", "path": str(q)}
                        for q in reversed([root, *root.parents])][-6:]}
+
+
+
+def choose() -> dict:
+    """
+    Open the machine's own folder chooser.
+
+    A browser cannot open a dialog that returns a filesystem path - that is the
+    security boundary that forced typing in the first place. This backend is a
+    local process though, so it can ask the OS directly and hand back a real
+    path. On anything other than macOS this simply reports that the picker is
+    unavailable and the typed path still works.
+    """
+    import subprocess
+    import sys
+
+    if sys.platform != "darwin":
+        return {"error": "Native chooser is macOS only - type or browse instead."}
+    script = ('POSIX path of (choose folder with prompt '
+              '"Choose a folder for the Sovereign Workbench to read")')
+    try:
+        r = subprocess.run(["osascript", "-e", script],
+                           capture_output=True, text=True, timeout=180)
+    except subprocess.TimeoutExpired:
+        return {"error": "The chooser timed out."}
+    if r.returncode != 0:
+        # code 1 with "User canceled" is the ordinary cancel path, not an error
+        if "User canceled" in (r.stderr or ""):
+            return {"cancelled": True}
+        return {"error": (r.stderr or "Could not open the chooser").strip()[:160]}
+    return {"path": r.stdout.strip().rstrip("/")}
