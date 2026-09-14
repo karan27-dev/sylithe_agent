@@ -44,7 +44,12 @@ def describe(image: str | Path, conf: float = 0.25) -> dict:
     for t in sorted(tagged):
         iso = isolation_valves(g, t)
         if iso:
-            lines.append(f"\nTO ISOLATE {t}, CLOSE: {', '.join(iso)}")
+            # State the count as well. Given only a comma list, the model
+            # helpfully added a second valve and labelled it "secondary
+            # isolation valve" - which is a fabricated instruction in a safety
+            # context. Saying "exactly 1 valve" leaves no room for that.
+            lines.append(f"\nTO ISOLATE {t}, CLOSE exactly {len(iso)} "
+                         f"valve(s): {', '.join(iso)}")
 
     return {"text": "\n".join(lines), "graph": g, "raw": r,
             "tags": sorted(tagged)}

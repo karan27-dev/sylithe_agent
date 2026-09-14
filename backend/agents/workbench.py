@@ -61,7 +61,14 @@ REFERENTIAL = re.compile(
     r"(file|files|document|documents|doc|docs|pdf|report|reports|sheet|scan|"
     r"image|attachment|data|readings|results|findings|numbers|content|info)\b"
     r"|\bwhat'?s? (is |are )?in (it|this|these|the file|the document)\b"
-    r"|\b(summari[sz]e|summary of|explain|describe|read) (it|this|these|them)\b",
+    r"|\b(summari[sz]e|summary of|explain|describe|read) (it|this|these|them)\b"
+    # Bare demonstratives with no noun after them. "what is this" carries no
+    # noun, so the pattern above missed it entirely - and with several files
+    # indexed, retrieval then answered from documents instead of the drawing
+    # the user was plainly pointing at.
+    r"|^\s*(what|what'?s)\s+(is\s+)?(this|it|that|these)\s*\??\s*$"
+    r"|^\s*(explain|describe|summari[sz]e|read)\s+(this|it|that|these)\s*\??\s*$"
+    r"|\bwhat (did|have) i (just )?(upload|attach|add)",
     re.I)
 
 # Questions about the corpus as a whole - the answer should draw on many
@@ -120,8 +127,11 @@ PID_SYS = (
     "1. A P&ID never states a set pressure, thickness or temperature. If a "
     "number is asked for, take it from the DOCUMENTS section only.\n"
     "2. Never invent a connection that is not listed, and never invent a tag.\n"
-    "3. For isolation, list exactly the valves given. A relief valve (PSV/PRV) "
-    "is never closed to isolate equipment.\n"
+    "3. For isolation, copy the valve list EXACTLY as given in the TO ISOLATE "
+    "line. Do not add a valve that is not on that line, and do not invent "
+    "labels like 'secondary isolation valve' - if one valve is listed, one "
+    "valve is the answer. A relief valve (PSV/PRV) is never closed to "
+    "isolate equipment.\n"
     "4. If something was not detected, say so plainly.\n"
     "5. Short answer, English."
 )
