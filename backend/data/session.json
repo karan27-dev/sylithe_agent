@@ -1,13 +1,59 @@
 {
- "saved": 1789410144.32409,
- "uploads": [],
+ "saved": 1789410599.820454,
+ "uploads": [
+  "Maintenance Bulletin MB-2026-22.md"
+ ],
  "drawings": [
+  "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-U200-001 Unit 200 Overview.png",
   "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-CDU2-004.png"
  ],
  "images": [
+  "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-U200-001 Unit 200 Overview.png",
   "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-CDU2-004.png"
  ],
  "briefs": [
+  {
+   "name": "PID-U200-001 Unit 200 Overview.png",
+   "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-U200-001 Unit 200 Overview.png",
+   "kind": "drawing",
+   "chunks": 0,
+   "tags": [
+    "V-202",
+    "E-204",
+    "HV-206",
+    "V-206",
+    "TI-203",
+    "LT-201",
+    "HV-201",
+    "HV-203",
+    "P-205A",
+    "E-203",
+    "V-201",
+    "T-206"
+   ],
+   "preview": "",
+   "detail": "engineering drawing, 6 symbols detected, 16 tags read"
+  },
+  {
+   "name": "Maintenance Bulletin MB-2026-22.md",
+   "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/Maintenance Bulletin MB-2026-22.md",
+   "kind": "document",
+   "chunks": 2,
+   "tags": [
+    "PSV-201",
+    "TO-25",
+    "SEP-2026",
+    "E-204",
+    "MAR-2027",
+    "V-201",
+    "PSV-202",
+    "AT-18",
+    "DA-2026",
+    "THE-31"
+   ],
+   "preview": "1, Action = Reset PSV-201 to 25.0 barg. 1, Owner = Maintenance. 1, Due = 30-Sep-2026. 2, Action = Survey E-204 - missed this campaign. 2, Owner = Inspection. 2, Due = 08-Mar-2027. 3, Action = Quarterly UT on V-201 course-1. 3, Owner = Inspection. 3, Due = ongoing PSV-202 remains at 18.2 barg under DA-2026-207 and requires no action before the 31-Mar-2027 turnaround.",
+   "detail": "2 indexed passages"
+  },
   {
    "name": "PID-CDU2-004.png",
    "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-CDU2-004.png",
