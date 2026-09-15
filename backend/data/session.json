@@ -1,17 +1,50 @@
 {
- "saved": 1789410599.820454,
- "uploads": [
-  "Maintenance Bulletin MB-2026-22.md"
- ],
+ "saved": 1789499651.2037299,
+ "uploads": [],
  "drawings": [
+  "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/process-p-id-diagram_44_png_jpg.rf.05aa5e51cf72cf9a5f35c71aa6717833.jpg",
+  "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/p-id-Diagrams_26_png_jpg.rf.316d3b357b2bf6a6b939f0800ea16b4d.jpg",
   "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-U200-001 Unit 200 Overview.png",
   "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-CDU2-004.png"
  ],
  "images": [
+  "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/process-p-id-diagram_44_png_jpg.rf.05aa5e51cf72cf9a5f35c71aa6717833.jpg",
+  "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/p-id-Diagrams_26_png_jpg.rf.316d3b357b2bf6a6b939f0800ea16b4d.jpg",
   "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-U200-001 Unit 200 Overview.png",
   "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-CDU2-004.png"
  ],
  "briefs": [
+  {
+   "name": "process-p-id-diagram_44_png_jpg.rf.05aa5e51cf72cf9a5f35c71aa6717833.jpg",
+   "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/process-p-id-diagram_44_png_jpg.rf.05aa5e51cf72cf9a5f35c71aa6717833.jpg",
+   "kind": "drawing",
+   "chunks": 0,
+   "tags": [],
+   "preview": "",
+   "detail": "engineering drawing, 3 symbols detected, 0 tags read"
+  },
+  {
+   "name": "p-id-Diagrams_26_png_jpg.rf.316d3b357b2bf6a6b939f0800ea16b4d.jpg",
+   "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/p-id-Diagrams_26_png_jpg.rf.316d3b357b2bf6a6b939f0800ea16b4d.jpg",
+   "kind": "drawing",
+   "chunks": 0,
+   "tags": [
+    "HV-102",
+    "TCV-102",
+    "FCV-101",
+    "E-101",
+    "P-101",
+    "PAI-103",
+    "PI-103",
+    "PT-103",
+    "FT-103",
+    "FR-103",
+    "TI-103",
+    "TT-103"
+   ],
+   "preview": "",
+   "detail": "engineering drawing, 4 symbols detected, 22 tags read"
+  },
   {
    "name": "PID-U200-001 Unit 200 Overview.png",
    "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-U200-001 Unit 200 Overview.png",
@@ -71,5 +104,5 @@
    "detail": "engineering drawing, 2 symbols detected, 6 tags read"
   }
  ],
- "folder": "/Users/karan/Desktop/Plant Manuals"
+ "folder": "/Users/karan/Desktop/Sylithe Agent "
 }

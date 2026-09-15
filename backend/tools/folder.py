@@ -202,8 +202,14 @@ def choose() -> dict:
     except subprocess.TimeoutExpired:
         return {"error": "The chooser timed out."}
     if r.returncode != 0:
-        # code 1 with "User canceled" is the ordinary cancel path, not an error
-        if "User canceled" in (r.stderr or ""):
+        err = r.stderr or ""
+        # Cancelling is the ordinary path, not an error. macOS reports it as
+        # "User cancelled. (-128)" - with two l's. This code looked for the
+        # American spelling, never matched, and fell into the error branch, so
+        # pressing Cancel opened the fallback path box instead of doing
+        # nothing. Match the error NUMBER, which does not vary by locale or
+        # spelling, and keep both spellings as a belt.
+        if "-128" in err or "cancel" in err.lower():
             return {"cancelled": True}
-        return {"error": (r.stderr or "Could not open the chooser").strip()[:160]}
+        return {"error": err.strip()[:160] or "Could not open the chooser"}
     return {"path": r.stdout.strip().rstrip("/")}

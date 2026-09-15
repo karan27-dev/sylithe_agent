@@ -432,238 +432,32 @@ hero(); boot(); pollSov(); qEl.focus();
 
 
 /* ==================== folder connector ==================== */
-/* PS 26117 asks for "a local knowledge base connector" so the assistant can
-   ground itself in the organisation's own manuals. Uploading files one at a
-   time is not how an engineer works - the manuals are already in a folder. */
+/* One way in: the machine's own folder dialog.
+   There used to be a path box with a Scan button as well, which appeared
+   whenever the dialog did not return a path - including on Cancel, because the
+   cancel signal was being missed. Two ways to do one thing, and the wrong one
+   showed up exactly when the user had just said no. Typing a path still works,
+   in the chat: "analyse the documents in ~/Documents/Plant Manuals". */
 
-const folderPanel = $("#folderpanel"), folderPath = $("#folderpath"),
-      folderPrev = $("#folderprev"), folderBtn = $("#folderbtn"),
-      folderScan = $("#folderscan");
-let folderReady = null;
+const folderBtn = $("#folderbtn");
 
-// Clicking Folder opens the MACHINE's folder chooser, not ours. Our own
-// browser was a workaround for the browser being unable to return a real path;
-// the backend is a local process and can ask the OS directly, so that is what
-// the button should do. The in-page browser stays as a fallback for when the
-// native dialog is unavailable.
 folderBtn.onclick = async () => {
   folderBtn.disabled = true;
   folderBtn.classList.add("on");
   try{
     const r = await (await fetch("/api/folder/choose", {method:"POST"})).json();
-    if(r.cancelled){ folderBtn.classList.remove("on"); return; }
-    if(r.path){
-      // Chosen a folder? Then say what is in it. Asking the user to press
-      // Scan and then ask "what is in here" is a step with only one possible
-      // outcome, so the agent just does it.
-      folderPanel.hidden = true;
-      folderBtn.classList.remove("on");
-      analyseFolder(r.path);
-      return;
-    }
-    // No native dialog here - fall back to typing a path.
-    toast(r.error || "Type the folder path below", 5000);
-    folderPanel.hidden = false;
-    folderPath.focus();
+    if(r.path){ analyseFolder(r.path); return; }
+    if(r.cancelled) return;                 // said no - do nothing at all
+    toast((r.error || "Could not open the folder chooser")
+          + ' - you can also say it in the chat: "analyse the documents in '
+          + '~/Documents/Plant Manuals"', 7000);
   }catch(e){
-    toast("Could not open the chooser: " + e.message, 5000);
-    folderPanel.hidden = false;
-    folderPath.focus();
+    toast("Could not open the folder chooser: " + e.message, 5000);
   }finally{
     folderBtn.disabled = false;
+    folderBtn.classList.remove("on");
   }
 };
-
-folderPath.addEventListener("keydown", e => {
-  if(e.key === "Enter"){ e.preventDefault(); scanFolder(); }
-});
-folderScan.onclick = () => {
-  const path = folderPath.value.trim();
-  if(!path) return;
-  folderPanel.hidden = true;
-  folderBtn.classList.remove("on");
-  analyseFolder(path);
-};
-
-async function scanFolder(){
-  const path = folderPath.value.trim();
-  if(!path) return;
-  folderReady = null;
-  folderPrev.hidden = false;
-  folderPrev.className = "fprev";
-  folderPrev.textContent = "Looking...";
-  try{
-    const r = await (await fetch(
-      "/api/folder/preview?path=" + encodeURIComponent(path))).json();
-    if(r.error){
-      folderPrev.className = "fprev err";
-      folderPrev.textContent = r.error;
-      folderScan.textContent = "Scan";
-      return;
-    }
-    const types = Object.entries(r.by_type)
-      .sort((a,b) => b[1]-a[1]).map(([k,v]) => `${v} ${k}`).join("  ");
-    folderPrev.innerHTML = `<b>${r.supported}</b> readable of ${r.found} files
-      <div class="types">${esc(types)}</div>`;
-    folderReady = path;
-    folderScan.textContent = `Index ${r.supported}`;
-    // Remember it server-side, so "analyse my folder" needs no path typed.
-    fetch("/api/folder/select?path=" + encodeURIComponent(path), {method:"POST"})
-      .catch(() => {});
-    toast(`${r.supported} readable file(s) in ${path.split("/").pop()}`, 4000);
-  }catch(err){
-    folderPrev.className = "fprev err";
-    folderPrev.textContent = "Could not read that path: " + err.message;
-  }
-}
-
-async function ingestFolder(){
-  const path = folderReady;
-  folderScan.disabled = true;
-  folderScan.textContent = "Indexing...";
-  folderPrev.className = "fprev";
-  folderPrev.innerHTML = `Reading ${esc(path)} - this runs locally and can take
-    a while for scans.<div class="bar"><i style="width:35%"></i></div>`;
-  try{
-    const r = await (await fetch(
-      "/api/folder/ingest?path=" + encodeURIComponent(path),
-      {method:"POST"})).json();
-    if(r.error){
-      folderPrev.className = "fprev err"; folderPrev.textContent = r.error;
-    }else{
-      const extra = r.skipped_self
-        ? ` &middot; skipped ${r.skipped_self} file(s) this system generated` : "";
-      folderPrev.innerHTML =
-        `Indexed <b>${r.indexed}</b> file(s), <b>${r.chunks}</b> passages in
-         ${r.seconds.toFixed(0)}s${extra}`;
-      $("#pill-index").innerHTML = `<b>${r.index.chunks}</b> chunks`;
-      toast(`Folder indexed - ${r.chunks} passages now searchable`);
-      folderReady = null;
-    }
-  }catch(err){
-    folderPrev.className = "fprev err";
-    folderPrev.textContent = "Failed: " + err.message;
-  }finally{
-    folderScan.disabled = false;
-    folderScan.textContent = "Scan";
-  }
-}
-
-// Dragging a folder from Finder gives a directory entry rather than a file.
-document.addEventListener("drop", e => {
-  for(const item of (e.dataTransfer?.items || [])){
-    const entry = item.webkitGetAsEntry?.();
-    if(entry?.isDirectory){
-      folderPanel.hidden = false;
-      folderBtn.classList.add("on");
-      folderPath.value = entry.fullPath || entry.name;
-      folderPrev.hidden = false;
-      folderPrev.className = "fprev";
-      folderPrev.textContent =
-        "The browser only reveals the folder NAME, not its full path. " +
-        "Paste the full path here, then press Scan.";
-      folderPath.focus();
-      return;
-    }
-  }
-}, true);
-
-
-/* ==================== dictation ==================== */
-/* The default Web Speech API streams audio to Google's servers. On this
-   project that is disqualifying - and worse, our own monitor would not even
-   catch it, because the request comes from the browser rather than from our
-   process. Chrome 139+ can run recognition ON DEVICE, so we require that mode
-   and refuse the microphone altogether when it is unavailable, rather than
-   quietly sending someone's plant discussion to a cloud service. */
-
-const micBtn = $("#micbtn"), micLabel = $("#miclabel");
-const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-let rec = null, recording = false;
-
-async function micReady(){
-  if(!SR) return { ok:false, why:"This browser has no speech recognition." };
-  if(!SR.available) return { ok:false,
-    why:"This browser cannot confirm on-device speech. Dictation is disabled "
-      + "because the fallback would send your audio to a cloud service." };
-  try{
-    const state = await SR.available({ langs:["en-US"], processLocally:true });
-    if(state === "available") return { ok:true };
-    if(state === "downloadable" || state === "downloading")
-      return { ok:false, downloadable:true,
-        why:"The on-device speech model is not installed yet." };
-    return { ok:false,
-      why:"On-device speech is unavailable here, and the cloud fallback is "
-        + "not acceptable on an air-gapped workbench." };
-  }catch(e){
-    return { ok:false, why:"Could not verify on-device speech: " + e.message };
-  }
-}
-
-micBtn.onclick = async () => {
-  if(recording){ rec?.stop(); return; }
-  const chk = await micReady();
-  if(!chk.ok){
-    toast(chk.why, 7000);
-    if(chk.downloadable){
-      try{
-        toast("Downloading the on-device speech model once...", 8000);
-        await SR.install({ langs:["en-US"], processLocally:true });
-        toast("On-device speech installed - press Speak again.", 5000);
-      }catch(e){ toast("Install failed: " + e.message, 6000); }
-    }
-    return;
-  }
-
-  rec = new SR();
-  rec.lang = "en-US";
-  rec.continuous = true;
-  rec.interimResults = true;
-  rec.processLocally = true;      // the whole point - never leaves the machine
-
-  const before = qEl.value;
-  rec.onstart = () => {
-    recording = true;
-    micBtn.classList.add("rec");
-    micLabel.textContent = "Stop";
-    toast("Listening on-device - audio stays on this machine", 3000);
-  };
-  // ev.resultIndex points at the first CHANGED result, not at the start. Once
-  // a phrase is finalised the next event begins at a higher index, so reading
-  // from resultIndex gives only the newest fragment - and writing
-  // `before + fragment` threw away everything said earlier. That is why a
-  // pause made the sentence restart. Keep finalised text separately and add
-  // only the still-changing tail.
-  let finalText = "";
-  rec.onresult = ev => {
-    let interim = "";
-    for(let i = ev.resultIndex; i < ev.results.length; i++){
-      const r = ev.results[i];
-      if(r.isFinal) finalText += r[0].transcript;
-      else interim += r[0].transcript;
-    }
-    qEl.value = (before ? before + " " : "") + finalText + interim;
-    qEl.style.height = "auto";
-    qEl.style.height = Math.min(qEl.scrollHeight, 200) + "px";
-  };
-  rec.onerror = ev => toast("Dictation error: " + ev.error, 5000);
-  rec.onend = () => {
-    recording = false;
-    micBtn.classList.remove("rec");
-    micLabel.textContent = "Speak";
-    qEl.focus();
-  };
-  try{ rec.start(); }catch(e){ toast("Could not start: " + e.message, 5000); }
-};
-
-// Say up front whether dictation is possible, rather than after a click.
-micReady().then(c => {
-  if(!c.ok && !c.downloadable){
-    micBtn.disabled = true;
-    micBtn.title = c.why;
-  }
-});
-
 
 /* The in-page folder browser is gone.
    It existed because a browser cannot return a real filesystem path, but the
