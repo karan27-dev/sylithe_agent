@@ -40,6 +40,9 @@ from tools import sandbox
 from tools.brief import context_block
 from tools import skills as skill_lib
 from tools import lessons as lesson_lib
+from tools import actions as actions_tool
+from tools import compare_docs as compare_tool
+from tools import verify as verify_tool
 
 # Words that mean "produce a file", mapped to the writer that should run.
 # Checked before the router, because "draft an approval note as a Word file"
@@ -86,6 +89,35 @@ BROAD = re.compile(
     r"\b(all|every|each|overall|across)\s+"
     r"(the\s+)?(file|files|document|documents|doc|docs|report|reports)\b"
     r"|\b(everything|whole corpus|all of them|summari[sz]e everything)\b",
+    re.I)
+
+# "List pending actions", "action tracker", "what actions are open" - routed
+# to a deterministic table extractor (tools/actions.py) rather than ordinary
+# retrieval. Measured cause of the bug this avoids: the header chunk of a
+# bulletin scores as high as its own action table for a generic query, so
+# the table that actually holds the rows never made it into a fixed top-k -
+# the model then correctly reported "no actions" about evidence that never
+# reached it. Checked before ordinary routing, same as DRAWING_TOPIC below.
+ACTION_TRACKER_INTENT = re.compile(
+    r"\b(pending\s+actions?|action\s+tracker|open\s+items?)\b"
+    r"|\b(list|show|what\s+are)\b.{0,20}\bactions?\b"
+    r"|\bactions?\b.{0,30}\b(owner|due\s+date|responsible|deadline)\b"
+    r"|\b(owner|due\s+date)s?\b.{0,30}\bactions?\b",
+    re.I)
+
+# "compare X with Y", "what changed between REV 1 and REV 2" - routed to a
+# deterministic line diff (tools/compare_docs.py). Measured cause of the bug
+# this avoids: two documents that share most of their wording embed close
+# enough together that retrieval cannot reliably tell them apart, so the
+# model ended up mixing an unrelated bulletin's rows into a comparison and
+# separately calling an unchanged line "new" because neither copy of it was
+# retrieved. A deterministic diff cannot make either mistake.
+COMPARE_INTENT = re.compile(
+    r"\bcompar(e|ing|ison)\b|\bversus\b|\bvs\.?\b"
+    r"|\bwhat\s+(changed|differs?|is\s+different)\b"
+    r"|\b(values?|instructions?|findings?)\s+(that\s+)?changed\b"
+    r"|\b(old|previous|earlier|original)\s+(and|vs\.?|versus|vs)\s+"
+    r"(new|latest|current|revised)\b",
     re.I)
 
 # Small models obey examples, not prohibitions. Telling qwen2.5-coder:1.5b
@@ -148,6 +180,34 @@ PID_SYS = (
     "6. Never mention the section names. The reader sees a drawing, not this "
     "prompt: write 'on the drawing', not 'in the DRAWING section'.\n"
     "7. Short answer, English."
+)
+
+ACTIONS_SYS = (
+    "You are given a VERIFIED table of action items, extracted directly from "
+    "the source documents by code - not by you, and not by search.\n"
+    "Rules:\n"
+    "1. Present the table's rows clearly. Do not add, remove, merge, "
+    "reorder or invent any row, owner or due date beyond what is given.\n"
+    "2. If the table is empty, say plainly that no action-item rows were "
+    "found for this equipment in the indexed documents - do not guess a "
+    "plausible-sounding action instead.\n"
+    "3. Keep the Source column or file name attached to each row.\n"
+    "4. Answer in English."
+)
+
+COMPARE_SYS = (
+    "You are given a VERIFIED list of line-level differences between two "
+    "documents, computed by a direct text diff - not by you, and not by "
+    "search.\n"
+    "Rules:\n"
+    "1. Summarise ONLY the differences listed. Every change you state must "
+    "correspond to a line in the list.\n"
+    "2. Do not say a value or instruction changed unless a CHANGED/ADDED/"
+    "REMOVED line for it is in the list. If the list is empty, say plainly "
+    "that no differences were found - do not invent one to seem useful.\n"
+    "3. Do not mention lines that only reformat wording with the same "
+    "meaning (e.g. a heading restated) unless the underlying value changed.\n"
+    "4. Answer in English."
 )
 
 GROUNDED_SYS = (
@@ -294,6 +354,72 @@ def extract_code(text: str) -> str | None:
     return None
 
 
+def select_relevant_history(question: str, history: list[dict],
+                             keep_recent_turns: int = 1) -> list[dict]:
+    """
+    Which past exchanges actually belong in THIS prompt.
+
+    Root cause this exists for: chats.history() returns the last few
+    messages unconditionally, and every one of them used to go straight into
+    the prompt regardless of topic. Checked against a real chat: asking
+    about a cylinder-volume script, then an unrelated API653 download
+    attempt, then "compare Maintenance Bulletin MB-2026-17 with its REV 2"
+    put all three in front of the model for the third question, and the
+    same question asked with no history came back different - not because
+    of anything the model made up, but because it was handed prior turns
+    that had nothing to do with the new one.
+
+    Two rules, and no LLM call to decide between them - a judgment call this
+    small a model cannot be trusted to make about its own prompt:
+      1. The most recent `keep_recent_turns` exchanges are kept ONLY when
+         the question itself signals a continuation - REFERENTIAL text
+         ("the above", "this report", "convert it") or a bare follow-up
+         with no equipment tag of its own. A question that reads as a fresh
+         topic does not get the immediately preceding turn for free just
+         because it was immediately preceding: checked against a real chat,
+         that rule alone still let an unrelated "download API 653" turn
+         leak into the very next, unrelated question.
+      2. Anything else, recent or older, is kept only if it shares an
+         equipment tag with the current question (TK-4102, PSV-2041, ...),
+         via the same tags_in() ingest.pipeline already uses for
+         exact-identifier matching. A same-topic follow-up several turns
+         later still pulls its earlier context back in.
+    """
+    if not history:
+        return []
+
+    exchanges: list[list[dict]] = []
+    i = 0
+    while i < len(history):
+        pair = [history[i]]
+        if (history[i].get("role") == "user" and i + 1 < len(history)
+                and history[i + 1].get("role") == "assistant"):
+            pair.append(history[i + 1])
+            i += 2
+        else:
+            i += 1
+        exchanges.append(pair)
+
+    q_tags = set(pipeline.tags_in(question))
+    is_continuation = bool(REFERENTIAL.search(question)) or not q_tags
+
+    recent = (exchanges[-keep_recent_turns:]
+              if is_continuation and keep_recent_turns else [])
+    older = exchanges[:len(exchanges) - len(recent)] if recent else exchanges
+
+    kept_older = []
+    if q_tags:
+        for ex in older:
+            ex_text = " ".join(m.get("content", "") for m in ex)
+            if q_tags & set(pipeline.tags_in(ex_text)):
+                kept_older.append(ex)
+
+    result: list[dict] = []
+    for ex in kept_older + recent:
+        result.extend(ex)
+    return result
+
+
 def _how(plan: "Plan", hits: list) -> str:
     """Explain in the activity feed why retrieval behaved the way it did."""
     if plan.scope:
@@ -326,8 +452,26 @@ class Agent:
         else:
             klass_name = klass.name
 
+        # Deterministic tools, checked ahead of the router's own class - see
+        # ACTION_TRACKER_INTENT / COMPARE_INTENT above for why ordinary
+        # retrieval is not trusted with either of these. retrieve is turned
+        # off: the tool's own verified output is the only context these two
+        # answers should be built from, not whatever ranked retrieval also
+        # happens to surface for the same wording.
+        retrieve_override: bool | None = None
+        if ACTION_TRACKER_INTENT.search(question):
+            klass_name, lane, pre_tool = "action_tracker", "reason", "extract_actions"
+            retrieve_override = False
+        elif COMPARE_INTENT.search(question):
+            klass_name, lane, pre_tool = "compare", "reason", "compare_docs"
+            retrieve_override = False
+
         steps = ["Understanding request", "Selecting model"]
-        if klass.retrieval:
+        if klass_name == "action_tracker":
+            steps.append("Extracting actions")
+        elif klass_name == "compare":
+            steps.append("Comparing documents")
+        elif klass.retrieval:
             steps.append("Searching corpus")
         steps.append("Drafting answer" if not kind else "Extracting findings")
         if kind:
@@ -368,8 +512,9 @@ class Agent:
             else:
                 per_source = 2          # nothing named: sample the corpus
 
+        retrieve = klass.retrieval if retrieve_override is None else retrieve_override
         return Plan(question=question, deliverable=kind,
-                    retrieve=klass.retrieval, lane=lane, klass=klass_name,
+                    retrieve=retrieve, lane=lane, klass=klass_name,
                     steps=steps, scope=scope, per_source=per_source,
                     no_floor=no_floor, pre_tool=pre_tool)
 
@@ -382,7 +527,8 @@ class Agent:
             briefs: list | None = None,
             folder: str | None = None) -> Iterator[dict]:
         t0 = time.perf_counter()
-        history = history or []
+        history_all = history or []
+        history = select_relevant_history(question, history_all)
         recent_files = recent_files or []
         briefs = briefs or []
         uploaded = context_block(briefs)
@@ -401,6 +547,9 @@ class Agent:
             bits.append(f"about {briefs[0].name}")
         bits.append(f"deliverable: {plan.deliverable}" if plan.deliverable
                     else "answer only")
+        dropped = len(history_all) - len(history)
+        if dropped > 0:
+            bits.append(f"{dropped} earlier message(s) set aside as unrelated")
         yield {"type": "step", "id": "understand", "status": "done",
                "label": "Understanding request", "detail": " · ".join(bits)}
         klass_pre_tool = plan.pre_tool
@@ -491,6 +640,56 @@ class Agent:
                 yield {"type": "step", "id": "pid", "status": "fail",
                        "label": "Analysing drawing",
                        "detail": f"{type(exc).__name__}: {exc}"}
+
+        # 2c -- deterministic table/diff tools --------------------------------
+        # extract_actions and compare_docs never touch a model. They are
+        # regex/difflib over the real index and the real files on disk, so a
+        # row or a "changed" line either exists verifiably or the tool says
+        # nothing was found - see tools/actions.py and tools/compare_docs.py
+        # for the retrieval bugs this sidesteps.
+        actions_ctx = ""
+        if klass_pre_tool == "extract_actions":
+            yield {"type": "step", "id": "actions", "status": "running",
+                   "label": "Extracting actions"}
+            tag = next(iter(pipeline.tags_in(question)), None)
+            rows = actions_tool.extract_actions(tag)
+            table_md = actions_tool.format_table(rows)
+            if rows:
+                actions_ctx = f"VERIFIED ACTION TABLE (tag={tag or 'any'}):\n{table_md}"
+                yield {"type": "step", "id": "actions", "status": "done",
+                       "label": "Extracting actions",
+                       "detail": f"{len(rows)} row(s)"
+                                 + (f" for {tag}" if tag else "")}
+            else:
+                actions_ctx = (
+                    f"No action-item rows were found for tag {tag!r} in the "
+                    "indexed documents." if tag else
+                    "No action-item rows were found in the indexed documents.")
+                yield {"type": "step", "id": "actions", "status": "warn",
+                       "label": "Extracting actions", "detail": "0 rows"}
+
+        compare_ctx = ""
+        if klass_pre_tool == "compare_docs":
+            yield {"type": "step", "id": "compare", "status": "running",
+                   "label": "Comparing documents"}
+            docs = compare_tool.find_documents(question)
+            if len(docs) == 2:
+                result = compare_tool.diff_documents(docs[0], docs[1])
+                compare_ctx = compare_tool.format_changes(result)
+                yield {"type": "step", "id": "compare", "status": "done",
+                       "label": "Comparing documents",
+                       "detail": (f"{docs[0].source} vs {docs[1].source} · "
+                                  f"{len(result.changes)} difference(s)")}
+            else:
+                found = ", ".join(d.source for d in docs) if docs else "none"
+                compare_ctx = (
+                    "Could not confidently identify two distinct documents to "
+                    f"compare from this question. Candidate(s) found: {found}. "
+                    "Ask the user to name both documents more specifically "
+                    "(e.g. the exact bulletin number or file name of each).")
+                yield {"type": "step", "id": "compare", "status": "warn",
+                       "label": "Comparing documents",
+                       "detail": f"{len(docs)} candidate(s), need exactly 2"}
 
         # 3 -- retrieve ------------------------------------------------------
         ctx, hits = "", []
@@ -620,6 +819,12 @@ class Agent:
         elif pid_ctx:
             system = PID_SYS
             turn = f"{head}{pid_ctx}\n\nQUESTION: {question}"
+        elif actions_ctx:
+            system = ACTIONS_SYS
+            turn = f"{head}{actions_ctx}\n\nQUESTION: {question}"
+        elif compare_ctx:
+            system = COMPARE_SYS
+            turn = f"{head}{compare_ctx}\n\nQUESTION: {question}"
         else:
             system = GROUNDED_SYS if ctx else NO_CONTEXT_SYS
             turn = (f"{head}PASSAGES:\n{ctx}\n\nQUESTION: {question}"
@@ -647,6 +852,21 @@ class Agent:
         for note in skill_lib.verify(answer, chosen):
             yield {"type": "step", "id": "verify", "status": "warn",
                    "label": "Skill check", "detail": note[:80]}
+
+        # A grounded answer can have the right numbers and still get the
+        # relationship between them backwards ("76% exceeds 82%") - a
+        # reasoning slip citation-checking cannot catch, since both numbers
+        # really were in the passages. Checked mechanically, not by asking
+        # the same model to grade itself. See tools/verify.py.
+        if ctx and hits and plan.lane == "reason":
+            issues = verify_tool.verify_claims(answer, [h.chunk.text for h in hits])
+            if issues:
+                yield {"type": "step", "id": "verify_claims", "status": "warn",
+                       "label": "Checking claims",
+                       "detail": f"{len(issues)} flagged for review"}
+                tail = verify_tool.format_issues(issues)
+                answer += tail
+                yield {"type": "token", "text": tail}
 
         # 4b -- execute --------------------------------------------------------
         # "A coding task run and verified in a sandbox" is named in the PS.
