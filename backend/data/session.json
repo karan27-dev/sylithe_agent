@@ -1,19 +1,26 @@
 {
- "saved": 1789499651.2037299,
+ "saved": 1789500708.877033,
  "uploads": [],
  "drawings": [
+  "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/994_png_jpg.rf.99aaa7d50a185b568667599641ff4c3c.jpg",
   "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/process-p-id-diagram_44_png_jpg.rf.05aa5e51cf72cf9a5f35c71aa6717833.jpg",
-  "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/p-id-Diagrams_26_png_jpg.rf.316d3b357b2bf6a6b939f0800ea16b4d.jpg",
-  "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-U200-001 Unit 200 Overview.png",
   "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-CDU2-004.png"
  ],
  "images": [
+  "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/994_png_jpg.rf.99aaa7d50a185b568667599641ff4c3c.jpg",
   "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/process-p-id-diagram_44_png_jpg.rf.05aa5e51cf72cf9a5f35c71aa6717833.jpg",
-  "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/p-id-Diagrams_26_png_jpg.rf.316d3b357b2bf6a6b939f0800ea16b4d.jpg",
-  "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-U200-001 Unit 200 Overview.png",
   "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-CDU2-004.png"
  ],
  "briefs": [
+  {
+   "name": "994_png_jpg.rf.99aaa7d50a185b568667599641ff4c3c.jpg",
+   "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/994_png_jpg.rf.99aaa7d50a185b568667599641ff4c3c.jpg",
+   "kind": "drawing",
+   "chunks": 0,
+   "tags": [],
+   "preview": "",
+   "detail": "engineering drawing, 4 symbols detected, 0 tags read"
+  },
   {
    "name": "process-p-id-diagram_44_png_jpg.rf.05aa5e51cf72cf9a5f35c71aa6717833.jpg",
    "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/process-p-id-diagram_44_png_jpg.rf.05aa5e51cf72cf9a5f35c71aa6717833.jpg",
@@ -22,70 +29,6 @@
    "tags": [],
    "preview": "",
    "detail": "engineering drawing, 3 symbols detected, 0 tags read"
-  },
-  {
-   "name": "p-id-Diagrams_26_png_jpg.rf.316d3b357b2bf6a6b939f0800ea16b4d.jpg",
-   "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/p-id-Diagrams_26_png_jpg.rf.316d3b357b2bf6a6b939f0800ea16b4d.jpg",
-   "kind": "drawing",
-   "chunks": 0,
-   "tags": [
-    "HV-102",
-    "TCV-102",
-    "FCV-101",
-    "E-101",
-    "P-101",
-    "PAI-103",
-    "PI-103",
-    "PT-103",
-    "FT-103",
-    "FR-103",
-    "TI-103",
-    "TT-103"
-   ],
-   "preview": "",
-   "detail": "engineering drawing, 4 symbols detected, 22 tags read"
-  },
-  {
-   "name": "PID-U200-001 Unit 200 Overview.png",
-   "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-U200-001 Unit 200 Overview.png",
-   "kind": "drawing",
-   "chunks": 0,
-   "tags": [
-    "V-202",
-    "E-204",
-    "HV-206",
-    "V-206",
-    "TI-203",
-    "LT-201",
-    "HV-201",
-    "HV-203",
-    "P-205A",
-    "E-203",
-    "V-201",
-    "T-206"
-   ],
-   "preview": "",
-   "detail": "engineering drawing, 6 symbols detected, 16 tags read"
-  },
-  {
-   "name": "Maintenance Bulletin MB-2026-22.md",
-   "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/Maintenance Bulletin MB-2026-22.md",
-   "kind": "document",
-   "chunks": 2,
-   "tags": [
-    "PSV-201",
-    "TO-25",
-    "SEP-2026",
-    "E-204",
-    "MAR-2027",
-    "V-201",
-    "PSV-202",
-    "AT-18",
-    "DA-2026",
-    "THE-31"
-   ],
-   "preview": "1, Action = Reset PSV-201 to 25.0 barg. 1, Owner = Maintenance. 1, Due = 30-Sep-2026. 2, Action = Survey E-204 - missed this campaign. 2, Owner = Inspection. 2, Due = 08-Mar-2027. 3, Action = Quarterly UT on V-201 course-1. 3, Owner = Inspection. 3, Due = ongoing PSV-202 remains at 18.2 barg under DA-2026-207 and requires no action before the 31-Mar-2027 turnaround.",
-   "detail": "2 indexed passages"
   },
   {
    "name": "PID-CDU2-004.png",

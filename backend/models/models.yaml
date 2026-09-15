@@ -157,15 +157,30 @@ routing:
         - "I need a function that plots the thickness trend"
     - name: reason
       lane: reason
-      hint: "general question, planning, comparison, with no file or image referenced"
+      hint: "general engineering knowledge, planning, comparison, or any
+             question answered from understanding rather than from a specific
+             file - no document, tag lookup or image referenced"
       examples:
         - "how should we build the shutdown plan"
         - "compare these two pieces of equipment"
         - "which of the two options is better"
+        # General engineering knowledge. Measured: without these, "does a pump
+        # need a suction strainer" classified as CODE and came back as a Python
+        # script, and "how does a gate valve work" fell to chitchat and got the
+        # 0.8b lane. The PS asks for an assistant people use the way they use
+        # Claude, not a document search box, so an ordinary engineering
+        # question has to reach the reasoning lane.
+        - "does a pump need a suction strainer"
+        - "how does a gate valve work"
+        - "what is cavitation and why does it matter"
+        - "explain what a relief valve does"
+        - "why do we inspect pressure vessels"
+        - "what is the difference between a gate valve and a globe valve"
     - name: chitchat
       lane: router                        # 0.8b is enough; waking the 2b is wasteful
       retrieval: false                    # <- never search the corpus for a greeting
-      hint: "greeting, thanks, 'what can you do' - not a plant question"
+      hint: "greeting, thanks, or asking what you can do. NOT a technical
+             question - anything asking how something works is reason."
       examples:
         - "hi"
         - "how are you"
