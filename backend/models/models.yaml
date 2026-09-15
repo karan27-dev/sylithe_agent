@@ -3,7 +3,7 @@
 # PS requirement: "New open weight models should be addable later
 #                  without redesigning the system."
 
-active_profile: tier-S
+active_profile: tier-M
 
 # ---------------------------------------------------------------------------
 # MEASURED ON THIS MACHINE (MacBook Air M1, 8 GB)
@@ -92,7 +92,12 @@ profiles:
     lanes:
       router:  { model: qwen3.5:0.8b,     think: false, max_tokens: 32 }
       reason:  { model: qwen3.5:4b,       think: false, max_tokens: 1024 }
-      code:    { model: qwen2.5-coder:1.5b, think: false, max_tokens: 1024 }
+      # tier-S already moved its code lane off qwen2.5-coder:1.5b, measured:
+      # the coder model runs 3/3 but is CORRECT 1/3, because it writes code
+      # that executes on invented numbers - on one task it took a design
+      # pressure of 18.0 barg and used it as a wall thickness. tier-M should
+      # not quietly reintroduce it.
+      code:    { model: qwen3.5:4b,       think: false, max_tokens: 1024 }
       vision:  { model: qwen3.5:4b,       think: false, max_tokens: 1024 }
       embed:   { model: nomic-embed-text, dim: 768 }
 
