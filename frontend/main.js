@@ -567,3 +567,126 @@ function analyseFolder(path){
   }
 }
 
+
+
+/* ==================== dictation ==================== */
+/* The default Web Speech API streams audio to Google's servers. On this
+   project that is disqualifying, and our own monitor would not even catch it,
+   because the request comes from the browser and not from our process - the
+   same blind spot that let subprocesses reach the network. Chrome 139+ can run
+   recognition ON DEVICE, so we require that and refuse the microphone when it
+   is unavailable, rather than quietly shipping a plant discussion to a cloud
+   service.
+
+   The button is never silently disabled. An earlier version greyed it out when
+   the on-device check failed, so clicking Speak did nothing and said nothing -
+   which looks identical to a broken button. It now always responds and names
+   the exact reason it cannot listen. */
+
+const micBtn = $("#micbtn"), micLabel = $("#miclabel");
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null, recording = false;
+
+async function micStatus(){
+  if(!window.isSecureContext)
+    return { ok:false, why:"The page is not a secure context, so the browser "
+                        + "will not grant microphone access." };
+  if(!SR)
+    return { ok:false, why:"This browser has no speech recognition. Chrome 139 "
+                        + "or newer is needed for on-device dictation." };
+  if(typeof SR.available !== "function")
+    return { ok:false, why:"This browser cannot run speech recognition on "
+                        + "device, and the cloud fallback would send your audio "
+                        + "to Google - so dictation stays off." };
+  try{
+    const state = await SR.available({ langs:["en-US"], processLocally:true });
+    if(state === "available")   return { ok:true };
+    if(state === "downloading") return { ok:false, why:"The on-device speech "
+                                       + "model is still downloading." };
+    if(state === "downloadable")
+      return { ok:false, downloadable:true,
+               why:"The on-device speech model is not installed yet." };
+    return { ok:false, why:"On-device speech is unavailable here (" + state
+                        + "), and the cloud fallback is not acceptable on an "
+                        + "air-gapped workbench." };
+  }catch(e){
+    return { ok:false, why:"Could not check on-device speech: " + e.message };
+  }
+}
+
+micBtn.onclick = async () => {
+  if(recording){ rec?.stop(); return; }
+
+  const st = await micStatus();
+  if(!st.ok){
+    toast(st.why, 7000);
+    console.warn("[dictation]", st.why);
+    if(st.downloadable){
+      try{
+        toast("Downloading the on-device speech model, once...", 9000);
+        await SR.install({ langs:["en-US"], processLocally:true });
+        toast("Installed - press Speak again.", 5000);
+      }catch(e){ toast("Install failed: " + e.message, 6000); }
+    }
+    return;
+  }
+
+  rec = new SR();
+  rec.lang = "en-US";
+  rec.continuous = true;
+  rec.interimResults = true;
+  rec.processLocally = true;          // the whole point: never leaves the machine
+
+  const before = qEl.value.trim();
+  // resultIndex points at the first CHANGED result, not the first. Reading from
+  // it gives only the newest fragment, so finalised text is kept separately -
+  // otherwise every pause restarts the sentence.
+  let finalText = "";
+
+  rec.onstart = () => {
+    recording = true;
+    micBtn.classList.add("rec");
+    micLabel.textContent = "Stop";
+    toast("Listening on device - audio stays on this machine", 3000);
+  };
+  rec.onresult = ev => {
+    let interim = "";
+    for(let i = ev.resultIndex; i < ev.results.length; i++){
+      const r = ev.results[i];
+      if(r.isFinal) finalText += r[0].transcript;
+      else interim += r[0].transcript;
+    }
+    qEl.value = (before ? before + " " : "") + finalText + interim;
+    qEl.style.height = "auto";
+    qEl.style.height = Math.min(qEl.scrollHeight, 200) + "px";
+  };
+  rec.onerror = ev => {
+    const why = {
+      "not-allowed": "Microphone permission was refused. Allow it for "
+                   + "127.0.0.1 in the address bar, then press Speak again.",
+      "service-not-allowed": "The browser blocked speech recognition.",
+      "no-speech": "Nothing was heard.",
+      "audio-capture": "No microphone was found.",
+      "network": "Recognition tried to use the network and was stopped.",
+    }[ev.error] || ("Dictation error: " + ev.error);
+    toast(why, 6000);
+    console.warn("[dictation]", ev.error);
+  };
+  rec.onend = () => {
+    recording = false;
+    micBtn.classList.remove("rec");
+    micLabel.textContent = "Speak";
+    qEl.focus();
+  };
+
+  try{ rec.start(); }
+  catch(e){ toast("Could not start dictation: " + e.message, 5000); }
+};
+
+// Say what the microphone can do before it is pressed, in the tooltip only -
+// the button stays clickable so the reason is always reachable.
+micStatus().then(st => {
+  micBtn.title = st.ok
+    ? "Dictate - runs on device, audio never leaves this machine"
+    : st.why;
+});
