@@ -1,5 +1,5 @@
 {
- "saved": 1789575553.815524,
+ "saved": 1789575879.866822,
  "chats": {
   "388e430265c9": {
    "uploads": [],
@@ -941,6 +941,58 @@
     "B07_DEV-2027-009_deviation_approval.docx",
     "B08_E-3304_shell_survey.docx"
    ]
+  },
+  "e6219dde6f2b": {
+   "uploads": [],
+   "drawings": [
+    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/994_png_jpg.rf.99aaa7d50a185b568667599641ff4c3c.jpg",
+    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/986_png_jpg.rf.8d09b8e1b7c6d6e48f587fc561d3d251.jpg",
+    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/91_png_jpg.rf.204f2d28cba382c1677ec6844f6f1ad1.jpg"
+   ],
+   "images": [
+    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/994_png_jpg.rf.99aaa7d50a185b568667599641ff4c3c.jpg",
+    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/986_png_jpg.rf.8d09b8e1b7c6d6e48f587fc561d3d251.jpg",
+    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/91_png_jpg.rf.204f2d28cba382c1677ec6844f6f1ad1.jpg"
+   ],
+   "briefs": [
+    {
+     "name": "994_png_jpg.rf.99aaa7d50a185b568667599641ff4c3c.jpg",
+     "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/994_png_jpg.rf.99aaa7d50a185b568667599641ff4c3c.jpg",
+     "kind": "drawing",
+     "chunks": 0,
+     "tags": [],
+     "preview": "",
+     "detail": "engineering drawing, 4 symbols detected, 0 tags read"
+    },
+    {
+     "name": "986_png_jpg.rf.8d09b8e1b7c6d6e48f587fc561d3d251.jpg",
+     "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/986_png_jpg.rf.8d09b8e1b7c6d6e48f587fc561d3d251.jpg",
+     "kind": "drawing",
+     "chunks": 0,
+     "tags": [],
+     "preview": "",
+     "detail": "engineering drawing, 9 symbols detected, 0 tags read"
+    },
+    {
+     "name": "91_png_jpg.rf.204f2d28cba382c1677ec6844f6f1ad1.jpg",
+     "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/91_png_jpg.rf.204f2d28cba382c1677ec6844f6f1ad1.jpg",
+     "kind": "drawing",
+     "chunks": 0,
+     "tags": [],
+     "preview": "",
+     "detail": "engineering drawing, 1 symbols detected, 0 tags read"
+    }
+   ],
+   "folder": null,
+   "corpus": []
+  },
+  "14853dd2b0da": {
+   "uploads": [],
+   "drawings": [],
+   "images": [],
+   "briefs": [],
+   "folder": "/Users/karan/Downloads/PACK-B-Unit33-hard",
+   "corpus": []
   }
  }
 }

@@ -74,7 +74,17 @@ class Lane:
     #
     # It matters beyond the error: switching tiers must not silently change
     # the embedding model, because that invalidates every vector in the index.
+    #
+    # It also lets one profile mix vendors, which is the point of lanes: the
+    # strongest reasoner and the strongest vision model are not the same
+    # company's, and a lane is the right unit at which to say so.
     endpoint: str | None = None
+    api_key_env: str | None = None
+
+    @property
+    def api_key(self) -> str | None:
+        import os
+        return os.environ.get(self.api_key_env) if self.api_key_env else None
 
     @classmethod
     def from_yaml(cls, name: str, raw: dict, defaults: dict) -> "Lane":
@@ -90,6 +100,7 @@ class Lane:
             endpoint=(str(merged["endpoint"]).rstrip("/")
                       if merged.get("endpoint") else None),
             reasoning_effort=merged.get("reasoning_effort"),
+            api_key_env=merged.get("api_key_env"),
         )
 
 
@@ -305,7 +316,12 @@ class Client:
 
         t0 = time.perf_counter()
         try:
-            if prof.backend == "ollama":
+            # A lane pointed at its own engine runs on the backend that
+            # endpoint implies, not the profile's. That is what lets one
+            # profile mix vendors - the strongest reasoner and the strongest
+            # vision model are not from the same company.
+            backend = _infer_backend(ln.endpoint) if ln.endpoint else prof.backend
+            if backend == "ollama":
                 data = self._call_ollama(prof, ln, messages, opts)
             else:
                 data = self._call_openai(prof, ln, messages, opts)
@@ -635,11 +651,12 @@ class Client:
         # set, so a missing key fails as an auth error from the server rather
         # than as a confusing 404 here.
         headers = {}
-        if prof.api_key:
-            headers["Authorization"] = f"Bearer {prof.api_key}"
+        key = ln.api_key or prof.api_key
+        if key:
+            headers["Authorization"] = f"Bearer {key}"
 
         r = self._http.post(
-            f"{prof.endpoint}/v1/chat/completions",
+            f"{ln.endpoint or prof.endpoint}/v1/chat/completions",
             json=payload,
             headers=headers or None,
             timeout=httpx.Timeout(ln.timeout_s, connect=_CONNECT_TIMEOUT),

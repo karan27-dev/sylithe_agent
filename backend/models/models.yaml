@@ -171,7 +171,18 @@ profiles:
       # code    V4 Pro, no thinking. The code lane writes a short script that
       #         is then EXECUTED in a sandbox, so its output is checked by
       #         running it - deliberation buys less here than it costs.
-      # vision  Flash, the only one of the two that accepts an image.
+      # vision  GEMINI, not DeepSeek. Lanes exist so one profile can mix
+      #         vendors, and vision is where that pays: Gemini leads the
+      #         public vision boards, and this lane reads scanned pages,
+      #         handwritten shift logs and nameplate photos - exactly what it
+      #         is strongest at. Its OpenAI-compatible endpoint means no code
+      #         change, only an endpoint and a key.
+      #
+      #         The P&ID path is NOT affected and does not become Gemini's
+      #         job: tools/pid_ocr.py reads the drawing and no language model
+      #         sees it. Measured, a VLM asked to enumerate symbols invents
+      #         categories that are not on the sheet - that is true of the
+      #         best VLM as much as the smallest.
       router:  { model: deepseek-flash,  think: false, max_tokens: 32 }
       reason:  { model: deepseek-v4-pro, think: true,  max_tokens: 4096,
                  reasoning_effort: max, timeout_s: 240 }
@@ -185,7 +196,12 @@ profiles:
       # reads the drawing and no language model ever sees it. Measured, that is
       # the right split - a VLM asked to enumerate symbols invents categories
       # that are not on the sheet.
-      vision:  { model: deepseek-flash,  think: false, max_tokens: 2048 }
+      vision:
+        model: gemini-2.5-pro
+        think: false
+        max_tokens: 2048
+        endpoint: https://generativelanguage.googleapis.com/v1beta/openai
+        api_key_env: GEMINI_API_KEY
       # Embeddings stay LOCAL, and the endpoint has to say so.
       #
       # Naming the model alone was not enough: the endpoint comes from the
