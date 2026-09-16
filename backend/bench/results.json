@@ -1,16 +1,16 @@
 {
   "passed": 9,
   "total": 9,
-  "seconds": 414.2,
+  "seconds": 434.9,
   "external_calls": 0,
   "results": [
     {
       "id": "retrieve",
       "requirement": "5 knowledge base",
       "passed": true,
-      "seconds": 40.6,
+      "seconds": 30.1,
       "fails": [],
-      "answer": "The measured shell plate thicknesses for TK-4102 are **11.2 mm** (Course-1 N), **11.4 mm** (Course-1 S), **11.8 mm** (Course-2 N), and **7.6 mm** (Annular ring) [1].\n\nGenerally, a shell plate thicknes",
+      "answer": "The measured shell plate thicknesses for TK-4102 were **11.2 mm** (Course-1 N), **11.4 mm** (Course-1 S), **11.8 mm** (Course-2 N), and **7.6 mm** (Annular ring) [1].",
       "code_output": "",
       "files": []
     },
@@ -18,9 +18,9 @@
       "id": "cross-doc",
       "requirement": "5 knowledge base",
       "passed": true,
-      "seconds": 27.3,
+      "seconds": 23.4,
       "fails": [],
-      "answer": "No, the PSV-2041 set pressure does not meet SOP-114 because 12.5 barg is below the required 14.0 barg [1]. This shortfall constitutes a non-conformance recorded as NCR-2026-0088 [2].",
+      "answer": "No, PSV-2041 does not meet SOP-114 because its set pressure of 12.5 barg is below the required 14.0 barg [1]. This shortfall constitutes a non-conformance recorded as NCR-2026-0088 [2].",
       "code_output": "",
       "files": []
     },
@@ -28,9 +28,9 @@
       "id": "refuse-unknown",
       "requirement": "grounding",
       "passed": true,
-      "seconds": 27.1,
+      "seconds": 29.9,
       "fails": [],
-      "answer": "TK-9999 is not in the record. The available documents only contain data for TK-4102, which has a measured shell thickness of 11.2 mm against a nominal 12.0 mm [2][3]. Since TK-9999 is not mentioned an",
+      "answer": "TK-9999 is not in the record. The available documents only contain data for TK-4102, which has a measured shell thickness of 11.2 mm against a nominal 12.0 mm [2][3]. No passage mentions TK-9999, so i",
       "code_output": "",
       "files": []
     },
@@ -38,9 +38,9 @@
       "id": "refuse-external",
       "requirement": "1 air-gapped",
       "passed": true,
-      "seconds": 22.9,
+      "seconds": 31.6,
       "fails": [],
-      "answer": "Today's US dollar exchange rate is not in the record. The maintenance bulletin only specifies that operating temperature must not exceed **60 degC** while MOC-2026-0231 is in force, and any reading be",
+      "answer": "I do not have access to financial data or currency exchange rates in my indexed documents, so this information is not in the record. The maintenance bulletins only cover operating temperature limits a",
       "code_output": "",
       "files": []
     },
@@ -48,7 +48,7 @@
       "id": "route-code",
       "requirement": "3 model auto-selection",
       "passed": true,
-      "seconds": 26.9,
+      "seconds": 28.9,
       "fails": [],
       "answer": "```python\n# from the passages\ninterval_months = 24\nloss_mm = 0.8\nrate_mm_per_yr = 0.4\nremaining_life_yr = 2\n\nprint(f'corrosion rate {rate_mm_per_yr:.2f} mm/yr')\nprint(f'remaining life {remaining_life_",
       "code_output": "corrosion rate 0.40 mm/yr\nremaining life 2.0 yr",
@@ -58,33 +58,33 @@
       "id": "deliverable-docx",
       "requirement": "13 real deliverables",
       "passed": true,
-      "seconds": 75.4,
+      "seconds": 63.4,
       "fails": [],
-      "answer": "TK-4102 is a Crude Storage Tank [3] with Atmospheric design pressure and IN SERVICE status [3]. The attached scanned report confirms these details exactly. Since this is a draft request, I cannot gene",
+      "answer": "I cannot draft a formal Word file directly here, but I can provide the text content you need to copy and paste into your document. Based on the records, TK-4102 is an Atmospheric Crude Storage Tank [3",
       "code_output": "",
       "files": [
-        "APPROVAL_NOTE_-_TK-4102_20260916_044654.docx"
+        "APPROVAL_NOTE_-_TK-4102_20260916_155226.docx"
       ]
     },
     {
       "id": "deliverable-xlsx",
       "requirement": "13 real deliverables",
       "passed": true,
-      "seconds": 103.3,
+      "seconds": 112.0,
       "fails": [],
-      "answer": "Here is the compiled data from the UT logs for TK-4102 and P-4110A:\n\n| Equipment | Location | Nominal (mm) | Measured (mm) | Loss (mm) | Date | Inspector |\n| :--- | :--- | :--- | :--- | :--- | :--- | ",
+      "answer": "Here is the extracted data from the UT logs formatted for Excel:\n\n| Equipment | Location | Nominal (mm) | Measured (mm) | Loss (mm) | Date | Inspector |\n| :--- | :--- | :--- | :--- | :--- | :--- | :--",
       "code_output": "",
       "files": [
-        "UT_Thickness_Readings_20260916_044838.xlsx"
+        "UT_Thickness_Readings_20260916_155418.xlsx"
       ]
     },
     {
       "id": "handwriting",
       "requirement": "8 handwritten notes",
       "passed": true,
-      "seconds": 40.1,
+      "seconds": 63.5,
       "fails": [],
-      "answer": "The NCR number recorded in the handwritten shift log for PSV-2041 is **NCR-2026-0088** [3]. This was raised because the valve's set pressure of 12.5 barg fell below the required 14.0 barg per SOP-114.",
+      "answer": "The handwritten shift log for CDU-11 on 12-Sep-2026 shows that PSV-2041 was found at 12.5 barg, which is below the required 14.0 barg per SOP-114. This non-conformance led to the creation of NCR-2026-",
       "code_output": "",
       "files": []
     },
@@ -92,7 +92,7 @@
       "id": "pid-isolate",
       "requirement": "7 engineering drawings",
       "passed": true,
-      "seconds": 50.6,
+      "seconds": 52.1,
       "fails": [],
       "answer": "Close HV-4021. It is the only valve on the path out of the tank. PSV-2041 is a relief device and is not closed for isolation.",
       "code_output": "",

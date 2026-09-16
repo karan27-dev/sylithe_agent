@@ -1,5 +1,5 @@
 {
- "saved": 1789553391.60957,
+ "saved": 1789554179.19263,
  "chats": {
   "388e430265c9": {
    "uploads": [],
@@ -146,6 +146,68 @@
     }
    ],
    "folder": null
+  },
+  "956d22c79cba": {
+   "uploads": [],
+   "drawings": [
+    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/basic-simple-valves-p-id-diagram_77_png_jpg.rf.eccad7fcaff96ab46b607f92165a5ce9.jpg"
+   ],
+   "images": [
+    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/basic-simple-valves-p-id-diagram_77_png_jpg.rf.eccad7fcaff96ab46b607f92165a5ce9.jpg"
+   ],
+   "briefs": [
+    {
+     "name": "basic-simple-valves-p-id-diagram_77_png_jpg.rf.eccad7fcaff96ab46b607f92165a5ce9.jpg",
+     "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/basic-simple-valves-p-id-diagram_77_png_jpg.rf.eccad7fcaff96ab46b607f92165a5ce9.jpg",
+     "kind": "drawing",
+     "chunks": 0,
+     "tags": [
+      "PC-005",
+      "IP-005",
+      "PY-005",
+      "PT-005",
+      "PV-005"
+     ],
+     "preview": "",
+     "detail": "engineering drawing, 4 symbols detected, 5 tags read"
+    }
+   ],
+   "folder": null
+  },
+  "e54ac25878ac": {
+   "uploads": [],
+   "drawings": [
+    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-CDU2-004.png"
+   ],
+   "images": [
+    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-CDU2-004.png"
+   ],
+   "briefs": [
+    {
+     "name": "PID-CDU2-004.png",
+     "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-CDU2-004.png",
+     "kind": "drawing",
+     "chunks": 0,
+     "tags": [
+      "PSV-2041",
+      "LT-4102",
+      "TK-4102",
+      "HV-4021",
+      "FV-4033",
+      "P-4110A"
+     ],
+     "preview": "",
+     "detail": "engineering drawing, 2 symbols detected, 6 tags read"
+    }
+   ],
+   "folder": null
+  },
+  "b184861966c4": {
+   "uploads": [],
+   "drawings": [],
+   "images": [],
+   "briefs": [],
+   "folder": "/Users/karan/Downloads/corpus"
   }
  }
 }

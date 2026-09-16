@@ -74,7 +74,16 @@ REFERENTIAL = re.compile(
     # the user was plainly pointing at.
     r"|^\s*(what|what'?s)\s+(is\s+)?(this|it|that|these)\s*\??\s*$"
     r"|^\s*(explain|describe|summari[sz]e|read)\s+(this|it|that|these)\s*\??\s*$"
-    r"|\bwhat (did|have) i (just )?(upload|attach|add)",
+    r"|\bwhat (did|have) i (just )?(upload|attach|add)"
+    # Hinglish. The product answers in the language it is asked in, but the
+    # routing regexes only spoke English, so "mujhe detail mai batao" right
+    # after uploading a P&ID matched nothing referential, took the ordinary
+    # document path, and answered from whatever text scraped past the 0.50
+    # floor - demo files about a different unit entirely. The drawing was
+    # uploaded, briefed and sitting there unused.
+    r"|\b(isko|iska|ismein|isme|is file|is doc\w*|ye|yeh|yah)\b"
+    r"|\b(bata|batao|batao?ge|samjha|samjhao|dikha|dikhao|padho|padh)\b"
+    r"|\bdetail\s*(mai|me|mein)\b",
     re.I)
 
 # Questions about the corpus as a whole - the answer should draw on many
@@ -83,7 +92,11 @@ REFERENTIAL = re.compile(
 DRAWING_TOPIC = re.compile(
     r"\b(isolat\w*|shut ?off|block in|lock ?out|close|closed|valve|valves|"
     r"manifold|branch|header|connect\w*|downstream|upstream|trace|path|"
-    r"line up|equipment on|what is on|p&?id|drawing|diagram)\b", re.I)
+    r"line up|equipment on|what is on|p&?id|drawing|diagram)\b"
+    # Hinglish for the same questions - band karna is closing a valve, and a
+    # naksha or chitra is a drawing.
+    r"|\b(band kar\w*|khol\w*|isolate kar\w*|naksha|chitra|jod\w*)\b",
+    re.I)
 
 # Chitchat runs on the 0.8b router lane, which is right for "hi" - it answers
 # in about a second. It is wrong for anything that deserves a real sentence.
