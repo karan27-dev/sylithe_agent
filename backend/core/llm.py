@@ -153,6 +153,19 @@ class Profile:
         return self.lanes[name]
 
 
+def _classify_host(endpoint: str) -> bool:
+    """True when the endpoint is something we run ourselves (local or LAN)."""
+    import ipaddress
+    from urllib.parse import urlparse
+    host = urlparse(endpoint).hostname or ""
+    if host in ("localhost", "127.0.0.1", "::1", "") or host.endswith(".local"):
+        return True
+    try:
+        return ipaddress.ip_address(host).is_private
+    except ValueError:
+        return False
+
+
 def _infer_backend(endpoint: str) -> str:
     """Port 11434 means ollama. Assume anything else is OpenAI-compatible."""
     return "ollama" if endpoint.endswith(":11434") else "openai"
@@ -181,6 +194,7 @@ class Reply:
     prompt_tokens: int = 0
     output_tokens: int = 0
     fell_back: bool = False
+    fell_back_why: str = ""            # what actually went wrong on the first try
     retried_for_truncation: int = 0    # 0=no, 1=budget raised, 2=thinking off
 
     def __str__(self) -> str:          # print(reply) gives the text directly
@@ -642,8 +656,16 @@ class Client:
         if ln.reasoning_effort:
             # DeepSeek's own switch. Sent only when a lane asks for it.
             payload["reasoning_effort"] = ln.reasoning_effort
-        elif not opts["think"]:
-            # Qwen chat-template switch; ignored by servers that do not know it
+        elif not opts["think"] and _classify_host(ln.endpoint or prof.endpoint):
+            # chat_template_kwargs is a vLLM extension for the Qwen chat
+            # template. It is NOT part of the OpenAI API, and a hosted vendor
+            # rejects the whole request over it: Gemini answered 400 Bad
+            # Request for every call until this was gated, and the failure was
+            # invisible because the lane quietly fell back to the local model.
+            #
+            # So it goes only to an engine on this machine or this LAN, which
+            # is where vLLM actually runs. A vendor-specific extension has no
+            # business on a vendor's own endpoint.
             payload["chat_template_kwargs"] = {"enable_thinking": False}
 
         # A self-hosted vLLM pod needs no auth; a hosted endpoint does. The
@@ -708,17 +730,28 @@ class Client:
         self, prof, lane, prompt, system, images, think,
         temperature, max_tokens, exc,
     ) -> Reply:
-        """tier-L timed out or is down: retry the same call on fallback_profile."""
+        """
+        tier-L timed out or is down: retry the same call on fallback_profile.
+
+        The reason travels with the reply. Without it a misconfigured tier
+        degrades to the local model in total silence - a wrong model name and
+        an expired key look identical to a working system, and the only clue
+        is that answers got slower. Diagnosing the Gemini lane cost two rounds
+        of guessing precisely because this was swallowed.
+        """
         target = prof.fallback_profile
+        why = f"{type(exc).__name__}: {exc}"[:200]
         if not target or target == prof.name:
             raise ModelError(
                 f"lane '{lane}' failed on profile '{prof.name}': {exc}"
             ) from exc
-        return self.chat(
+        reply = self.chat(
             lane, prompt, system=system, images=images, think=think,
             temperature=temperature, max_tokens=max_tokens,
             profile=target, _fell_back=True,
         )
+        reply.fell_back_why = f"{prof.name}/{lane} -> {why}"
+        return reply
 
     # -- helpers -----------------------------------------------------------
 

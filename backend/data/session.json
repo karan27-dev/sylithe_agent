@@ -1,5 +1,5 @@
 {
- "saved": 1789575879.866822,
+ "saved": 1789577094.9255612,
  "chats": {
   "388e430265c9": {
    "uploads": [],
@@ -708,16 +708,7 @@
    "corpus": []
   },
   "a7a229bd4f97": {
-   "uploads": [
-    "B13_E-3304_bundle_quotations.csv",
-    "B12_equipment_register.xlsx",
-    "B11_V-3302_nameplate_photo.png",
-    "B10_shift_log_scanned.pdf",
-    "B09_ncr_register.csv",
-    "B08_E-3304_shell_survey.docx",
-    "B07_DEV-2027-009_deviation_approval.docx",
-    "B06_PSV-3318_test_certificate.pdf"
-   ],
+   "uploads": [],
    "drawings": [
     "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/B14_PID-U33-014.png"
    ],
@@ -827,15 +818,7 @@
    ]
   },
   "565278526ee7": {
-   "uploads": [
-    "B08_E-3304_shell_survey.docx",
-    "B07_DEV-2027-009_deviation_approval.docx",
-    "B01_V-3302_thickness_survey.docx",
-    "B06_PSV-3318_test_certificate.pdf",
-    "B05_PSV-3312_test_certificate.pdf",
-    "B04_DHDS-SOP-210_Rev5_CURRENT.pdf",
-    "B03_DHDS-SOP-210_Rev4_SUPERSEDED.pdf"
-   ],
+   "uploads": [],
    "drawings": [],
    "images": [],
    "briefs": [
@@ -993,6 +976,62 @@
    "briefs": [],
    "folder": "/Users/karan/Downloads/PACK-B-Unit33-hard",
    "corpus": []
+  },
+  "bd6111834740": {
+   "uploads": [],
+   "drawings": [],
+   "images": [
+    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/B11_V-3302_nameplate_photo.png"
+   ],
+   "briefs": [
+    {
+     "name": "B11_V-3302_nameplate_photo.png",
+     "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/B11_V-3302_nameplate_photo.png",
+     "kind": "scan",
+     "chunks": 1,
+     "tags": [
+      "V-3302",
+      "HP-2009",
+      "TEMP-370",
+      "SA-387"
+     ],
+     "preview": "EQUIPMENT TAG V-3302 SERIAL NO HP-2009-8812 YEAR BUILT 2009 DESIGN PRESSURE 62 barg DESIGN TEMP 370 degC MDMT -20 degC MATERIAL SA-387 Gr.11 HYDROTEST 93.0 barg",
+     "detail": "1 indexed passages over 1 page(s)"
+    }
+   ],
+   "folder": null,
+   "corpus": [
+    "B11_V-3302_nameplate_photo.png"
+   ]
+  },
+  "a759da351313": {
+   "uploads": [
+    "B11_V-3302_nameplate_photo.png"
+   ],
+   "drawings": [],
+   "images": [
+    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/B11_V-3302_nameplate_photo.png"
+   ],
+   "briefs": [
+    {
+     "name": "B11_V-3302_nameplate_photo.png",
+     "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/B11_V-3302_nameplate_photo.png",
+     "kind": "scan",
+     "chunks": 1,
+     "tags": [
+      "V-3302",
+      "HP-2009",
+      "TEMP-370",
+      "SA-387"
+     ],
+     "preview": "EQUIPMENT TAG V-3302 SERIAL NO HP-2009-8812 YEAR BUILT 2009 DESIGN PRESSURE 62 barg DESIGN TEMP 370 degC MDMT -20 degC MATERIAL SA-387 Gr.11 HYDROTEST 93.0 barg",
+     "detail": "1 indexed passages over 1 page(s)"
+    }
+   ],
+   "folder": null,
+   "corpus": [
+    "B11_V-3302_nameplate_photo.png"
+   ]
   }
  }
 }

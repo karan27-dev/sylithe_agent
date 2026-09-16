@@ -196,8 +196,13 @@ profiles:
       # reads the drawing and no language model ever sees it. Measured, that is
       # the right split - a VLM asked to enumerate symbols invents categories
       # that are not on the sheet.
+      #         Model name checked against the key's own /models listing, not
+      #         assumed. gemini-2.5-pro returns 404 ("no longer available to
+      #         new users"), gemini-3.1-pro-preview returns 429 on a free key,
+      #         and 3.7/3.8-flash return 503. gemini-3.5-flash answers, and
+      #         read this pack's skewed nameplate field for field.
       vision:
-        model: gemini-2.5-pro
+        model: gemini-3.5-flash
         think: false
         max_tokens: 2048
         endpoint: https://generativelanguage.googleapis.com/v1beta/openai
