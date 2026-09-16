@@ -145,16 +145,37 @@ profiles:
   # thing this product exists to make impossible.
   # ---------------------------------------------------------------------
   tier-R:
-    endpoint: http://REPLACE-ME.runpod.net:8000   # vLLM, OpenAI-compatible
+    # Two ways to fill this in. Either is fine; both are EXTERNAL.
+    #
+    #   self-hosted vLLM pod   endpoint: https://<pod>-8000.proxy.runpod.net
+    #                          api_key_env: (omit - pods need no auth)
+    #   hosted open weights    endpoint: https://api.deepinfra.com/v1/openai
+    #                          api_key_env: TIER_R_API_KEY
+    #
+    # Pick a provider that serves OPEN WEIGHTS - the same models tier-L runs on
+    # a plant GPU node - rather than a vendor's own closed product. The demo
+    # then says "this is the model your node will run, reached over the network
+    # today", which is true, instead of "this is somebody else's model", which
+    # is the thing this product exists to avoid.
+    #
+    # api_key_env names the environment variable. The key itself never goes in
+    # this file: the file is committed, and a key in git is a key that leaked.
+    #   export TIER_R_API_KEY=...
+    endpoint: https://REPLACE-ME/v1/openai
+    # api_key_env: TIER_R_API_KEY
     max_loaded_models: 4
     keep_alive: 60m
     fallback_profile: tier-S
     lanes:
-      router:  { model: qwen3.5:2b,           think: false, max_tokens: 32 }
-      reason:  { model: glm-5.3,              think: true,  max_tokens: 8192 }
-      code:    { model: deepseek-v4-pro,      think: false, max_tokens: 4096 }
-      vision:  { model: qwen3-vl:235b-a22b,   think: false, max_tokens: 4096 }
-      embed:   { model: qwen3-embedding:8b,   dim: 4096 }
+      # Model names must match what the endpoint serves, exactly.
+      router:  { model: Qwen/Qwen3-32B,  think: false, max_tokens: 32 }
+      reason:  { model: Qwen/Qwen3-32B,  think: false, max_tokens: 2048 }
+      code:    { model: Qwen/Qwen3-32B,  think: false, max_tokens: 2048 }
+      vision:  { model: Qwen/Qwen3-32B,  think: false, max_tokens: 2048 }
+      # Embeddings stay LOCAL. Changing the embedding model invalidates the
+      # index, and re-embedding the corpus through a paid endpoint costs money
+      # to gain nothing - the comparison is about reasoning, not retrieval.
+      embed:   { model: nomic-embed-text, dim: 768 }
 
   tier-L:
     endpoint: http://192.168.1.50:8000      # vLLM, OpenAI-compatible

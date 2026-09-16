@@ -84,6 +84,15 @@ class Profile:
     keep_alive: str = "30s"
     fallback_profile: str | None = None
     lanes: dict[str, Lane] = field(default_factory=dict)
+    # Name of the environment variable holding this endpoint's bearer token.
+    # The NAME lives in the YAML; the key itself never does, because the YAML
+    # is committed and a key in git is a key that has leaked.
+    api_key_env: str | None = None
+
+    @property
+    def api_key(self) -> str | None:
+        import os
+        return os.environ.get(self.api_key_env) if self.api_key_env else None
 
     @classmethod
     def from_yaml(cls, name: str, raw: dict, defaults: dict) -> "Profile":
@@ -97,6 +106,7 @@ class Profile:
             name=name,
             endpoint=endpoint,
             backend=backend,
+            api_key_env=raw.get("api_key_env"),
             max_loaded_models=int(raw.get("max_loaded_models", 1)),
             keep_alive=str(raw.get("keep_alive", "30s")),
             fallback_profile=raw.get("fallback_profile"),
@@ -592,9 +602,18 @@ class Client:
             # Qwen chat-template switch; ignored by servers that do not know it
             payload["chat_template_kwargs"] = {"enable_thinking": False}
 
+        # A self-hosted vLLM pod needs no auth; a hosted endpoint does. The
+        # header is sent only when the named environment variable is actually
+        # set, so a missing key fails as an auth error from the server rather
+        # than as a confusing 404 here.
+        headers = {}
+        if prof.api_key:
+            headers["Authorization"] = f"Bearer {prof.api_key}"
+
         r = self._http.post(
             f"{prof.endpoint}/v1/chat/completions",
             json=payload,
+            headers=headers or None,
             timeout=httpx.Timeout(ln.timeout_s, connect=_CONNECT_TIMEOUT),
         )
         r.raise_for_status()
