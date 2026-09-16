@@ -98,6 +98,7 @@ async function loadChats(){
    a rented box on a public address is not, and the UI has to say so rather
    than let a green "0 external calls" imply something it cannot promise. */
 function renderTiers(profiles){
+  PROFILES = profiles;
   const box = $("#tiersel");
   box.innerHTML = profiles.map(p =>
     `<button data-tier="${esc(p.name)}" class="${p.active ? "on" : ""}"
@@ -113,16 +114,56 @@ function showReach(p){
   const el = $("#pill-reach");
   if(!p){ el.textContent = "\u2014"; return; }
   if(p.sovereign){
-    el.className = "pill ok";
-    el.innerHTML = `<b>on-premise</b> \u00b7 ${esc(p.reach)}`;
-    el.title = `Engine at ${p.endpoint} - inside the plant, seal holds`;
+    el.className = "reach ok";
+    el.textContent = p.reach === "local" ? "on this machine" : "on the plant LAN";
+    el.title = `Engine at ${p.endpoint} - inside the plant, the seal holds`;
   }else{
-    el.className = "pill ext";
-    el.innerHTML = `<b>EXTERNAL</b> \u00b7 data leaves this machine`;
+    el.className = "reach ext";
+    el.textContent = "leaves this machine";
     el.title = `Engine at ${p.endpoint} is outside the plant. `
              + `Under seal these calls are refused.`;
   }
 }
+
+/* ---------- which models are actually in use ----------
+   The header can only show one model name, and the product runs five at once
+   on different lanes - which is the whole design, and was invisible. Clicking
+   the pill lists every lane on every tier, so "what is this thing running" is
+   one click rather than a YAML file. */
+let PROFILES = [];
+
+function renderModelCard(){
+  const box = $("#modelcard");
+  const LANE_NOTE = {
+    router: "picks the lane", reason: "answers and judges",
+    code:   "writes code that is then executed",
+    vision: "reads scans, photos, handwriting",
+    embed:  "indexes and searches documents",
+  };
+  box.innerHTML = `<h4>Models in use</h4>` + PROFILES.map(p => `
+    <div class="tierblk">
+      <div class="hdr"><b>${esc(p.name)}</b>
+        <span class="tag ${p.sovereign ? "ok" : "ext"}">${
+          p.sovereign ? (p.reach === "local" ? "this machine" : "plant LAN")
+                      : "external"}</span>
+        ${p.active ? '<span class="tag ok">active</span>' : ""}</div>
+      ${Object.entries(p.lanes).map(([lane, model]) => `
+        <div class="lane"><i>${esc(lane)}</i>
+          <span>${esc(model)}<br><em>${esc(LANE_NOTE[lane] || "")}</em></span>
+        </div>`).join("")}
+    </div>`).join("");
+}
+
+$("#pill-model").onclick = e => {
+  e.stopPropagation();
+  const box = $("#modelcard");
+  box.hidden = !box.hidden;
+  if(!box.hidden) renderModelCard();
+};
+document.addEventListener("click", e => {
+  const box = $("#modelcard");
+  if(!box.hidden && !box.contains(e.target)) box.hidden = true;
+});
 
 async function setTier(name){
   try{
@@ -141,6 +182,136 @@ async function setTier(name){
     }
   }catch(e){ toast("Could not switch tier"); }
 }
+
+/* ---------- usage dashboard ----------
+   The deployment is one workbench per engineer's PC, so the first question a
+   plant IT manager asks after "is our data safe" is "who is using this, how
+   much, and what does it cost". Each instance knows only its own traffic;
+   a fleet view is these files gathered on a share, deliberately not a service
+   every PC phones home to - that would be a network dependency in a product
+   whose claim is that there is none.
+
+   Sections are chosen to answer the questions actually asked: what did it
+   cost, who is heavy, who is not using it at all, which lane is burning the
+   budget, and is today unlike the other days. */
+let USAGE_DAYS = 30;
+
+const fmtInt = n => (n || 0).toLocaleString();
+const fmtTok = n => n >= 1e6 ? (n / 1e6).toFixed(2) + "M"
+                  : n >= 1e3 ? (n / 1e3).toFixed(1) + "k" : String(n || 0);
+const fmtUsd = n => n >= 1 ? "$" + n.toFixed(2)
+                  : n > 0 ? "$" + n.toFixed(4) : "$0.00";
+
+function uvRows(list, total, mine){
+  if(!list.length) return `<tr><td colspan="5" class="uv-empty">Nothing yet.</td></tr>`;
+  return list.map(r => {
+    const tok = r.prompt_tokens + r.output_tokens;
+    const pct = total ? Math.round(tok / total * 100) : 0;
+    const me = r.key === mine ? " me" : "";
+    return `<tr>
+      <td class="${me.trim()}">${esc(r.key)}${me ? " (this machine)" : ""}
+        <div class="uv-bar"><i style="width:${pct}%"></i></div></td>
+      <td class="num">${fmtInt(r.calls)}</td>
+      <td class="num">${fmtTok(tok)}</td>
+      <td class="num">${pct}%</td>
+      <td class="num">${fmtUsd(r.cost_usd)}</td>
+    </tr>`;
+  }).join("");
+}
+
+function uvTable(title, why, list, total, mine, unit){
+  return `<div class="uv-sec"><h3>${esc(title)}</h3><p class="why">${why}</p>
+    <table class="uv-tab"><thead><tr>
+      <th>${esc(unit)}</th><th class="num">calls</th><th class="num">tokens</th>
+      <th class="num">share</th><th class="num">cost</th>
+    </tr></thead><tbody>${uvRows(list, total, mine)}</tbody></table></div>`;
+}
+
+async function showUsage(){
+  const view = $("#usageview");
+  view.hidden = false;
+  view.innerHTML = `<div class="uv-sub">Reading usage\u2026</div>`;
+  let d;
+  try{
+    d = await (await fetch("/api/usage?days=" + USAGE_DAYS)).json();
+  }catch(e){ view.innerHTML = `<div class="uv-empty">Could not read usage.</div>`; return; }
+
+  const t = d.total, tok = t.tokens || 0;
+  const peak = Math.max(1, ...d.daily.map(x => x.prompt_tokens + x.output_tokens));
+  const hosted = d.tiers.filter(x => x.cost_usd > 0)
+                        .reduce((a, x) => a + x.cost_usd, 0);
+  const localTok = d.models.filter(m => !(d.pricing[m.key]?.output))
+                           .reduce((a, m) => a + m.prompt_tokens + m.output_tokens, 0);
+
+  view.innerHTML = `
+    <div class="uv-head"><h2>Usage and cost</h2>
+      <div class="uv-range">
+        ${[1, 7, 30, 90].map(n =>
+          `<button data-d="${n}" class="${n === USAGE_DAYS ? "on" : ""}">${
+            n === 1 ? "today" : n + "d"}</button>`).join("")}
+      </div>
+    </div>
+    <div class="uv-sub">This machine: <b>${esc(d.this_machine)}</b>
+      \u00b7 signed in as <b>${esc(d.this_user)}</b>
+      \u00b7 last ${d.days} day${d.days === 1 ? "" : "s"}</div>
+
+    <div class="uv-cards">
+      <div class="uv-card"><div class="k">requests</div>
+        <div class="v">${fmtInt(t.calls)}</div>
+        <div class="n">${fmtInt(t.tokens_per_call)} tokens each on average</div></div>
+      <div class="uv-card"><div class="k">tokens</div>
+        <div class="v">${fmtTok(tok)}</div>
+        <div class="n">${fmtTok(t.prompt_tokens)} in \u00b7 ${fmtTok(t.output_tokens)} out</div></div>
+      <div class="uv-card"><div class="k">billed</div>
+        <div class="v">${fmtUsd(t.cost_usd)}</div>
+        <div class="n">${hosted > 0 ? "hosted tiers only" : "nothing billable yet"}</div></div>
+      <div class="uv-card free"><div class="k">ran free on-premise</div>
+        <div class="v">${fmtTok(localTok)}</div>
+        <div class="n">tokens that cost nothing per call</div></div>
+      <div class="uv-card"><div class="k">engine time</div>
+        <div class="v">${(t.seconds / 60).toFixed(1)}m</div>
+        <div class="n">${t.fell_back} fell back to local</div></div>
+    </div>
+
+    <div class="uv-sec"><h3>Daily</h3>
+      <p class="why">A day unlike the others is usually a misconfiguration or a
+        script, not a busy engineer - which is the point of watching it.</p>
+      <div class="uv-spark">${d.daily.map(x => {
+        const v = x.prompt_tokens + x.output_tokens;
+        return `<i style="height:${Math.max(2, v / peak * 100)}%"
+          title="${esc(x.key)} \u00b7 ${fmtTok(v)} tokens \u00b7 ${fmtUsd(x.cost_usd)}"></i>`;
+      }).join("") || '<span class="uv-empty">No days recorded yet.</span>'}</div>
+    </div>
+
+    ${uvTable("By machine",
+      "One workbench per PC, so a machine is a person's usage. The lightest "
+      + "rows matter as much as the heaviest: a machine at zero is a licence "
+      + "nobody is using.", d.machines, tok, d.this_machine, "machine")}
+
+    ${uvTable("By person", "Who the OS says was signed in. Taken from the "
+      + "login rather than asked for, so it cannot be typed wrong or borrowed.",
+      d.users, tok, d.this_user, "user")}
+
+    ${uvTable("By model", "What each model is costing. Local models are billed "
+      + "at zero because they are - that is the product, not a rounding.",
+      d.models, tok, null, "model")}
+
+    ${uvTable("By lane", "Which job spends the budget. A router burning tokens "
+      + "means a big model is doing a small model's work.",
+      d.lanes, tok, null, "lane")}
+
+    ${uvTable("By tier", "Local against hosted, in money.", d.tiers, tok, null, "tier")}
+  `;
+
+  view.querySelectorAll(".uv-range button").forEach(b => {
+    b.onclick = () => { USAGE_DAYS = +b.dataset.d; showUsage(); };
+  });
+}
+
+$("#usage").onclick = () => {
+  const v = $("#usageview");
+  if(v.hidden) showUsage(); else v.hidden = true;
+};
 
 async function newChat(){
   const r = await (await fetch("/api/chats", { method: "POST" })).json();

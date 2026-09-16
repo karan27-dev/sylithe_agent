@@ -219,6 +219,9 @@ class Registry:
     fallback_class: str
     path: Path
     retrieval: dict = field(default_factory=dict)
+    # USD per million tokens, per model. Read by the usage dashboard; a model
+    # that is absent prices at zero, which is correct for anything local.
+    pricing: dict = field(default_factory=dict)
 
     @classmethod
     def load(cls, path: Path | str = _YAML_PATH) -> "Registry":
@@ -246,6 +249,7 @@ class Registry:
             raise ModelError(f"active_profile '{active}' is not in profiles")
         return cls(
             active_profile=active,
+            pricing=raw.get("pricing") or {},
             defaults=defaults,
             profiles=profiles,
             classes=classes,
@@ -370,7 +374,7 @@ class Client:
                     profile=prof.name, _fell_back=_fell_back, _retried=2,
                 )
 
-        return Reply(
+        reply = Reply(
             text=data["text"].strip(),
             lane=lane,
             model=ln.model,
@@ -382,6 +386,19 @@ class Client:
             fell_back=_fell_back,
             retried_for_truncation=_retried,
         )
+        # One choke point for accounting: every lane call passes through here,
+        # so nothing has to remember to log. Tokens and latency only - see
+        # core/usage.py for what is deliberately not stored.
+        try:
+            from core import usage
+            usage.record(tier=prof.name, lane=lane, model=ln.model,
+                         prompt_tokens=reply.prompt_tokens,
+                         output_tokens=reply.output_tokens,
+                         latency_s=dt, fell_back=_fell_back,
+                         rates=self.reg.pricing)
+        except Exception:
+            pass
+        return reply
 
     def stream(
         self,

@@ -220,6 +220,27 @@ profiles:
         endpoint: http://localhost:11434
 
 # ---------------------------------------------------------------------------
+# PRICING - USD per MILLION tokens, for the usage dashboard
+# ---------------------------------------------------------------------------
+# A model not listed here prices at zero. That is correct for anything running
+# on this machine: the point of the product is that those tokens cost nothing
+# per call, so the dashboard shows 0.00 rather than an invented electricity
+# figure dressed up as a saving.
+#
+# Hosted rates are list prices and change. They are here rather than in code
+# so a finance correction is a YAML edit, and the dashboard says which rates
+# it used.
+pricing:
+  deepseek-v4-pro:  { input: 0.60, output: 2.40 }
+  deepseek-flash:   { input: 0.30, output: 1.20 }   # half these off-peak
+  gemini-3.5-flash: { input: 0.30, output: 2.50 }
+  # local - free per token, and that is the headline rather than a footnote
+  qwen3.5:0.8b:     { input: 0.0, output: 0.0 }
+  qwen3.5:2b:       { input: 0.0, output: 0.0 }
+  qwen3.5:4b:       { input: 0.0, output: 0.0 }
+  nomic-embed-text: { input: 0.0, output: 0.0 }
+
+# ---------------------------------------------------------------------------
 # ROUTING - the router lane classifies input into these classes
 # ---------------------------------------------------------------------------
 # The 0.8b router has a natural bias: it used to answer "code" for everything

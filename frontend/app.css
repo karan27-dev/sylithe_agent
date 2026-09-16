@@ -420,3 +420,74 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
 #pill-reach.ok{color:var(--ok)}
 #pill-reach.ext{color:var(--bad);
   background:color-mix(in srgb, var(--bad) 12%, transparent)}
+
+/* ---- header: the tier is the headline ---- */
+#top{position:relative}
+.tierwrap{position:absolute;left:50%;transform:translateX(-50%);
+          display:flex;flex-direction:column;align-items:center;gap:3px}
+.tierwrap .tiersel{padding:3px;border-radius:11px}
+.tierwrap .tiersel button{font-size:13px;padding:7px 18px;letter-spacing:.08em}
+.reach{font:600 9.5px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;
+       color:var(--dim2);white-space:nowrap}
+.reach.ok{color:var(--ok)}
+.reach.ext{color:var(--bad)}
+.pill.clickable{cursor:pointer}
+.pill.clickable:hover{background:var(--side2);color:var(--ink)}
+
+/* ---- which models are in use ---- */
+#modelcard{position:absolute;top:52px;right:16px;z-index:40;width:330px;
+  background:var(--bg);border:1px solid var(--line);border-radius:12px;
+  box-shadow:0 12px 34px rgba(0,0,0,.18);padding:12px 14px;font-size:12px}
+#modelcard h4{margin:0 0 2px;font-size:11px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--dim2)}
+#modelcard .tierblk{padding:8px 0;border-bottom:1px solid var(--line)}
+#modelcard .tierblk:last-child{border-bottom:none}
+#modelcard .hdr{display:flex;align-items:baseline;gap:7px;margin-bottom:6px}
+#modelcard .hdr b{font-size:12px}
+#modelcard .tag{font:600 9px/1 var(--mono);letter-spacing:.05em;padding:3px 6px;
+  border-radius:5px;text-transform:uppercase}
+#modelcard .tag.ok{background:color-mix(in srgb,var(--ok) 15%,transparent);color:var(--ok)}
+#modelcard .tag.ext{background:color-mix(in srgb,var(--bad) 15%,transparent);color:var(--bad)}
+#modelcard .lane{display:flex;gap:8px;padding:2px 0;font-family:var(--mono);font-size:11px}
+#modelcard .lane i{color:var(--dim2);font-style:normal;width:52px;flex:none}
+#modelcard .lane span{color:var(--ink2);word-break:break-all}
+#modelcard .lane em{color:var(--dim2);font-style:normal;font-size:10px}
+
+/* ---- usage dashboard ---- */
+#usageview{position:absolute;inset:0;background:var(--bg);overflow:auto;
+  padding:26px 30px 60px;z-index:30}
+.uv-head{display:flex;align-items:baseline;gap:14px;margin-bottom:4px}
+.uv-head h2{margin:0;font-size:19px;letter-spacing:-.01em}
+.uv-sub{color:var(--dim2);font-size:12px;margin-bottom:22px}
+.uv-sub b{color:var(--ink2);font-weight:600}
+.uv-range{margin-left:auto;display:inline-flex;gap:2px;padding:2px;
+  border-radius:8px;background:var(--side2)}
+.uv-range button{border:none;background:none;color:var(--dim);cursor:pointer;
+  font:600 11px/1 var(--mono);padding:5px 9px;border-radius:6px}
+.uv-range button.on{background:var(--bg);color:var(--ink)}
+.uv-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:12px;margin-bottom:26px}
+.uv-card{border:1px solid var(--line);border-radius:11px;padding:13px 15px}
+.uv-card .k{font:600 10px/1 var(--mono);letter-spacing:.06em;
+  text-transform:uppercase;color:var(--dim2)}
+.uv-card .v{font-size:23px;font-weight:600;margin-top:7px;letter-spacing:-.02em}
+.uv-card .n{font-size:11px;color:var(--dim2);margin-top:3px}
+.uv-card.free .v{color:var(--ok)}
+.uv-sec{margin-bottom:26px}
+.uv-sec h3{font-size:12px;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--dim2);margin:0 0 4px}
+.uv-sec .why{font-size:11.5px;color:var(--dim2);margin:0 0 11px;max-width:62ch}
+.uv-tab{width:100%;border-collapse:collapse;font-size:12.5px}
+.uv-tab th{text-align:left;font:600 10px/1 var(--mono);letter-spacing:.05em;
+  text-transform:uppercase;color:var(--dim2);padding:0 10px 7px 0}
+.uv-tab td{padding:7px 10px 7px 0;border-top:1px solid var(--line)}
+.uv-tab td.num,.uv-tab th.num{text-align:right;font-family:var(--mono);font-size:11.5px}
+.uv-tab .me{color:var(--accent);font-weight:600}
+.uv-bar{height:5px;border-radius:3px;background:var(--line2);overflow:hidden;
+  min-width:52px;margin-top:5px}
+.uv-bar i{display:block;height:100%;background:var(--accent);border-radius:3px}
+.uv-spark{display:flex;align-items:flex-end;gap:2px;height:52px;margin-top:8px}
+.uv-spark i{flex:1;background:var(--accent);border-radius:2px 2px 0 0;min-height:2px;
+  opacity:.75}
+.uv-spark i:hover{opacity:1}
+.uv-empty{color:var(--dim2);font-size:12.5px;padding:14px 0}

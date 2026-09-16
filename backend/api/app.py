@@ -548,6 +548,23 @@ def api_deliverable_get(name: str):
                         media_type="application/octet-stream")
 
 
+@app.get("/api/usage")
+def api_usage(days: int = 30) -> dict:
+    """
+    Token and cost accounting for this machine.
+
+    The deployment is one workbench per engineer's PC, so each instance knows
+    only its own traffic. A plant-wide view is these files collected on a
+    share - deliberately not a service that every PC phones home to, which
+    would be a network dependency in a product whose whole claim is that there
+    is none.
+    """
+    from core import usage
+    out = usage.summary(days=days)
+    out["pricing"] = CLIENT.reg.pricing
+    return out
+
+
 @app.get("/api/source/{name}")
 def api_source_get(name: str):
     """

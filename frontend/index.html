@@ -38,10 +38,23 @@
            stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
     </button>
     <div class="title" id="chattitle">New chat</div>
-    <div class="tiersel" id="tiersel" title="Which engine answers"></div>
-    <div class="pill" id="pill-reach" title="Where that engine runs">—</div>
-    <div class="pill" id="pill-model" title="active lane model">—</div>
+
+    <!-- Centre: which engine answers. The tier is the most consequential
+         setting in the product, so it sits in the middle at a size that
+         matches, and the badge under it says where that engine runs rather
+         than sitting across the bar as a separate fact to assemble. -->
+    <div class="tierwrap">
+      <div class="tiersel" id="tiersel" title="Which engine answers"></div>
+      <div class="reach" id="pill-reach" title="Where that engine runs">—</div>
+    </div>
+
+    <div class="pill clickable" id="pill-model" title="Models in use - click for all lanes">—</div>
     <div class="pill" id="pill-index">—</div>
+    <button class="iconbtn" id="usage" title="Usage and cost">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>
+    </button>
     <button class="iconbtn" id="theme" title="Toggle theme">
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
            stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/>
@@ -49,7 +62,11 @@
     </button>
   </div>
 
+  <!-- lane/model popover, filled by main.js -->
+  <div id="modelcard" hidden></div>
+
   <div id="scroll"><div class="col" id="feed"></div></div>
+  <div id="usageview" hidden></div>
 
   <div id="composer">
     <div class="cwrap">
