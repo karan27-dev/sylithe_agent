@@ -1,17 +1,36 @@
 {
- "saved": 1789500708.877033,
- "uploads": [],
+ "saved": 1789508863.474565,
+ "uploads": [
+  "982_png_jpg.rf.e30aaf4afb64f98b013aa898cf41804d.jpg"
+ ],
  "drawings": [
   "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/994_png_jpg.rf.99aaa7d50a185b568667599641ff4c3c.jpg",
   "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/process-p-id-diagram_44_png_jpg.rf.05aa5e51cf72cf9a5f35c71aa6717833.jpg",
   "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-CDU2-004.png"
  ],
  "images": [
+  "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/982_png_jpg.rf.e30aaf4afb64f98b013aa898cf41804d.jpg",
   "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/994_png_jpg.rf.99aaa7d50a185b568667599641ff4c3c.jpg",
   "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/process-p-id-diagram_44_png_jpg.rf.05aa5e51cf72cf9a5f35c71aa6717833.jpg",
   "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-CDU2-004.png"
  ],
  "briefs": [
+  {
+   "name": "982_png_jpg.rf.e30aaf4afb64f98b013aa898cf41804d.jpg",
+   "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/982_png_jpg.rf.e30aaf4afb64f98b013aa898cf41804d.jpg",
+   "kind": "scan",
+   "chunks": 1,
+   "tags": [
+    "PT-44",
+    "CT-106",
+    "P-12",
+    "D-105",
+    "P-14",
+    "P-13"
+   ],
+   "preview": "Feed\nTank\nRotary Compressor I/P\nPT\n44\nControl\nValve CT-106\nGate\nValve\nGate Gate\nValve Valve p-12\nV-2\nTank PT\nD-105\np-14\nTo Process\nREALPARS\nPCV\np-13",
+   "detail": "1 indexed passages over 1 page(s)"
+  },
   {
    "name": "994_png_jpg.rf.99aaa7d50a185b568667599641ff4c3c.jpg",
    "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/994_png_jpg.rf.99aaa7d50a185b568667599641ff4c3c.jpg",

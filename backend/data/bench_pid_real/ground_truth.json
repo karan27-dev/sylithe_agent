@@ -1,0 +1,5265 @@
+[
+ {
+  "sheet": "easy_01.png",
+  "tier": "easy",
+  "width": 1500,
+  "height": 1560,
+  "panels": [
+   "14_png_jpg.rf.e72805fecded18f0c498931c9c85a7d9.jpg",
+   "37_jpg.rf.34970488b1142d5f6a6e443ad63c2759.jpg",
+   "07_png_jpg.rf.367210bed444c53e4a1699ce10038d47.jpg"
+  ],
+  "symbols": [
+   {
+    "class": "globe_valve",
+    "box": [
+     276.0,
+     275.0,
+     540.0,
+     562.0
+    ],
+    "panel": "14_png_jpg.rf.e72805fecded18f0c498931c9c85a7d9.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     935.0,
+     176.0,
+     1297.0,
+     638.0
+    ],
+    "panel": "37_jpg.rf.34970488b1142d5f6a6e443ad63c2759.jpg"
+   },
+   {
+    "class": "needle_valve",
+    "box": [
+     182.0,
+     973.0,
+     224.0,
+     1023.0
+    ],
+    "panel": "07_png_jpg.rf.367210bed444c53e4a1699ce10038d47.jpg"
+   },
+   {
+    "class": "needle_valve",
+    "box": [
+     384.0,
+     952.0,
+     438.0,
+     1031.0
+    ],
+    "panel": "07_png_jpg.rf.367210bed444c53e4a1699ce10038d47.jpg"
+   },
+   {
+    "class": "needle_valve",
+    "box": [
+     178.0,
+     1181.0,
+     234.0,
+     1247.0
+    ],
+    "panel": "07_png_jpg.rf.367210bed444c53e4a1699ce10038d47.jpg"
+   },
+   {
+    "class": "pipe_fitting",
+    "box": [
+     343.0,
+     1172.0,
+     419.0,
+     1251.0
+    ],
+    "panel": "07_png_jpg.rf.367210bed444c53e4a1699ce10038d47.jpg"
+   },
+   {
+    "class": "pipe_fitting",
+    "box": [
+     531.0,
+     1176.0,
+     613.0,
+     1251.0
+    ],
+    "panel": "07_png_jpg.rf.367210bed444c53e4a1699ce10038d47.jpg"
+   }
+  ]
+ },
+ {
+  "sheet": "easy_02.png",
+  "tier": "easy",
+  "width": 1500,
+  "height": 1560,
+  "panels": [
+   "basic-simple-valves-p-id-diagram_77_png_jpg.rf.eccad7fcaff96ab46b607f92165a5ce9.jpg",
+   "all-individuals-single-single-of-valves-symbols-in-p-id-drawing_190_png_jpg.rf.2dd8cc830cd2fe57d43d9cbce7b783f7.jpg",
+   "82_jpg.rf.7ae2379a5da262e23a4b8117ced1ba40.jpg",
+   "146_jpg.rf.d0a936bf8c02063483928623a184f87b.jpg"
+  ],
+  "symbols": [
+   {
+    "class": "globe_valve",
+    "box": [
+     425.0,
+     625.0,
+     470.0,
+     669.0
+    ],
+    "panel": "basic-simple-valves-p-id-diagram_77_png_jpg.rf.eccad7fcaff96ab46b607f92165a5ce9.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     497.0,
+     513.0,
+     536.0,
+     548.0
+    ],
+    "panel": "basic-simple-valves-p-id-diagram_77_png_jpg.rf.eccad7fcaff96ab46b607f92165a5ce9.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     360.0,
+     507.0,
+     398.0,
+     553.0
+    ],
+    "panel": "basic-simple-valves-p-id-diagram_77_png_jpg.rf.eccad7fcaff96ab46b607f92165a5ce9.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     422.0,
+     458.0,
+     468.0,
+     554.0
+    ],
+    "panel": "basic-simple-valves-p-id-diagram_77_png_jpg.rf.eccad7fcaff96ab46b607f92165a5ce9.jpg"
+   },
+   {
+    "class": "actuator",
+    "box": [
+     931.0,
+     454.0,
+     961.0,
+     480.0
+    ],
+    "panel": "all-individuals-single-single-of-valves-symbols-in-p-id-drawing_190_png_jpg.rf.2dd8cc830cd2fe57d43d9cbce7b783f7.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     223.0,
+     789.0,
+     377.0,
+     1070.0
+    ],
+    "panel": "82_jpg.rf.7ae2379a5da262e23a4b8117ced1ba40.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     966.0,
+     846.0,
+     1001.0,
+     900.0
+    ],
+    "panel": "146_jpg.rf.d0a936bf8c02063483928623a184f87b.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1012.0,
+     1177.0,
+     1045.0,
+     1230.0
+    ],
+    "panel": "146_jpg.rf.d0a936bf8c02063483928623a184f87b.jpg"
+   },
+   {
+    "class": "butterfly_valve",
+    "box": [
+     959.0,
+     1020.0,
+     1019.0,
+     1086.0
+    ],
+    "panel": "146_jpg.rf.d0a936bf8c02063483928623a184f87b.jpg"
+   },
+   {
+    "class": "butterfly_valve",
+    "box": [
+     1002.0,
+     1340.0,
+     1064.0,
+     1405.0
+    ],
+    "panel": "146_jpg.rf.d0a936bf8c02063483928623a184f87b.jpg"
+   }
+  ]
+ },
+ {
+  "sheet": "easy_03.png",
+  "tier": "easy",
+  "width": 1500,
+  "height": 2240,
+  "panels": [
+   "07_png_jpg.rf.367210bed444c53e4a1699ce10038d47.jpg",
+   "basic-simple-p-id-diagram_32_png_jpg.rf.d2550155a49061b8a4290417c2aeb2c6.jpg",
+   "219_jpg.rf.2a7d2ab8cd81a42c5c996c19dfa145c6.jpg",
+   "88_png_jpg.rf.fcdc5594d2368ba6947a5f0f55f0bd78.jpg",
+   "213_jpg.rf.0bff98b89eb2dc18aa0574d0d793cf0a.jpg"
+  ],
+  "symbols": [
+   {
+    "class": "needle_valve",
+    "box": [
+     182.0,
+     293.0,
+     224.0,
+     343.0
+    ],
+    "panel": "07_png_jpg.rf.367210bed444c53e4a1699ce10038d47.jpg"
+   },
+   {
+    "class": "needle_valve",
+    "box": [
+     384.0,
+     272.0,
+     438.0,
+     351.0
+    ],
+    "panel": "07_png_jpg.rf.367210bed444c53e4a1699ce10038d47.jpg"
+   },
+   {
+    "class": "needle_valve",
+    "box": [
+     178.0,
+     501.0,
+     234.0,
+     567.0
+    ],
+    "panel": "07_png_jpg.rf.367210bed444c53e4a1699ce10038d47.jpg"
+   },
+   {
+    "class": "pipe_fitting",
+    "box": [
+     343.0,
+     492.0,
+     419.0,
+     571.0
+    ],
+    "panel": "07_png_jpg.rf.367210bed444c53e4a1699ce10038d47.jpg"
+   },
+   {
+    "class": "pipe_fitting",
+    "box": [
+     531.0,
+     496.0,
+     613.0,
+     571.0
+    ],
+    "panel": "07_png_jpg.rf.367210bed444c53e4a1699ce10038d47.jpg"
+   },
+   {
+    "class": "relief_valve",
+    "box": [
+     1134.0,
+     463.0,
+     1159.0,
+     517.0
+    ],
+    "panel": "basic-simple-p-id-diagram_32_png_jpg.rf.d2550155a49061b8a4290417c2aeb2c6.jpg"
+   },
+   {
+    "class": "relief_valve",
+    "box": [
+     208.0,
+     786.0,
+     678.0,
+     1350.0
+    ],
+    "panel": "219_jpg.rf.2a7d2ab8cd81a42c5c996c19dfa145c6.jpg"
+   },
+   {
+    "class": "actuator",
+    "box": [
+     1036.0,
+     840.0,
+     1193.0,
+     1350.0
+    ],
+    "panel": "88_png_jpg.rf.fcdc5594d2368ba6947a5f0f55f0bd78.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     203.0,
+     1665.0,
+     273.0,
+     1741.0
+    ],
+    "panel": "213_jpg.rf.0bff98b89eb2dc18aa0574d0d793cf0a.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     540.0,
+     1674.0,
+     620.0,
+     1745.0
+    ],
+    "panel": "213_jpg.rf.0bff98b89eb2dc18aa0574d0d793cf0a.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     268.0,
+     1783.0,
+     327.0,
+     1895.0
+    ],
+    "panel": "213_jpg.rf.0bff98b89eb2dc18aa0574d0d793cf0a.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     489.0,
+     1782.0,
+     541.0,
+     1899.0
+    ],
+    "panel": "213_jpg.rf.0bff98b89eb2dc18aa0574d0d793cf0a.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     331.0,
+     1512.0,
+     444.0,
+     1770.0
+    ],
+    "panel": "213_jpg.rf.0bff98b89eb2dc18aa0574d0d793cf0a.jpg"
+   }
+  ]
+ },
+ {
+  "sheet": "easy_04.png",
+  "tier": "easy",
+  "width": 820,
+  "height": 880,
+  "panels": [
+   "184_jpg.rf.b5a1ab6a5fbc836efe36c2f18feb0c11.jpg"
+  ],
+  "symbols": [
+   {
+    "class": "relief_valve",
+    "box": [
+     239.0,
+     143.0,
+     303.0,
+     267.0
+    ],
+    "panel": "184_jpg.rf.b5a1ab6a5fbc836efe36c2f18feb0c11.jpg"
+   },
+   {
+    "class": "relief_valve",
+    "box": [
+     566.0,
+     151.0,
+     642.0,
+     267.0
+    ],
+    "panel": "184_jpg.rf.b5a1ab6a5fbc836efe36c2f18feb0c11.jpg"
+   },
+   {
+    "class": "pipe_fitting",
+    "box": [
+     193.0,
+     363.0,
+     243.0,
+     399.0
+    ],
+    "panel": "184_jpg.rf.b5a1ab6a5fbc836efe36c2f18feb0c11.jpg"
+   },
+   {
+    "class": "pipe_fitting",
+    "box": [
+     616.0,
+     364.0,
+     674.0,
+     402.0
+    ],
+    "panel": "184_jpg.rf.b5a1ab6a5fbc836efe36c2f18feb0c11.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     591.0,
+     404.0,
+     624.0,
+     482.0
+    ],
+    "panel": "184_jpg.rf.b5a1ab6a5fbc836efe36c2f18feb0c11.jpg"
+   },
+   {
+    "class": "relief_valve",
+    "box": [
+     395.0,
+     374.0,
+     427.0,
+     451.0
+    ],
+    "panel": "184_jpg.rf.b5a1ab6a5fbc836efe36c2f18feb0c11.jpg"
+   },
+   {
+    "class": "relief_valve",
+    "box": [
+     233.0,
+     402.0,
+     282.0,
+     490.0
+    ],
+    "panel": "184_jpg.rf.b5a1ab6a5fbc836efe36c2f18feb0c11.jpg"
+   },
+   {
+    "class": "ball_valve",
+    "box": [
+     375.0,
+     271.0,
+     428.0,
+     364.0
+    ],
+    "panel": "184_jpg.rf.b5a1ab6a5fbc836efe36c2f18feb0c11.jpg"
+   }
+  ]
+ },
+ {
+  "sheet": "easy_05.png",
+  "tier": "easy",
+  "width": 820,
+  "height": 880,
+  "panels": [
+   "single-images-of-all-valve-symbol-in-p-id_20_png_jpg.rf.1398e3d69f05d0a8eb2a89dab7d4d92f.jpg"
+  ],
+  "symbols": [
+   {
+    "class": "gate_valve",
+    "box": [
+     159.0,
+     141.0,
+     227.0,
+     197.0
+    ],
+    "panel": "single-images-of-all-valve-symbol-in-p-id_20_png_jpg.rf.1398e3d69f05d0a8eb2a89dab7d4d92f.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     316.0,
+     141.0,
+     393.0,
+     201.0
+    ],
+    "panel": "single-images-of-all-valve-symbol-in-p-id_20_png_jpg.rf.1398e3d69f05d0a8eb2a89dab7d4d92f.jpg"
+   },
+   {
+    "class": "butterfly_valve",
+    "box": [
+     474.0,
+     139.0,
+     520.0,
+     195.0
+    ],
+    "panel": "single-images-of-all-valve-symbol-in-p-id_20_png_jpg.rf.1398e3d69f05d0a8eb2a89dab7d4d92f.jpg"
+   },
+   {
+    "class": "ball_valve",
+    "box": [
+     610.0,
+     138.0,
+     660.0,
+     196.0
+    ],
+    "panel": "single-images-of-all-valve-symbol-in-p-id_20_png_jpg.rf.1398e3d69f05d0a8eb2a89dab7d4d92f.jpg"
+   },
+   {
+    "class": "flow_instrument",
+    "box": [
+     167.0,
+     266.0,
+     224.0,
+     333.0
+    ],
+    "panel": "single-images-of-all-valve-symbol-in-p-id_20_png_jpg.rf.1398e3d69f05d0a8eb2a89dab7d4d92f.jpg"
+   },
+   {
+    "class": "diaphragm_valve",
+    "box": [
+     318.0,
+     451.0,
+     381.0,
+     503.0
+    ],
+    "panel": "single-images-of-all-valve-symbol-in-p-id_20_png_jpg.rf.1398e3d69f05d0a8eb2a89dab7d4d92f.jpg"
+   },
+   {
+    "class": "angle_valve",
+    "box": [
+     470.0,
+     454.0,
+     533.0,
+     514.0
+    ],
+    "panel": "single-images-of-all-valve-symbol-in-p-id_20_png_jpg.rf.1398e3d69f05d0a8eb2a89dab7d4d92f.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     610.0,
+     449.0,
+     672.0,
+     505.0
+    ],
+    "panel": "single-images-of-all-valve-symbol-in-p-id_20_png_jpg.rf.1398e3d69f05d0a8eb2a89dab7d4d92f.jpg"
+   },
+   {
+    "class": "relief_valve",
+    "box": [
+     609.0,
+     614.0,
+     671.0,
+     695.0
+    ],
+    "panel": "single-images-of-all-valve-symbol-in-p-id_20_png_jpg.rf.1398e3d69f05d0a8eb2a89dab7d4d92f.jpg"
+   },
+   {
+    "class": "control_valve",
+    "box": [
+     305.0,
+     567.0,
+     389.0,
+     696.0
+    ],
+    "panel": "single-images-of-all-valve-symbol-in-p-id_20_png_jpg.rf.1398e3d69f05d0a8eb2a89dab7d4d92f.jpg"
+   },
+   {
+    "class": "check_valve",
+    "box": [
+     157.0,
+     629.0,
+     229.0,
+     699.0
+    ],
+    "panel": "single-images-of-all-valve-symbol-in-p-id_20_png_jpg.rf.1398e3d69f05d0a8eb2a89dab7d4d92f.jpg"
+   }
+  ]
+ },
+ {
+  "sheet": "hard_01.png",
+  "tier": "hard",
+  "width": 2180,
+  "height": 1560,
+  "panels": [
+   "215_png_jpg.rf.77b64256b31023e5a593dfa36e16d4ba.jpg",
+   "basic-simple-p-id-diagram_31_png_jpg.rf.7eb369ba80de62e8d0ca56dfb8efaafc.jpg",
+   "different-types-of-p-id-diagram_37_png_jpg.rf.b97cd4c32eb584837f45d35d2f63e9ac.jpg",
+   "219_jpg.rf.2a7d2ab8cd81a42c5c996c19dfa145c6.jpg",
+   "113_jpg.rf.3284daca7e8e1b1fe364eebf6355f461.jpg"
+  ],
+  "symbols": [
+   {
+    "class": "control_valve",
+    "box": [
+     164.0,
+     162.0,
+     632.0,
+     648.0
+    ],
+    "panel": "215_png_jpg.rf.77b64256b31023e5a593dfa36e16d4ba.jpg"
+   },
+   {
+    "class": "ball_valve",
+    "box": [
+     861.0,
+     157.0,
+     885.0,
+     188.0
+    ],
+    "panel": "basic-simple-p-id-diagram_31_png_jpg.rf.7eb369ba80de62e8d0ca56dfb8efaafc.jpg"
+   },
+   {
+    "class": "ball_valve",
+    "box": [
+     923.0,
+     262.0,
+     952.0,
+     301.0
+    ],
+    "panel": "basic-simple-p-id-diagram_31_png_jpg.rf.7eb369ba80de62e8d0ca56dfb8efaafc.jpg"
+   },
+   {
+    "class": "ball_valve",
+    "box": [
+     926.0,
+     353.0,
+     950.0,
+     398.0
+    ],
+    "panel": "basic-simple-p-id-diagram_31_png_jpg.rf.7eb369ba80de62e8d0ca56dfb8efaafc.jpg"
+   },
+   {
+    "class": "ball_valve",
+    "box": [
+     1057.0,
+     645.0,
+     1086.0,
+     690.0
+    ],
+    "panel": "basic-simple-p-id-diagram_31_png_jpg.rf.7eb369ba80de62e8d0ca56dfb8efaafc.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1057.0,
+     359.0,
+     1088.0,
+     393.0
+    ],
+    "panel": "basic-simple-p-id-diagram_31_png_jpg.rf.7eb369ba80de62e8d0ca56dfb8efaafc.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     963.0,
+     363.0,
+     991.0,
+     398.0
+    ],
+    "panel": "basic-simple-p-id-diagram_31_png_jpg.rf.7eb369ba80de62e8d0ca56dfb8efaafc.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     889.0,
+     357.0,
+     917.0,
+     396.0
+    ],
+    "panel": "basic-simple-p-id-diagram_31_png_jpg.rf.7eb369ba80de62e8d0ca56dfb8efaafc.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1849.0,
+     148.0,
+     1934.0,
+     324.0
+    ],
+    "panel": "different-types-of-p-id-diagram_37_png_jpg.rf.b97cd4c32eb584837f45d35d2f63e9ac.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     1475.0,
+     133.0,
+     1584.0,
+     348.0
+    ],
+    "panel": "different-types-of-p-id-diagram_37_png_jpg.rf.b97cd4c32eb584837f45d35d2f63e9ac.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     1639.0,
+     141.0,
+     1788.0,
+     344.0
+    ],
+    "panel": "different-types-of-p-id-diagram_37_png_jpg.rf.b97cd4c32eb584837f45d35d2f63e9ac.jpg"
+   },
+   {
+    "class": "relief_valve",
+    "box": [
+     208.0,
+     786.0,
+     678.0,
+     1350.0
+    ],
+    "panel": "219_jpg.rf.2a7d2ab8cd81a42c5c996c19dfa145c6.jpg"
+   },
+   {
+    "class": "angle_valve",
+    "box": [
+     995.0,
+     986.0,
+     1179.0,
+     1196.0
+    ],
+    "panel": "113_jpg.rf.3284daca7e8e1b1fe364eebf6355f461.jpg"
+   }
+  ]
+ },
+ {
+  "sheet": "hard_02.png",
+  "tier": "hard",
+  "width": 2180,
+  "height": 1560,
+  "panels": [
+   "all-individuals-single-single-of-valves-symbols-in-p-id-drawing_131_png_jpg.rf.8b307db8ffc703dfe1a468c40d3cc409.jpg",
+   "Hand-Operated-gate-valve-symbols_5_png_jpg.rf.266e6e02fef29682927ab6d6abb1580d.jpg",
+   "process-p-id-diagram_46_png_jpg.rf.adf33509b0ab1b1600497c8dfb313e4a.jpg",
+   "183_jpg.rf.809bec81447ee54ec5cb717e7c4d6ac5.jpg"
+  ],
+  "symbols": [
+   {
+    "class": "gate_valve",
+    "box": [
+     526.0,
+     133.0,
+     593.0,
+     205.0
+    ],
+    "panel": "all-individuals-single-single-of-valves-symbols-in-p-id-drawing_131_png_jpg.rf.8b307db8ffc703dfe1a468c40d3cc409.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     521.0,
+     254.0,
+     596.0,
+     327.0
+    ],
+    "panel": "all-individuals-single-single-of-valves-symbols-in-p-id-drawing_131_png_jpg.rf.8b307db8ffc703dfe1a468c40d3cc409.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     525.0,
+     617.0,
+     591.0,
+     682.0
+    ],
+    "panel": "all-individuals-single-single-of-valves-symbols-in-p-id-drawing_131_png_jpg.rf.8b307db8ffc703dfe1a468c40d3cc409.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     934.0,
+     129.0,
+     1240.0,
+     592.0
+    ],
+    "panel": "Hand-Operated-gate-valve-symbols_5_png_jpg.rf.266e6e02fef29682927ab6d6abb1580d.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     1601.0,
+     191.0,
+     1678.0,
+     295.0
+    ],
+    "panel": "process-p-id-diagram_46_png_jpg.rf.adf33509b0ab1b1600497c8dfb313e4a.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1681.0,
+     445.0,
+     1743.0,
+     515.0
+    ],
+    "panel": "process-p-id-diagram_46_png_jpg.rf.adf33509b0ab1b1600497c8dfb313e4a.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     120.0,
+     859.0,
+     158.0,
+     884.0
+    ],
+    "panel": "183_jpg.rf.809bec81447ee54ec5cb717e7c4d6ac5.jpg"
+   },
+   {
+    "class": "angle_valve",
+    "box": [
+     117.0,
+     976.0,
+     154.0,
+     1007.0
+    ],
+    "panel": "183_jpg.rf.809bec81447ee54ec5cb717e7c4d6ac5.jpg"
+   },
+   {
+    "class": "angle_valve",
+    "box": [
+     152.0,
+     1038.0,
+     185.0,
+     1061.0
+    ],
+    "panel": "183_jpg.rf.809bec81447ee54ec5cb717e7c4d6ac5.jpg"
+   },
+   {
+    "class": "ball_valve",
+    "box": [
+     130.0,
+     1097.0,
+     184.0,
+     1122.0
+    ],
+    "panel": "183_jpg.rf.809bec81447ee54ec5cb717e7c4d6ac5.jpg"
+   },
+   {
+    "class": "butterfly_valve",
+    "box": [
+     131.0,
+     1157.0,
+     177.0,
+     1182.0
+    ],
+    "panel": "183_jpg.rf.809bec81447ee54ec5cb717e7c4d6ac5.jpg"
+   },
+   {
+    "class": "check_valve",
+    "box": [
+     127.0,
+     1217.0,
+     192.0,
+     1242.0
+    ],
+    "panel": "183_jpg.rf.809bec81447ee54ec5cb717e7c4d6ac5.jpg"
+   },
+   {
+    "class": "check_valve",
+    "box": [
+     122.0,
+     1278.0,
+     191.0,
+     1303.0
+    ],
+    "panel": "183_jpg.rf.809bec81447ee54ec5cb717e7c4d6ac5.jpg"
+   },
+   {
+    "class": "needle_valve",
+    "box": [
+     291.0,
+     859.0,
+     345.0,
+     891.0
+    ],
+    "panel": "183_jpg.rf.809bec81447ee54ec5cb717e7c4d6ac5.jpg"
+   },
+   {
+    "class": "plug_valve",
+    "box": [
+     295.0,
+     976.0,
+     345.0,
+     1001.0
+    ],
+    "panel": "183_jpg.rf.809bec81447ee54ec5cb717e7c4d6ac5.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     288.0,
+     1278.0,
+     343.0,
+     1300.0
+    ],
+    "panel": "183_jpg.rf.809bec81447ee54ec5cb717e7c4d6ac5.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     291.0,
+     1342.0,
+     347.0,
+     1361.0
+    ],
+    "panel": "183_jpg.rf.809bec81447ee54ec5cb717e7c4d6ac5.jpg"
+   },
+   {
+    "class": "control_valve",
+    "box": [
+     459.0,
+     1251.0,
+     522.0,
+     1321.0
+    ],
+    "panel": "183_jpg.rf.809bec81447ee54ec5cb717e7c4d6ac5.jpg"
+   },
+   {
+    "class": "control_valve",
+    "box": [
+     468.0,
+     1160.0,
+     532.0,
+     1235.0
+    ],
+    "panel": "183_jpg.rf.809bec81447ee54ec5cb717e7c4d6ac5.jpg"
+   },
+   {
+    "class": "control_valve",
+    "box": [
+     458.0,
+     1070.0,
+     526.0,
+     1143.0
+    ],
+    "panel": "183_jpg.rf.809bec81447ee54ec5cb717e7c4d6ac5.jpg"
+   }
+  ]
+ },
+ {
+  "sheet": "hard_03.png",
+  "tier": "hard",
+  "width": 2180,
+  "height": 1560,
+  "panels": [
+   "process-p-id-diagram_48_png_jpg.rf.52f7d75bbfaa9acc19ac33dea8a09692.jpg",
+   "26_png_jpg.rf.4e28a7a7d5957e3714e2ed687886b75e.jpg",
+   "146_jpg.rf.d0a936bf8c02063483928623a184f87b.jpg",
+   "process-p-id-diagram_46_png_jpg.rf.adf33509b0ab1b1600497c8dfb313e4a.jpg",
+   "valves-images-in-p-id-Diagrams_15_png_jpg.rf.36630596a168db855a9a7c187e0f8dcf.jpg",
+   "07_png_jpg.rf.367210bed444c53e4a1699ce10038d47.jpg"
+  ],
+  "symbols": [
+   {
+    "class": "vessel",
+    "box": [
+     431.0,
+     182.0,
+     508.0,
+     362.0
+    ],
+    "panel": "process-p-id-diagram_48_png_jpg.rf.52f7d75bbfaa9acc19ac33dea8a09692.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     956.0,
+     247.0,
+     1223.0,
+     529.0
+    ],
+    "panel": "26_png_jpg.rf.4e28a7a7d5957e3714e2ed687886b75e.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1646.0,
+     166.0,
+     1681.0,
+     220.0
+    ],
+    "panel": "146_jpg.rf.d0a936bf8c02063483928623a184f87b.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1692.0,
+     497.0,
+     1725.0,
+     550.0
+    ],
+    "panel": "146_jpg.rf.d0a936bf8c02063483928623a184f87b.jpg"
+   },
+   {
+    "class": "butterfly_valve",
+    "box": [
+     1639.0,
+     340.0,
+     1699.0,
+     406.0
+    ],
+    "panel": "146_jpg.rf.d0a936bf8c02063483928623a184f87b.jpg"
+   },
+   {
+    "class": "butterfly_valve",
+    "box": [
+     1682.0,
+     660.0,
+     1744.0,
+     725.0
+    ],
+    "panel": "146_jpg.rf.d0a936bf8c02063483928623a184f87b.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     241.0,
+     871.0,
+     318.0,
+     975.0
+    ],
+    "panel": "process-p-id-diagram_46_png_jpg.rf.adf33509b0ab1b1600497c8dfb313e4a.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     321.0,
+     1125.0,
+     383.0,
+     1195.0
+    ],
+    "panel": "process-p-id-diagram_46_png_jpg.rf.adf33509b0ab1b1600497c8dfb313e4a.jpg"
+   },
+   {
+    "class": "needle_valve",
+    "box": [
+     1034.0,
+     962.0,
+     1187.0,
+     1100.0
+    ],
+    "panel": "valves-images-in-p-id-Diagrams_15_png_jpg.rf.36630596a168db855a9a7c187e0f8dcf.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     782.0,
+     1158.0,
+     923.0,
+     1265.0
+    ],
+    "panel": "valves-images-in-p-id-Diagrams_15_png_jpg.rf.36630596a168db855a9a7c187e0f8dcf.jpg"
+   },
+   {
+    "class": "needle_valve",
+    "box": [
+     1542.0,
+     973.0,
+     1584.0,
+     1023.0
+    ],
+    "panel": "07_png_jpg.rf.367210bed444c53e4a1699ce10038d47.jpg"
+   },
+   {
+    "class": "needle_valve",
+    "box": [
+     1744.0,
+     952.0,
+     1798.0,
+     1031.0
+    ],
+    "panel": "07_png_jpg.rf.367210bed444c53e4a1699ce10038d47.jpg"
+   },
+   {
+    "class": "needle_valve",
+    "box": [
+     1538.0,
+     1181.0,
+     1594.0,
+     1247.0
+    ],
+    "panel": "07_png_jpg.rf.367210bed444c53e4a1699ce10038d47.jpg"
+   },
+   {
+    "class": "pipe_fitting",
+    "box": [
+     1703.0,
+     1172.0,
+     1779.0,
+     1251.0
+    ],
+    "panel": "07_png_jpg.rf.367210bed444c53e4a1699ce10038d47.jpg"
+   },
+   {
+    "class": "pipe_fitting",
+    "box": [
+     1891.0,
+     1176.0,
+     1973.0,
+     1251.0
+    ],
+    "panel": "07_png_jpg.rf.367210bed444c53e4a1699ce10038d47.jpg"
+   }
+  ]
+ },
+ {
+  "sheet": "hard_04.png",
+  "tier": "hard",
+  "width": 2180,
+  "height": 2240,
+  "panels": [
+   "155_png_jpg.rf.dd06ef817776f1bedf1a7e1b37961254.jpg",
+   "37_png_jpg.rf.547323301b8b00d2121911d99aa52c56.jpg",
+   "24_jpg.rf.1e418cab5c76e8b22dcb32a875c10046.jpg",
+   "all-individuals-single-single-of-valves-symbols-in-p-id-drawing_102_png_jpg.rf.3405469b01aa48bc7edb9ac65a7dc946.jpg",
+   "different-types-of-p-id-diagram_37_png_jpg.rf.b97cd4c32eb584837f45d35d2f63e9ac.jpg",
+   "basic-simple-p-id-diagram_76_png_jpg.rf.44e5bac62d837a0f985b6ed2ba6766f6.jpg",
+   "219_jpg.rf.2a7d2ab8cd81a42c5c996c19dfa145c6.jpg",
+   "213_jpg.rf.0bff98b89eb2dc18aa0574d0d793cf0a.jpg"
+  ],
+  "symbols": [
+   {
+    "class": "pump",
+    "box": [
+     157.0,
+     287.0,
+     186.0,
+     327.0
+    ],
+    "panel": "155_png_jpg.rf.dd06ef817776f1bedf1a7e1b37961254.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     212.0,
+     625.0,
+     236.0,
+     677.0
+    ],
+    "panel": "155_png_jpg.rf.dd06ef817776f1bedf1a7e1b37961254.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     323.0,
+     632.0,
+     353.0,
+     682.0
+    ],
+    "panel": "155_png_jpg.rf.dd06ef817776f1bedf1a7e1b37961254.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     448.0,
+     626.0,
+     480.0,
+     679.0
+    ],
+    "panel": "155_png_jpg.rf.dd06ef817776f1bedf1a7e1b37961254.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     574.0,
+     551.0,
+     617.0,
+     607.0
+    ],
+    "panel": "155_png_jpg.rf.dd06ef817776f1bedf1a7e1b37961254.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     636.0,
+     548.0,
+     668.0,
+     605.0
+    ],
+    "panel": "155_png_jpg.rf.dd06ef817776f1bedf1a7e1b37961254.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     687.0,
+     546.0,
+     722.0,
+     609.0
+    ],
+    "panel": "155_png_jpg.rf.dd06ef817776f1bedf1a7e1b37961254.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     333.0,
+     286.0,
+     368.0,
+     335.0
+    ],
+    "panel": "155_png_jpg.rf.dd06ef817776f1bedf1a7e1b37961254.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     266.0,
+     428.0,
+     317.0,
+     476.0
+    ],
+    "panel": "155_png_jpg.rf.dd06ef817776f1bedf1a7e1b37961254.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     935.0,
+     176.0,
+     1297.0,
+     638.0
+    ],
+    "panel": "37_png_jpg.rf.547323301b8b00d2121911d99aa52c56.jpg"
+   },
+   {
+    "class": "butterfly_valve",
+    "box": [
+     1666.0,
+     329.0,
+     1881.0,
+     480.0
+    ],
+    "panel": "24_jpg.rf.1e418cab5c76e8b22dcb32a875c10046.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     322.0,
+     1055.0,
+     445.0,
+     1169.0
+    ],
+    "panel": "all-individuals-single-single-of-valves-symbols-in-p-id-drawing_102_png_jpg.rf.3405469b01aa48bc7edb9ac65a7dc946.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     604.0,
+     1051.0,
+     724.0,
+     1257.0
+    ],
+    "panel": "all-individuals-single-single-of-valves-symbols-in-p-id-drawing_102_png_jpg.rf.3405469b01aa48bc7edb9ac65a7dc946.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1169.0,
+     828.0,
+     1254.0,
+     1004.0
+    ],
+    "panel": "different-types-of-p-id-diagram_37_png_jpg.rf.b97cd4c32eb584837f45d35d2f63e9ac.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     795.0,
+     813.0,
+     904.0,
+     1028.0
+    ],
+    "panel": "different-types-of-p-id-diagram_37_png_jpg.rf.b97cd4c32eb584837f45d35d2f63e9ac.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     959.0,
+     821.0,
+     1108.0,
+     1024.0
+    ],
+    "panel": "different-types-of-p-id-diagram_37_png_jpg.rf.b97cd4c32eb584837f45d35d2f63e9ac.jpg"
+   },
+   {
+    "class": "fired_heater",
+    "box": [
+     1703.0,
+     925.0,
+     1737.0,
+     979.0
+    ],
+    "panel": "basic-simple-p-id-diagram_76_png_jpg.rf.44e5bac62d837a0f985b6ed2ba6766f6.jpg"
+   },
+   {
+    "class": "relief_valve",
+    "box": [
+     208.0,
+     1466.0,
+     678.0,
+     2030.0
+    ],
+    "panel": "219_jpg.rf.2a7d2ab8cd81a42c5c996c19dfa145c6.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     883.0,
+     1665.0,
+     953.0,
+     1741.0
+    ],
+    "panel": "213_jpg.rf.0bff98b89eb2dc18aa0574d0d793cf0a.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1220.0,
+     1674.0,
+     1300.0,
+     1745.0
+    ],
+    "panel": "213_jpg.rf.0bff98b89eb2dc18aa0574d0d793cf0a.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     948.0,
+     1783.0,
+     1007.0,
+     1895.0
+    ],
+    "panel": "213_jpg.rf.0bff98b89eb2dc18aa0574d0d793cf0a.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1169.0,
+     1782.0,
+     1221.0,
+     1899.0
+    ],
+    "panel": "213_jpg.rf.0bff98b89eb2dc18aa0574d0d793cf0a.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     1011.0,
+     1512.0,
+     1124.0,
+     1770.0
+    ],
+    "panel": "213_jpg.rf.0bff98b89eb2dc18aa0574d0d793cf0a.jpg"
+   }
+  ]
+ },
+ {
+  "sheet": "hard_05.png",
+  "tier": "hard",
+  "width": 2180,
+  "height": 2240,
+  "panels": [
+   "basic-simple-p-id-diagram_28_png_jpg.rf.61499d7b8b10d9e92f180fa7a932a6ea.jpg",
+   "118_png_jpg.rf.3771abf7998fa060dce097aadc72e163.jpg",
+   "process-p-id-diagram_46_png_jpg.rf.adf33509b0ab1b1600497c8dfb313e4a.jpg",
+   "26_jpg.rf.b125b2b6cb60aa75f4e37a25877f2a72.jpg",
+   "all-individuals-single-single-of-valves-symbols-in-p-id-drawing_190_png_jpg.rf.2dd8cc830cd2fe57d43d9cbce7b783f7.jpg",
+   "965_png_jpg.rf.59da82f73bd266bab1e8ab0d01fcc427.jpg",
+   "170_png_jpg.rf.de97350634e8c40f4ced9c96b208a078.jpg"
+  ],
+  "symbols": [
+   {
+    "class": "gate_valve",
+    "box": [
+     527.0,
+     334.0,
+     544.0,
+     356.0
+    ],
+    "panel": "basic-simple-p-id-diagram_28_png_jpg.rf.61499d7b8b10d9e92f180fa7a932a6ea.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     978.0,
+     297.0,
+     1195.0,
+     498.0
+    ],
+    "panel": "118_png_jpg.rf.3771abf7998fa060dce097aadc72e163.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     1601.0,
+     191.0,
+     1678.0,
+     295.0
+    ],
+    "panel": "process-p-id-diagram_46_png_jpg.rf.adf33509b0ab1b1600497c8dfb313e4a.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1681.0,
+     445.0,
+     1743.0,
+     515.0
+    ],
+    "panel": "process-p-id-diagram_46_png_jpg.rf.adf33509b0ab1b1600497c8dfb313e4a.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     276.0,
+     927.0,
+     543.0,
+     1209.0
+    ],
+    "panel": "26_jpg.rf.b125b2b6cb60aa75f4e37a25877f2a72.jpg"
+   },
+   {
+    "class": "actuator",
+    "box": [
+     931.0,
+     1134.0,
+     961.0,
+     1160.0
+    ],
+    "panel": "all-individuals-single-single-of-valves-symbols-in-p-id-drawing_190_png_jpg.rf.2dd8cc830cd2fe57d43d9cbce7b783f7.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1734.0,
+     918.0,
+     1767.0,
+     986.0
+    ],
+    "panel": "965_png_jpg.rf.59da82f73bd266bab1e8ab0d01fcc427.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1666.0,
+     1106.0,
+     1695.0,
+     1177.0
+    ],
+    "panel": "965_png_jpg.rf.59da82f73bd266bab1e8ab0d01fcc427.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1729.0,
+     1281.0,
+     1765.0,
+     1340.0
+    ],
+    "panel": "965_png_jpg.rf.59da82f73bd266bab1e8ab0d01fcc427.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1840.0,
+     1084.0,
+     1868.0,
+     1152.0
+    ],
+    "panel": "965_png_jpg.rf.59da82f73bd266bab1e8ab0d01fcc427.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     172.0,
+     1769.0,
+     212.0,
+     1842.0
+    ],
+    "panel": "170_png_jpg.rf.de97350634e8c40f4ced9c96b208a078.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     396.0,
+     1625.0,
+     424.0,
+     1698.0
+    ],
+    "panel": "170_png_jpg.rf.de97350634e8c40f4ced9c96b208a078.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     352.0,
+     1899.0,
+     393.0,
+     1984.0
+    ],
+    "panel": "170_png_jpg.rf.de97350634e8c40f4ced9c96b208a078.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     587.0,
+     2013.0,
+     629.0,
+     2090.0
+    ],
+    "panel": "170_png_jpg.rf.de97350634e8c40f4ced9c96b208a078.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     602.0,
+     1786.0,
+     635.0,
+     1865.0
+    ],
+    "panel": "170_png_jpg.rf.de97350634e8c40f4ced9c96b208a078.jpg"
+   }
+  ]
+ },
+ {
+  "sheet": "very_hard_01.png",
+  "tier": "very_hard",
+  "width": 2860,
+  "height": 1560,
+  "panels": [
+   "113_jpg.rf.3284daca7e8e1b1fe364eebf6355f461.jpg",
+   "215_png_jpg.rf.77b64256b31023e5a593dfa36e16d4ba.jpg",
+   "88_png_jpg.rf.fcdc5594d2368ba6947a5f0f55f0bd78.jpg",
+   "117_png_jpg.rf.7a7c00b3239b2cc3d5783c617447b643.jpg",
+   "0021_jpg.rf.411df78204ad906381176ff1777655dc.jpg",
+   "146_jpg.rf.d0a936bf8c02063483928623a184f87b.jpg"
+  ],
+  "symbols": [
+   {
+    "class": "angle_valve",
+    "box": [
+     315.0,
+     306.0,
+     499.0,
+     516.0
+    ],
+    "panel": "113_jpg.rf.3284daca7e8e1b1fe364eebf6355f461.jpg"
+   },
+   {
+    "class": "control_valve",
+    "box": [
+     844.0,
+     162.0,
+     1312.0,
+     648.0
+    ],
+    "panel": "215_png_jpg.rf.77b64256b31023e5a593dfa36e16d4ba.jpg"
+   },
+   {
+    "class": "actuator",
+    "box": [
+     1716.0,
+     160.0,
+     1873.0,
+     670.0
+    ],
+    "panel": "88_png_jpg.rf.fcdc5594d2368ba6947a5f0f55f0bd78.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     2361.0,
+     226.0,
+     2399.0,
+     292.0
+    ],
+    "panel": "117_png_jpg.rf.7a7c00b3239b2cc3d5783c617447b643.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     2213.0,
+     597.0,
+     2236.0,
+     640.0
+    ],
+    "panel": "117_png_jpg.rf.7a7c00b3239b2cc3d5783c617447b643.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     2271.0,
+     662.0,
+     2288.0,
+     724.0
+    ],
+    "panel": "117_png_jpg.rf.7a7c00b3239b2cc3d5783c617447b643.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     2302.0,
+     659.0,
+     2320.0,
+     726.0
+    ],
+    "panel": "117_png_jpg.rf.7a7c00b3239b2cc3d5783c617447b643.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     2596.0,
+     477.0,
+     2640.0,
+     545.0
+    ],
+    "panel": "117_png_jpg.rf.7a7c00b3239b2cc3d5783c617447b643.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     2645.0,
+     236.0,
+     2680.0,
+     301.0
+    ],
+    "panel": "117_png_jpg.rf.7a7c00b3239b2cc3d5783c617447b643.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     2719.0,
+     238.0,
+     2757.0,
+     312.0
+    ],
+    "panel": "117_png_jpg.rf.7a7c00b3239b2cc3d5783c617447b643.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     2676.0,
+     95.0,
+     2720.0,
+     151.0
+    ],
+    "panel": "117_png_jpg.rf.7a7c00b3239b2cc3d5783c617447b643.jpg"
+   },
+   {
+    "class": "angle_valve",
+    "box": [
+     331.0,
+     774.0,
+     358.0,
+     803.0
+    ],
+    "panel": "0021_jpg.rf.411df78204ad906381176ff1777655dc.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     511.0,
+     927.0,
+     531.0,
+     949.0
+    ],
+    "panel": "0021_jpg.rf.411df78204ad906381176ff1777655dc.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     580.0,
+     924.0,
+     601.0,
+     951.0
+    ],
+    "panel": "0021_jpg.rf.411df78204ad906381176ff1777655dc.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     438.0,
+     926.0,
+     456.0,
+     950.0
+    ],
+    "panel": "0021_jpg.rf.411df78204ad906381176ff1777655dc.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     283.0,
+     1269.0,
+     303.0,
+     1298.0
+    ],
+    "panel": "0021_jpg.rf.411df78204ad906381176ff1777655dc.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     609.0,
+     1264.0,
+     629.0,
+     1288.0
+    ],
+    "panel": "0021_jpg.rf.411df78204ad906381176ff1777655dc.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     139.0,
+     1274.0,
+     160.0,
+     1303.0
+    ],
+    "panel": "0021_jpg.rf.411df78204ad906381176ff1777655dc.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     207.0,
+     1355.0,
+     240.0,
+     1381.0
+    ],
+    "panel": "0021_jpg.rf.411df78204ad906381176ff1777655dc.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     213.0,
+     1271.0,
+     232.0,
+     1293.0
+    ],
+    "panel": "0021_jpg.rf.411df78204ad906381176ff1777655dc.jpg"
+   },
+   {
+    "class": "needle_valve",
+    "box": [
+     483.0,
+     1257.0,
+     507.0,
+     1290.0
+    ],
+    "panel": "0021_jpg.rf.411df78204ad906381176ff1777655dc.jpg"
+   },
+   {
+    "class": "pipe_fitting",
+    "box": [
+     465.0,
+     1282.0,
+     485.0,
+     1333.0
+    ],
+    "panel": "0021_jpg.rf.411df78204ad906381176ff1777655dc.jpg"
+   },
+   {
+    "class": "pipe_fitting",
+    "box": [
+     416.0,
+     928.0,
+     432.0,
+     979.0
+    ],
+    "panel": "0021_jpg.rf.411df78204ad906381176ff1777655dc.jpg"
+   },
+   {
+    "class": "pipe_fitting",
+    "box": [
+     385.0,
+     935.0,
+     405.0,
+     979.0
+    ],
+    "panel": "0021_jpg.rf.411df78204ad906381176ff1777655dc.jpg"
+   },
+   {
+    "class": "pipe_fitting",
+    "box": [
+     336.0,
+     936.0,
+     360.0,
+     985.0
+    ],
+    "panel": "0021_jpg.rf.411df78204ad906381176ff1777655dc.jpg"
+   },
+   {
+    "class": "pipe_fitting",
+    "box": [
+     310.0,
+     934.0,
+     330.0,
+     980.0
+    ],
+    "panel": "0021_jpg.rf.411df78204ad906381176ff1777655dc.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     966.0,
+     846.0,
+     1001.0,
+     900.0
+    ],
+    "panel": "146_jpg.rf.d0a936bf8c02063483928623a184f87b.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1012.0,
+     1177.0,
+     1045.0,
+     1230.0
+    ],
+    "panel": "146_jpg.rf.d0a936bf8c02063483928623a184f87b.jpg"
+   },
+   {
+    "class": "butterfly_valve",
+    "box": [
+     959.0,
+     1020.0,
+     1019.0,
+     1086.0
+    ],
+    "panel": "146_jpg.rf.d0a936bf8c02063483928623a184f87b.jpg"
+   },
+   {
+    "class": "butterfly_valve",
+    "box": [
+     1002.0,
+     1340.0,
+     1064.0,
+     1405.0
+    ],
+    "panel": "146_jpg.rf.d0a936bf8c02063483928623a184f87b.jpg"
+   }
+  ]
+ },
+ {
+  "sheet": "very_hard_02.png",
+  "tier": "very_hard",
+  "width": 2860,
+  "height": 1560,
+  "panels": [
+   "01_jpg.rf.d35525a2ba2d02d6574219b830b4e180.jpg",
+   "219_jpg.rf.2a7d2ab8cd81a42c5c996c19dfa145c6.jpg",
+   "gate-valve-symbols_14_png_jpg.rf.e3da93e3db463a583325bdebc8b0a350.jpg",
+   "basic-simple-p-id-diagram_38_png_jpg.rf.65b9c9693b598eae530421ad31334514.jpg",
+   "37_jpg.rf.34970488b1142d5f6a6e443ad63c2759.jpg",
+   "120_jpg.rf.5303f02bed2273cbced45f0152fb79b6.jpg"
+  ],
+  "symbols": [
+   {
+    "class": "actuator",
+    "box": [
+     194.0,
+     99.0,
+     287.0,
+     252.0
+    ],
+    "panel": "01_jpg.rf.d35525a2ba2d02d6574219b830b4e180.jpg"
+   },
+   {
+    "class": "actuator",
+    "box": [
+     521.0,
+     102.0,
+     624.0,
+     259.0
+    ],
+    "panel": "01_jpg.rf.d35525a2ba2d02d6574219b830b4e180.jpg"
+   },
+   {
+    "class": "actuator",
+    "box": [
+     531.0,
+     405.0,
+     622.0,
+     569.0
+    ],
+    "panel": "01_jpg.rf.d35525a2ba2d02d6574219b830b4e180.jpg"
+   },
+   {
+    "class": "actuator",
+    "box": [
+     186.0,
+     409.0,
+     280.0,
+     563.0
+    ],
+    "panel": "01_jpg.rf.d35525a2ba2d02d6574219b830b4e180.jpg"
+   },
+   {
+    "class": "relief_valve",
+    "box": [
+     888.0,
+     106.0,
+     1358.0,
+     670.0
+    ],
+    "panel": "219_jpg.rf.2a7d2ab8cd81a42c5c996c19dfa145c6.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1614.0,
+     118.0,
+     1924.0,
+     606.0
+    ],
+    "panel": "gate-valve-symbols_14_png_jpg.rf.e3da93e3db463a583325bdebc8b0a350.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     2179.0,
+     253.0,
+     2223.0,
+     289.0
+    ],
+    "panel": "basic-simple-p-id-diagram_38_png_jpg.rf.65b9c9693b598eae530421ad31334514.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     2186.0,
+     543.0,
+     2227.0,
+     594.0
+    ],
+    "panel": "basic-simple-p-id-diagram_38_png_jpg.rf.65b9c9693b598eae530421ad31334514.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     2236.0,
+     595.0,
+     2260.0,
+     655.0
+    ],
+    "panel": "basic-simple-p-id-diagram_38_png_jpg.rf.65b9c9693b598eae530421ad31334514.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     2439.0,
+     607.0,
+     2466.0,
+     672.0
+    ],
+    "panel": "basic-simple-p-id-diagram_38_png_jpg.rf.65b9c9693b598eae530421ad31334514.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     2567.0,
+     491.0,
+     2593.0,
+     560.0
+    ],
+    "panel": "basic-simple-p-id-diagram_38_png_jpg.rf.65b9c9693b598eae530421ad31334514.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     2666.0,
+     567.0,
+     2707.0,
+     610.0
+    ],
+    "panel": "basic-simple-p-id-diagram_38_png_jpg.rf.65b9c9693b598eae530421ad31334514.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     2564.0,
+     288.0,
+     2589.0,
+     343.0
+    ],
+    "panel": "basic-simple-p-id-diagram_38_png_jpg.rf.65b9c9693b598eae530421ad31334514.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     2544.0,
+     118.0,
+     2572.0,
+     187.0
+    ],
+    "panel": "basic-simple-p-id-diagram_38_png_jpg.rf.65b9c9693b598eae530421ad31334514.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     2668.0,
+     181.0,
+     2711.0,
+     228.0
+    ],
+    "panel": "basic-simple-p-id-diagram_38_png_jpg.rf.65b9c9693b598eae530421ad31334514.jpg"
+   },
+   {
+    "class": "relief_valve",
+    "box": [
+     2396.0,
+     166.0,
+     2439.0,
+     242.0
+    ],
+    "panel": "basic-simple-p-id-diagram_38_png_jpg.rf.65b9c9693b598eae530421ad31334514.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     2236.0,
+     300.0,
+     2262.0,
+     359.0
+    ],
+    "panel": "basic-simple-p-id-diagram_38_png_jpg.rf.65b9c9693b598eae530421ad31334514.jpg"
+   },
+   {
+    "class": "relief_valve",
+    "box": [
+     2151.0,
+     366.0,
+     2193.0,
+     466.0
+    ],
+    "panel": "basic-simple-p-id-diagram_38_png_jpg.rf.65b9c9693b598eae530421ad31334514.jpg"
+   },
+   {
+    "class": "relief_valve",
+    "box": [
+     2698.0,
+     336.0,
+     2738.0,
+     430.0
+    ],
+    "panel": "basic-simple-p-id-diagram_38_png_jpg.rf.65b9c9693b598eae530421ad31334514.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     255.0,
+     856.0,
+     617.0,
+     1318.0
+    ],
+    "panel": "37_jpg.rf.34970488b1142d5f6a6e443ad63c2759.jpg"
+   },
+   {
+    "class": "pipe_fitting",
+    "box": [
+     925.0,
+     1033.0,
+     940.0,
+     1076.0
+    ],
+    "panel": "120_jpg.rf.5303f02bed2273cbced45f0152fb79b6.jpg"
+   },
+   {
+    "class": "pipe_fitting",
+    "box": [
+     829.0,
+     862.0,
+     863.0,
+     887.0
+    ],
+    "panel": "120_jpg.rf.5303f02bed2273cbced45f0152fb79b6.jpg"
+   },
+   {
+    "class": "pipe_fitting",
+    "box": [
+     1034.0,
+     935.0,
+     1052.0,
+     983.0
+    ],
+    "panel": "120_jpg.rf.5303f02bed2273cbced45f0152fb79b6.jpg"
+   },
+   {
+    "class": "pipe_fitting",
+    "box": [
+     890.0,
+     1152.0,
+     905.0,
+     1195.0
+    ],
+    "panel": "120_jpg.rf.5303f02bed2273cbced45f0152fb79b6.jpg"
+   },
+   {
+    "class": "pipe_fitting",
+    "box": [
+     834.0,
+     1243.0,
+     859.0,
+     1264.0
+    ],
+    "panel": "120_jpg.rf.5303f02bed2273cbced45f0152fb79b6.jpg"
+   }
+  ]
+ },
+ {
+  "sheet": "very_hard_03.png",
+  "tier": "very_hard",
+  "width": 1500,
+  "height": 880,
+  "panels": [
+   "00175_png_jpg.rf.5f148c7c85e9b5755e78a57f08bd2571.jpg",
+   "basic-simple-valves-p-id-diagram_77_png_jpg.rf.eccad7fcaff96ab46b607f92165a5ce9.jpg"
+  ],
+  "symbols": [
+   {
+    "class": "gate_valve",
+    "box": [
+     103.0,
+     133.0,
+     162.0,
+     205.0
+    ],
+    "panel": "00175_png_jpg.rf.5f148c7c85e9b5755e78a57f08bd2571.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     206.0,
+     161.0,
+     244.0,
+     190.0
+    ],
+    "panel": "00175_png_jpg.rf.5f148c7c85e9b5755e78a57f08bd2571.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     293.0,
+     140.0,
+     333.0,
+     188.0
+    ],
+    "panel": "00175_png_jpg.rf.5f148c7c85e9b5755e78a57f08bd2571.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     384.0,
+     157.0,
+     428.0,
+     189.0
+    ],
+    "panel": "00175_png_jpg.rf.5f148c7c85e9b5755e78a57f08bd2571.jpg"
+   },
+   {
+    "class": "needle_valve",
+    "box": [
+     470.0,
+     151.0,
+     519.0,
+     185.0
+    ],
+    "panel": "00175_png_jpg.rf.5f148c7c85e9b5755e78a57f08bd2571.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     568.0,
+     147.0,
+     612.0,
+     190.0
+    ],
+    "panel": "00175_png_jpg.rf.5f148c7c85e9b5755e78a57f08bd2571.jpg"
+   },
+   {
+    "class": "control_valve",
+    "box": [
+     652.0,
+     140.0,
+     703.0,
+     199.0
+    ],
+    "panel": "00175_png_jpg.rf.5f148c7c85e9b5755e78a57f08bd2571.jpg"
+   },
+   {
+    "class": "angle_valve",
+    "box": [
+     662.0,
+     289.0,
+     699.0,
+     347.0
+    ],
+    "panel": "00175_png_jpg.rf.5f148c7c85e9b5755e78a57f08bd2571.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     568.0,
+     305.0,
+     612.0,
+     349.0
+    ],
+    "panel": "00175_png_jpg.rf.5f148c7c85e9b5755e78a57f08bd2571.jpg"
+   },
+   {
+    "class": "pipe_fitting",
+    "box": [
+     474.0,
+     312.0,
+     517.0,
+     347.0
+    ],
+    "panel": "00175_png_jpg.rf.5f148c7c85e9b5755e78a57f08bd2571.jpg"
+   },
+   {
+    "class": "butterfly_valve",
+    "box": [
+     372.0,
+     304.0,
+     435.0,
+     347.0
+    ],
+    "panel": "00175_png_jpg.rf.5f148c7c85e9b5755e78a57f08bd2571.jpg"
+   },
+   {
+    "class": "check_valve",
+    "box": [
+     203.0,
+     300.0,
+     248.0,
+     340.0
+    ],
+    "panel": "00175_png_jpg.rf.5f148c7c85e9b5755e78a57f08bd2571.jpg"
+   },
+   {
+    "class": "check_valve",
+    "box": [
+     290.0,
+     299.0,
+     333.0,
+     341.0
+    ],
+    "panel": "00175_png_jpg.rf.5f148c7c85e9b5755e78a57f08bd2571.jpg"
+   },
+   {
+    "class": "plug_valve",
+    "box": [
+     108.0,
+     301.0,
+     151.0,
+     345.0
+    ],
+    "panel": "00175_png_jpg.rf.5f148c7c85e9b5755e78a57f08bd2571.jpg"
+   },
+   {
+    "class": "relief_valve",
+    "box": [
+     111.0,
+     450.0,
+     150.0,
+     504.0
+    ],
+    "panel": "00175_png_jpg.rf.5f148c7c85e9b5755e78a57f08bd2571.jpg"
+   },
+   {
+    "class": "angle_valve",
+    "box": [
+     202.0,
+     454.0,
+     246.0,
+     510.0
+    ],
+    "panel": "00175_png_jpg.rf.5f148c7c85e9b5755e78a57f08bd2571.jpg"
+   },
+   {
+    "class": "ball_valve",
+    "box": [
+     291.0,
+     465.0,
+     335.0,
+     493.0
+    ],
+    "panel": "00175_png_jpg.rf.5f148c7c85e9b5755e78a57f08bd2571.jpg"
+   },
+   {
+    "class": "ball_valve",
+    "box": [
+     377.0,
+     452.0,
+     432.0,
+     501.0
+    ],
+    "panel": "00175_png_jpg.rf.5f148c7c85e9b5755e78a57f08bd2571.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     474.0,
+     441.0,
+     519.0,
+     518.0
+    ],
+    "panel": "00175_png_jpg.rf.5f148c7c85e9b5755e78a57f08bd2571.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     562.0,
+     440.0,
+     612.0,
+     508.0
+    ],
+    "panel": "00175_png_jpg.rf.5f148c7c85e9b5755e78a57f08bd2571.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     661.0,
+     442.0,
+     704.0,
+     510.0
+    ],
+    "panel": "00175_png_jpg.rf.5f148c7c85e9b5755e78a57f08bd2571.jpg"
+   },
+   {
+    "class": "relief_valve",
+    "box": [
+     664.0,
+     592.0,
+     699.0,
+     666.0
+    ],
+    "panel": "00175_png_jpg.rf.5f148c7c85e9b5755e78a57f08bd2571.jpg"
+   },
+   {
+    "class": "pressure_instrument",
+    "box": [
+     559.0,
+     589.0,
+     612.0,
+     672.0
+    ],
+    "panel": "00175_png_jpg.rf.5f148c7c85e9b5755e78a57f08bd2571.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     473.0,
+     606.0,
+     521.0,
+     656.0
+    ],
+    "panel": "00175_png_jpg.rf.5f148c7c85e9b5755e78a57f08bd2571.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     385.0,
+     607.0,
+     422.0,
+     651.0
+    ],
+    "panel": "00175_png_jpg.rf.5f148c7c85e9b5755e78a57f08bd2571.jpg"
+   },
+   {
+    "class": "needle_valve",
+    "box": [
+     287.0,
+     607.0,
+     339.0,
+     656.0
+    ],
+    "panel": "00175_png_jpg.rf.5f148c7c85e9b5755e78a57f08bd2571.jpg"
+   },
+   {
+    "class": "check_valve",
+    "box": [
+     197.0,
+     591.0,
+     248.0,
+     662.0
+    ],
+    "panel": "00175_png_jpg.rf.5f148c7c85e9b5755e78a57f08bd2571.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     109.0,
+     601.0,
+     154.0,
+     667.0
+    ],
+    "panel": "00175_png_jpg.rf.5f148c7c85e9b5755e78a57f08bd2571.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     1105.0,
+     625.0,
+     1150.0,
+     669.0
+    ],
+    "panel": "basic-simple-valves-p-id-diagram_77_png_jpg.rf.eccad7fcaff96ab46b607f92165a5ce9.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1177.0,
+     513.0,
+     1216.0,
+     548.0
+    ],
+    "panel": "basic-simple-valves-p-id-diagram_77_png_jpg.rf.eccad7fcaff96ab46b607f92165a5ce9.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1040.0,
+     507.0,
+     1078.0,
+     553.0
+    ],
+    "panel": "basic-simple-valves-p-id-diagram_77_png_jpg.rf.eccad7fcaff96ab46b607f92165a5ce9.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     1102.0,
+     458.0,
+     1148.0,
+     554.0
+    ],
+    "panel": "basic-simple-valves-p-id-diagram_77_png_jpg.rf.eccad7fcaff96ab46b607f92165a5ce9.jpg"
+   }
+  ]
+ },
+ {
+  "sheet": "very_hard_04.png",
+  "tier": "very_hard",
+  "width": 1500,
+  "height": 880,
+  "panels": [
+   "148_jpg.rf.9645902eeec4d6f56963de7484e23903.jpg",
+   "231_jpg.rf.d6868eb1e34a0aa28db2dc0e1d6cfbab.jpg"
+  ],
+  "symbols": [
+   {
+    "class": "pump",
+    "box": [
+     214.0,
+     390.0,
+     274.0,
+     458.0
+    ],
+    "panel": "148_jpg.rf.9645902eeec4d6f56963de7484e23903.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     326.0,
+     435.0,
+     381.0,
+     497.0
+    ],
+    "panel": "148_jpg.rf.9645902eeec4d6f56963de7484e23903.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     332.0,
+     621.0,
+     393.0,
+     675.0
+    ],
+    "panel": "148_jpg.rf.9645902eeec4d6f56963de7484e23903.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     345.0,
+     271.0,
+     369.0,
+     319.0
+    ],
+    "panel": "148_jpg.rf.9645902eeec4d6f56963de7484e23903.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     566.0,
+     503.0,
+     593.0,
+     540.0
+    ],
+    "panel": "148_jpg.rf.9645902eeec4d6f56963de7484e23903.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     522.0,
+     664.0,
+     544.0,
+     690.0
+    ],
+    "panel": "148_jpg.rf.9645902eeec4d6f56963de7484e23903.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     642.0,
+     200.0,
+     658.0,
+     222.0
+    ],
+    "panel": "148_jpg.rf.9645902eeec4d6f56963de7484e23903.jpg"
+   },
+   {
+    "class": "actuator",
+    "box": [
+     382.0,
+     441.0,
+     417.0,
+     517.0
+    ],
+    "panel": "148_jpg.rf.9645902eeec4d6f56963de7484e23903.jpg"
+   },
+   {
+    "class": "actuator",
+    "box": [
+     392.0,
+     622.0,
+     424.0,
+     694.0
+    ],
+    "panel": "148_jpg.rf.9645902eeec4d6f56963de7484e23903.jpg"
+   },
+   {
+    "class": "needle_valve",
+    "box": [
+     793.0,
+     168.0,
+     865.0,
+     276.0
+    ],
+    "panel": "231_jpg.rf.d6868eb1e34a0aa28db2dc0e1d6cfbab.jpg"
+   },
+   {
+    "class": "needle_valve",
+    "box": [
+     782.0,
+     274.0,
+     860.0,
+     366.0
+    ],
+    "panel": "231_jpg.rf.d6868eb1e34a0aa28db2dc0e1d6cfbab.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     791.0,
+     470.0,
+     864.0,
+     605.0
+    ],
+    "panel": "231_jpg.rf.d6868eb1e34a0aa28db2dc0e1d6cfbab.jpg"
+   },
+   {
+    "class": "relief_valve",
+    "box": [
+     891.0,
+     443.0,
+     966.0,
+     602.0
+    ],
+    "panel": "231_jpg.rf.d6868eb1e34a0aa28db2dc0e1d6cfbab.jpg"
+   },
+   {
+    "class": "diaphragm_valve",
+    "box": [
+     891.0,
+     279.0,
+     968.0,
+     362.0
+    ],
+    "panel": "231_jpg.rf.d6868eb1e34a0aa28db2dc0e1d6cfbab.jpg"
+   },
+   {
+    "class": "diaphragm_valve",
+    "box": [
+     895.0,
+     178.0,
+     984.0,
+     284.0
+    ],
+    "panel": "231_jpg.rf.d6868eb1e34a0aa28db2dc0e1d6cfbab.jpg"
+   },
+   {
+    "class": "plug_valve",
+    "box": [
+     976.0,
+     230.0,
+     1081.0,
+     360.0
+    ],
+    "panel": "231_jpg.rf.d6868eb1e34a0aa28db2dc0e1d6cfbab.jpg"
+   },
+   {
+    "class": "control_valve",
+    "box": [
+     1006.0,
+     453.0,
+     1074.0,
+     591.0
+    ],
+    "panel": "231_jpg.rf.d6868eb1e34a0aa28db2dc0e1d6cfbab.jpg"
+   },
+   {
+    "class": "angle_valve",
+    "box": [
+     1112.0,
+     217.0,
+     1179.0,
+     368.0
+    ],
+    "panel": "231_jpg.rf.d6868eb1e34a0aa28db2dc0e1d6cfbab.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1208.0,
+     197.0,
+     1290.0,
+     369.0
+    ],
+    "panel": "231_jpg.rf.d6868eb1e34a0aa28db2dc0e1d6cfbab.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1212.0,
+     480.0,
+     1285.0,
+     593.0
+    ],
+    "panel": "231_jpg.rf.d6868eb1e34a0aa28db2dc0e1d6cfbab.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1308.0,
+     236.0,
+     1386.0,
+     360.0
+    ],
+    "panel": "231_jpg.rf.d6868eb1e34a0aa28db2dc0e1d6cfbab.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1305.0,
+     447.0,
+     1386.0,
+     593.0
+    ],
+    "panel": "231_jpg.rf.d6868eb1e34a0aa28db2dc0e1d6cfbab.jpg"
+   }
+  ]
+ },
+ {
+  "sheet": "very_hard_05.png",
+  "tier": "very_hard",
+  "width": 2860,
+  "height": 1560,
+  "panels": [
+   "basic-simple-p-id-diagram_31_png_jpg.rf.7eb369ba80de62e8d0ca56dfb8efaafc.jpg",
+   "37_jpg.rf.34970488b1142d5f6a6e443ad63c2759.jpg",
+   "994_png_jpg.rf.99aaa7d50a185b568667599641ff4c3c.jpg",
+   "183_jpg.rf.809bec81447ee54ec5cb717e7c4d6ac5.jpg",
+   "all-individuals-single-single-of-valves-symbols-in-p-id-drawing_190_png_jpg.rf.2dd8cc830cd2fe57d43d9cbce7b783f7.jpg",
+   "120_png_jpg.rf.debe1b5178a361a24d2481693d7c858d.jpg"
+  ],
+  "symbols": [
+   {
+    "class": "ball_valve",
+    "box": [
+     181.0,
+     157.0,
+     205.0,
+     188.0
+    ],
+    "panel": "basic-simple-p-id-diagram_31_png_jpg.rf.7eb369ba80de62e8d0ca56dfb8efaafc.jpg"
+   },
+   {
+    "class": "ball_valve",
+    "box": [
+     243.0,
+     262.0,
+     272.0,
+     301.0
+    ],
+    "panel": "basic-simple-p-id-diagram_31_png_jpg.rf.7eb369ba80de62e8d0ca56dfb8efaafc.jpg"
+   },
+   {
+    "class": "ball_valve",
+    "box": [
+     246.0,
+     353.0,
+     270.0,
+     398.0
+    ],
+    "panel": "basic-simple-p-id-diagram_31_png_jpg.rf.7eb369ba80de62e8d0ca56dfb8efaafc.jpg"
+   },
+   {
+    "class": "ball_valve",
+    "box": [
+     377.0,
+     645.0,
+     406.0,
+     690.0
+    ],
+    "panel": "basic-simple-p-id-diagram_31_png_jpg.rf.7eb369ba80de62e8d0ca56dfb8efaafc.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     377.0,
+     359.0,
+     408.0,
+     393.0
+    ],
+    "panel": "basic-simple-p-id-diagram_31_png_jpg.rf.7eb369ba80de62e8d0ca56dfb8efaafc.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     283.0,
+     363.0,
+     311.0,
+     398.0
+    ],
+    "panel": "basic-simple-p-id-diagram_31_png_jpg.rf.7eb369ba80de62e8d0ca56dfb8efaafc.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     209.0,
+     357.0,
+     237.0,
+     396.0
+    ],
+    "panel": "basic-simple-p-id-diagram_31_png_jpg.rf.7eb369ba80de62e8d0ca56dfb8efaafc.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     935.0,
+     176.0,
+     1297.0,
+     638.0
+    ],
+    "panel": "37_jpg.rf.34970488b1142d5f6a6e443ad63c2759.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1537.0,
+     262.0,
+     1561.0,
+     315.0
+    ],
+    "panel": "994_png_jpg.rf.99aaa7d50a185b568667599641ff4c3c.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1523.0,
+     355.0,
+     1558.0,
+     412.0
+    ],
+    "panel": "994_png_jpg.rf.99aaa7d50a185b568667599641ff4c3c.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     1574.0,
+     516.0,
+     1612.0,
+     566.0
+    ],
+    "panel": "994_png_jpg.rf.99aaa7d50a185b568667599641ff4c3c.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1871.0,
+     422.0,
+     1903.0,
+     455.0
+    ],
+    "panel": "994_png_jpg.rf.99aaa7d50a185b568667599641ff4c3c.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     2160.0,
+     179.0,
+     2198.0,
+     204.0
+    ],
+    "panel": "183_jpg.rf.809bec81447ee54ec5cb717e7c4d6ac5.jpg"
+   },
+   {
+    "class": "angle_valve",
+    "box": [
+     2157.0,
+     296.0,
+     2194.0,
+     327.0
+    ],
+    "panel": "183_jpg.rf.809bec81447ee54ec5cb717e7c4d6ac5.jpg"
+   },
+   {
+    "class": "angle_valve",
+    "box": [
+     2192.0,
+     358.0,
+     2225.0,
+     381.0
+    ],
+    "panel": "183_jpg.rf.809bec81447ee54ec5cb717e7c4d6ac5.jpg"
+   },
+   {
+    "class": "ball_valve",
+    "box": [
+     2170.0,
+     417.0,
+     2224.0,
+     442.0
+    ],
+    "panel": "183_jpg.rf.809bec81447ee54ec5cb717e7c4d6ac5.jpg"
+   },
+   {
+    "class": "butterfly_valve",
+    "box": [
+     2171.0,
+     477.0,
+     2217.0,
+     502.0
+    ],
+    "panel": "183_jpg.rf.809bec81447ee54ec5cb717e7c4d6ac5.jpg"
+   },
+   {
+    "class": "check_valve",
+    "box": [
+     2167.0,
+     537.0,
+     2232.0,
+     562.0
+    ],
+    "panel": "183_jpg.rf.809bec81447ee54ec5cb717e7c4d6ac5.jpg"
+   },
+   {
+    "class": "check_valve",
+    "box": [
+     2162.0,
+     598.0,
+     2231.0,
+     623.0
+    ],
+    "panel": "183_jpg.rf.809bec81447ee54ec5cb717e7c4d6ac5.jpg"
+   },
+   {
+    "class": "needle_valve",
+    "box": [
+     2331.0,
+     179.0,
+     2385.0,
+     211.0
+    ],
+    "panel": "183_jpg.rf.809bec81447ee54ec5cb717e7c4d6ac5.jpg"
+   },
+   {
+    "class": "plug_valve",
+    "box": [
+     2335.0,
+     296.0,
+     2385.0,
+     321.0
+    ],
+    "panel": "183_jpg.rf.809bec81447ee54ec5cb717e7c4d6ac5.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     2328.0,
+     598.0,
+     2383.0,
+     620.0
+    ],
+    "panel": "183_jpg.rf.809bec81447ee54ec5cb717e7c4d6ac5.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     2331.0,
+     662.0,
+     2387.0,
+     681.0
+    ],
+    "panel": "183_jpg.rf.809bec81447ee54ec5cb717e7c4d6ac5.jpg"
+   },
+   {
+    "class": "control_valve",
+    "box": [
+     2499.0,
+     571.0,
+     2562.0,
+     641.0
+    ],
+    "panel": "183_jpg.rf.809bec81447ee54ec5cb717e7c4d6ac5.jpg"
+   },
+   {
+    "class": "control_valve",
+    "box": [
+     2508.0,
+     480.0,
+     2572.0,
+     555.0
+    ],
+    "panel": "183_jpg.rf.809bec81447ee54ec5cb717e7c4d6ac5.jpg"
+   },
+   {
+    "class": "control_valve",
+    "box": [
+     2498.0,
+     390.0,
+     2566.0,
+     463.0
+    ],
+    "panel": "183_jpg.rf.809bec81447ee54ec5cb717e7c4d6ac5.jpg"
+   },
+   {
+    "class": "actuator",
+    "box": [
+     251.0,
+     1134.0,
+     281.0,
+     1160.0
+    ],
+    "panel": "all-individuals-single-single-of-valves-symbols-in-p-id-drawing_190_png_jpg.rf.2dd8cc830cd2fe57d43d9cbce7b783f7.jpg"
+   },
+   {
+    "class": "pipe_fitting",
+    "box": [
+     925.0,
+     1033.0,
+     940.0,
+     1076.0
+    ],
+    "panel": "120_png_jpg.rf.debe1b5178a361a24d2481693d7c858d.jpg"
+   },
+   {
+    "class": "pipe_fitting",
+    "box": [
+     829.0,
+     862.0,
+     863.0,
+     887.0
+    ],
+    "panel": "120_png_jpg.rf.debe1b5178a361a24d2481693d7c858d.jpg"
+   },
+   {
+    "class": "pipe_fitting",
+    "box": [
+     1034.0,
+     935.0,
+     1052.0,
+     983.0
+    ],
+    "panel": "120_png_jpg.rf.debe1b5178a361a24d2481693d7c858d.jpg"
+   },
+   {
+    "class": "pipe_fitting",
+    "box": [
+     890.0,
+     1152.0,
+     905.0,
+     1195.0
+    ],
+    "panel": "120_png_jpg.rf.debe1b5178a361a24d2481693d7c858d.jpg"
+   },
+   {
+    "class": "pipe_fitting",
+    "box": [
+     834.0,
+     1243.0,
+     859.0,
+     1264.0
+    ],
+    "panel": "120_png_jpg.rf.debe1b5178a361a24d2481693d7c858d.jpg"
+   }
+  ]
+ },
+ {
+  "sheet": "complex_01.png",
+  "tier": "complex",
+  "width": 4220,
+  "height": 880,
+  "panels": [
+   "59_jpg.rf.f32b6ad085abd7aef7bacb42fb005b39.jpg",
+   "162_png_jpg.rf.6e4b4ddb0763168d12bdf4f6b03c0dfe.jpg",
+   "37_jpg.rf.34970488b1142d5f6a6e443ad63c2759.jpg",
+   "all-individuals-single-single-of-valves-symbols-in-p-id-drawing_131_png_jpg.rf.8b307db8ffc703dfe1a468c40d3cc409.jpg",
+   "p-id-Diagrams_26_png_jpg.rf.316d3b357b2bf6a6b939f0800ea16b4d.jpg",
+   "Hand-Operated-gate-valve-symbols_13_png_jpg.rf.94524109e984feb92d3707b98921afb5.jpg"
+  ],
+  "symbols": [
+   {
+    "class": "plug_valve",
+    "box": [
+     128.0,
+     370.0,
+     152.0,
+     408.0
+    ],
+    "panel": "59_jpg.rf.f32b6ad085abd7aef7bacb42fb005b39.jpg"
+   },
+   {
+    "class": "flow_instrument",
+    "box": [
+     166.0,
+     403.0,
+     185.0,
+     453.0
+    ],
+    "panel": "59_jpg.rf.f32b6ad085abd7aef7bacb42fb005b39.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     129.0,
+     411.0,
+     159.0,
+     462.0
+    ],
+    "panel": "59_jpg.rf.f32b6ad085abd7aef7bacb42fb005b39.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     216.0,
+     404.0,
+     240.0,
+     432.0
+    ],
+    "panel": "59_jpg.rf.f32b6ad085abd7aef7bacb42fb005b39.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     131.0,
+     595.0,
+     207.0,
+     725.0
+    ],
+    "panel": "59_jpg.rf.f32b6ad085abd7aef7bacb42fb005b39.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     357.0,
+     571.0,
+     378.0,
+     607.0
+    ],
+    "panel": "59_jpg.rf.f32b6ad085abd7aef7bacb42fb005b39.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     564.0,
+     287.0,
+     594.0,
+     336.0
+    ],
+    "panel": "59_jpg.rf.f32b6ad085abd7aef7bacb42fb005b39.jpg"
+   },
+   {
+    "class": "butterfly_valve",
+    "box": [
+     595.0,
+     337.0,
+     611.0,
+     380.0
+    ],
+    "panel": "59_jpg.rf.f32b6ad085abd7aef7bacb42fb005b39.jpg"
+   },
+   {
+    "class": "butterfly_valve",
+    "box": [
+     638.0,
+     339.0,
+     659.0,
+     380.0
+    ],
+    "panel": "59_jpg.rf.f32b6ad085abd7aef7bacb42fb005b39.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     645.0,
+     517.0,
+     667.0,
+     560.0
+    ],
+    "panel": "59_jpg.rf.f32b6ad085abd7aef7bacb42fb005b39.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     510.0,
+     662.0,
+     528.0,
+     699.0
+    ],
+    "panel": "59_jpg.rf.f32b6ad085abd7aef7bacb42fb005b39.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     916.0,
+     325.0,
+     924.0,
+     357.0
+    ],
+    "panel": "162_png_jpg.rf.6e4b4ddb0763168d12bdf4f6b03c0dfe.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     915.0,
+     286.0,
+     925.0,
+     318.0
+    ],
+    "panel": "162_png_jpg.rf.6e4b4ddb0763168d12bdf4f6b03c0dfe.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     916.0,
+     251.0,
+     924.0,
+     275.0
+    ],
+    "panel": "162_png_jpg.rf.6e4b4ddb0763168d12bdf4f6b03c0dfe.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     950.0,
+     288.0,
+     958.0,
+     312.0
+    ],
+    "panel": "162_png_jpg.rf.6e4b4ddb0763168d12bdf4f6b03c0dfe.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     1083.0,
+     614.0,
+     1090.0,
+     646.0
+    ],
+    "panel": "162_png_jpg.rf.6e4b4ddb0763168d12bdf4f6b03c0dfe.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     1162.0,
+     559.0,
+     1173.0,
+     584.0
+    ],
+    "panel": "162_png_jpg.rf.6e4b4ddb0763168d12bdf4f6b03c0dfe.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     1178.0,
+     612.0,
+     1186.0,
+     642.0
+    ],
+    "panel": "162_png_jpg.rf.6e4b4ddb0763168d12bdf4f6b03c0dfe.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     1245.0,
+     562.0,
+     1253.0,
+     583.0
+    ],
+    "panel": "162_png_jpg.rf.6e4b4ddb0763168d12bdf4f6b03c0dfe.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     1249.0,
+     329.0,
+     1264.0,
+     344.0
+    ],
+    "panel": "162_png_jpg.rf.6e4b4ddb0763168d12bdf4f6b03c0dfe.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     1253.0,
+     463.0,
+     1264.0,
+     476.0
+    ],
+    "panel": "162_png_jpg.rf.6e4b4ddb0763168d12bdf4f6b03c0dfe.jpg"
+   },
+   {
+    "class": "check_valve",
+    "box": [
+     1245.0,
+     614.0,
+     1252.0,
+     645.0
+    ],
+    "panel": "162_png_jpg.rf.6e4b4ddb0763168d12bdf4f6b03c0dfe.jpg"
+   },
+   {
+    "class": "check_valve",
+    "box": [
+     1160.0,
+     611.0,
+     1169.0,
+     641.0
+    ],
+    "panel": "162_png_jpg.rf.6e4b4ddb0763168d12bdf4f6b03c0dfe.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1615.0,
+     176.0,
+     1977.0,
+     638.0
+    ],
+    "panel": "37_jpg.rf.34970488b1142d5f6a6e443ad63c2759.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     2566.0,
+     133.0,
+     2633.0,
+     205.0
+    ],
+    "panel": "all-individuals-single-single-of-valves-symbols-in-p-id-drawing_131_png_jpg.rf.8b307db8ffc703dfe1a468c40d3cc409.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     2561.0,
+     254.0,
+     2636.0,
+     327.0
+    ],
+    "panel": "all-individuals-single-single-of-valves-symbols-in-p-id-drawing_131_png_jpg.rf.8b307db8ffc703dfe1a468c40d3cc409.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     2565.0,
+     617.0,
+     2631.0,
+     682.0
+    ],
+    "panel": "all-individuals-single-single-of-valves-symbols-in-p-id-drawing_131_png_jpg.rf.8b307db8ffc703dfe1a468c40d3cc409.jpg"
+   },
+   {
+    "class": "flow_instrument",
+    "box": [
+     3109.0,
+     213.0,
+     3144.0,
+     240.0
+    ],
+    "panel": "p-id-Diagrams_26_png_jpg.rf.316d3b357b2bf6a6b939f0800ea16b4d.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     3112.0,
+     315.0,
+     3145.0,
+     357.0
+    ],
+    "panel": "p-id-Diagrams_26_png_jpg.rf.316d3b357b2bf6a6b939f0800ea16b4d.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     3114.0,
+     402.0,
+     3150.0,
+     448.0
+    ],
+    "panel": "p-id-Diagrams_26_png_jpg.rf.316d3b357b2bf6a6b939f0800ea16b4d.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     2984.0,
+     521.0,
+     3019.0,
+     551.0
+    ],
+    "panel": "p-id-Diagrams_26_png_jpg.rf.316d3b357b2bf6a6b939f0800ea16b4d.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     2870.0,
+     532.0,
+     2931.0,
+     579.0
+    ],
+    "panel": "p-id-Diagrams_26_png_jpg.rf.316d3b357b2bf6a6b939f0800ea16b4d.jpg"
+   },
+   {
+    "class": "flow_instrument",
+    "box": [
+     2936.0,
+     530.0,
+     2967.0,
+     555.0
+    ],
+    "panel": "p-id-Diagrams_26_png_jpg.rf.316d3b357b2bf6a6b939f0800ea16b4d.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     3554.0,
+     139.0,
+     3616.0,
+     185.0
+    ],
+    "panel": "Hand-Operated-gate-valve-symbols_13_png_jpg.rf.94524109e984feb92d3707b98921afb5.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     3702.0,
+     138.0,
+     3757.0,
+     181.0
+    ],
+    "panel": "Hand-Operated-gate-valve-symbols_13_png_jpg.rf.94524109e984feb92d3707b98921afb5.jpg"
+   },
+   {
+    "class": "butterfly_valve",
+    "box": [
+     3848.0,
+     140.0,
+     3894.0,
+     180.0
+    ],
+    "panel": "Hand-Operated-gate-valve-symbols_13_png_jpg.rf.94524109e984feb92d3707b98921afb5.jpg"
+   },
+   {
+    "class": "diaphragm_valve",
+    "box": [
+     3966.0,
+     136.0,
+     4032.0,
+     182.0
+    ],
+    "panel": "Hand-Operated-gate-valve-symbols_13_png_jpg.rf.94524109e984feb92d3707b98921afb5.jpg"
+   },
+   {
+    "class": "ball_valve",
+    "box": [
+     3710.0,
+     232.0,
+     3754.0,
+     273.0
+    ],
+    "panel": "Hand-Operated-gate-valve-symbols_13_png_jpg.rf.94524109e984feb92d3707b98921afb5.jpg"
+   },
+   {
+    "class": "ball_valve",
+    "box": [
+     3696.0,
+     272.0,
+     3763.0,
+     312.0
+    ],
+    "panel": "Hand-Operated-gate-valve-symbols_13_png_jpg.rf.94524109e984feb92d3707b98921afb5.jpg"
+   },
+   {
+    "class": "angle_valve",
+    "box": [
+     3846.0,
+     391.0,
+     3899.0,
+     451.0
+    ],
+    "panel": "Hand-Operated-gate-valve-symbols_13_png_jpg.rf.94524109e984feb92d3707b98921afb5.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     3975.0,
+     391.0,
+     4030.0,
+     440.0
+    ],
+    "panel": "Hand-Operated-gate-valve-symbols_13_png_jpg.rf.94524109e984feb92d3707b98921afb5.jpg"
+   },
+   {
+    "class": "check_valve",
+    "box": [
+     3553.0,
+     546.0,
+     3610.0,
+     604.0
+    ],
+    "panel": "Hand-Operated-gate-valve-symbols_13_png_jpg.rf.94524109e984feb92d3707b98921afb5.jpg"
+   },
+   {
+    "class": "control_valve",
+    "box": [
+     3706.0,
+     497.0,
+     3762.0,
+     602.0
+    ],
+    "panel": "Hand-Operated-gate-valve-symbols_13_png_jpg.rf.94524109e984feb92d3707b98921afb5.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     3757.0,
+     642.0,
+     3811.0,
+     685.0
+    ],
+    "panel": "Hand-Operated-gate-valve-symbols_13_png_jpg.rf.94524109e984feb92d3707b98921afb5.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     3849.0,
+     646.0,
+     3915.0,
+     684.0
+    ],
+    "panel": "Hand-Operated-gate-valve-symbols_13_png_jpg.rf.94524109e984feb92d3707b98921afb5.jpg"
+   }
+  ]
+ },
+ {
+  "sheet": "complex_02.png",
+  "tier": "complex",
+  "width": 3540,
+  "height": 880,
+  "panels": [
+   "187_png_jpg.rf.a2bb362b5c3ab2609ceefd5705113d24.jpg",
+   "88_jpg.rf.78134a8941c37e13da3f281fadb68f64.jpg",
+   "181_png_jpg.rf.7530eb10e32190d069d721b0a47837d1.jpg",
+   "01_jpg.rf.d35525a2ba2d02d6574219b830b4e180.jpg",
+   "170_png_jpg.rf.de97350634e8c40f4ced9c96b208a078.jpg"
+  ],
+  "symbols": [
+   {
+    "class": "gate_valve",
+    "box": [
+     96.0,
+     160.0,
+     151.0,
+     204.0
+    ],
+    "panel": "187_png_jpg.rf.a2bb362b5c3ab2609ceefd5705113d24.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     147.0,
+     153.0,
+     199.0,
+     200.0
+    ],
+    "panel": "187_png_jpg.rf.a2bb362b5c3ab2609ceefd5705113d24.jpg"
+   },
+   {
+    "class": "ball_valve",
+    "box": [
+     202.0,
+     148.0,
+     251.0,
+     202.0
+    ],
+    "panel": "187_png_jpg.rf.a2bb362b5c3ab2609ceefd5705113d24.jpg"
+   },
+   {
+    "class": "ball_valve",
+    "box": [
+     250.0,
+     141.0,
+     302.0,
+     202.0
+    ],
+    "panel": "187_png_jpg.rf.a2bb362b5c3ab2609ceefd5705113d24.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     303.0,
+     146.0,
+     357.0,
+     209.0
+    ],
+    "panel": "187_png_jpg.rf.a2bb362b5c3ab2609ceefd5705113d24.jpg"
+   },
+   {
+    "class": "butterfly_valve",
+    "box": [
+     359.0,
+     146.0,
+     408.0,
+     201.0
+    ],
+    "panel": "187_png_jpg.rf.a2bb362b5c3ab2609ceefd5705113d24.jpg"
+   },
+   {
+    "class": "check_valve",
+    "box": [
+     407.0,
+     141.0,
+     461.0,
+     205.0
+    ],
+    "panel": "187_png_jpg.rf.a2bb362b5c3ab2609ceefd5705113d24.jpg"
+   },
+   {
+    "class": "plug_valve",
+    "box": [
+     458.0,
+     145.0,
+     507.0,
+     197.0
+    ],
+    "panel": "187_png_jpg.rf.a2bb362b5c3ab2609ceefd5705113d24.jpg"
+   },
+   {
+    "class": "needle_valve",
+    "box": [
+     510.0,
+     152.0,
+     559.0,
+     209.0
+    ],
+    "panel": "187_png_jpg.rf.a2bb362b5c3ab2609ceefd5705113d24.jpg"
+   },
+   {
+    "class": "needle_valve",
+    "box": [
+     558.0,
+     153.0,
+     616.0,
+     200.0
+    ],
+    "panel": "187_png_jpg.rf.a2bb362b5c3ab2609ceefd5705113d24.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     613.0,
+     141.0,
+     665.0,
+     208.0
+    ],
+    "panel": "187_png_jpg.rf.a2bb362b5c3ab2609ceefd5705113d24.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     665.0,
+     145.0,
+     718.0,
+     208.0
+    ],
+    "panel": "187_png_jpg.rf.a2bb362b5c3ab2609ceefd5705113d24.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     95.0,
+     208.0,
+     148.0,
+     273.0
+    ],
+    "panel": "187_png_jpg.rf.a2bb362b5c3ab2609ceefd5705113d24.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     146.0,
+     204.0,
+     202.0,
+     273.0
+    ],
+    "panel": "187_png_jpg.rf.a2bb362b5c3ab2609ceefd5705113d24.jpg"
+   },
+   {
+    "class": "control_valve",
+    "box": [
+     90.0,
+     268.0,
+     149.0,
+     331.0
+    ],
+    "panel": "187_png_jpg.rf.a2bb362b5c3ab2609ceefd5705113d24.jpg"
+   },
+   {
+    "class": "relief_valve",
+    "box": [
+     146.0,
+     274.0,
+     205.0,
+     335.0
+    ],
+    "panel": "187_png_jpg.rf.a2bb362b5c3ab2609ceefd5705113d24.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     200.0,
+     265.0,
+     260.0,
+     334.0
+    ],
+    "panel": "187_png_jpg.rf.a2bb362b5c3ab2609ceefd5705113d24.jpg"
+   },
+   {
+    "class": "angle_valve",
+    "box": [
+     311.0,
+     271.0,
+     361.0,
+     332.0
+    ],
+    "panel": "187_png_jpg.rf.a2bb362b5c3ab2609ceefd5705113d24.jpg"
+   },
+   {
+    "class": "angle_valve",
+    "box": [
+     361.0,
+     272.0,
+     406.0,
+     331.0
+    ],
+    "panel": "187_png_jpg.rf.a2bb362b5c3ab2609ceefd5705113d24.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     417.0,
+     272.0,
+     467.0,
+     330.0
+    ],
+    "panel": "187_png_jpg.rf.a2bb362b5c3ab2609ceefd5705113d24.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     510.0,
+     270.0,
+     566.0,
+     329.0
+    ],
+    "panel": "187_png_jpg.rf.a2bb362b5c3ab2609ceefd5705113d24.jpg"
+   },
+   {
+    "class": "actuator",
+    "box": [
+     1036.0,
+     160.0,
+     1193.0,
+     670.0
+    ],
+    "panel": "88_jpg.rf.78134a8941c37e13da3f281fadb68f64.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1511.0,
+     140.0,
+     1606.0,
+     207.0
+    ],
+    "panel": "181_png_jpg.rf.7530eb10e32190d069d721b0a47837d1.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     1716.0,
+     136.0,
+     1821.0,
+     209.0
+    ],
+    "panel": "181_png_jpg.rf.7530eb10e32190d069d721b0a47837d1.jpg"
+   },
+   {
+    "class": "butterfly_valve",
+    "box": [
+     1927.0,
+     135.0,
+     2023.0,
+     216.0
+    ],
+    "panel": "181_png_jpg.rf.7530eb10e32190d069d721b0a47837d1.jpg"
+   },
+   {
+    "class": "needle_valve",
+    "box": [
+     1941.0,
+     355.0,
+     2044.0,
+     446.0
+    ],
+    "panel": "181_png_jpg.rf.7530eb10e32190d069d721b0a47837d1.jpg"
+   },
+   {
+    "class": "needle_valve",
+    "box": [
+     1945.0,
+     445.0,
+     2044.0,
+     525.0
+    ],
+    "panel": "181_png_jpg.rf.7530eb10e32190d069d721b0a47837d1.jpg"
+   },
+   {
+    "class": "ball_valve",
+    "box": [
+     1708.0,
+     355.0,
+     1813.0,
+     439.0
+    ],
+    "panel": "181_png_jpg.rf.7530eb10e32190d069d721b0a47837d1.jpg"
+   },
+   {
+    "class": "ball_valve",
+    "box": [
+     1710.0,
+     433.0,
+     1820.0,
+     514.0
+    ],
+    "panel": "181_png_jpg.rf.7530eb10e32190d069d721b0a47837d1.jpg"
+   },
+   {
+    "class": "plug_valve",
+    "box": [
+     1492.0,
+     360.0,
+     1607.0,
+     467.0
+    ],
+    "panel": "181_png_jpg.rf.7530eb10e32190d069d721b0a47837d1.jpg"
+   },
+   {
+    "class": "actuator",
+    "box": [
+     2234.0,
+     99.0,
+     2327.0,
+     252.0
+    ],
+    "panel": "01_jpg.rf.d35525a2ba2d02d6574219b830b4e180.jpg"
+   },
+   {
+    "class": "actuator",
+    "box": [
+     2561.0,
+     102.0,
+     2664.0,
+     259.0
+    ],
+    "panel": "01_jpg.rf.d35525a2ba2d02d6574219b830b4e180.jpg"
+   },
+   {
+    "class": "actuator",
+    "box": [
+     2571.0,
+     405.0,
+     2662.0,
+     569.0
+    ],
+    "panel": "01_jpg.rf.d35525a2ba2d02d6574219b830b4e180.jpg"
+   },
+   {
+    "class": "actuator",
+    "box": [
+     2226.0,
+     409.0,
+     2320.0,
+     563.0
+    ],
+    "panel": "01_jpg.rf.d35525a2ba2d02d6574219b830b4e180.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     2892.0,
+     409.0,
+     2932.0,
+     482.0
+    ],
+    "panel": "170_png_jpg.rf.de97350634e8c40f4ced9c96b208a078.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     3116.0,
+     265.0,
+     3144.0,
+     338.0
+    ],
+    "panel": "170_png_jpg.rf.de97350634e8c40f4ced9c96b208a078.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     3072.0,
+     539.0,
+     3113.0,
+     624.0
+    ],
+    "panel": "170_png_jpg.rf.de97350634e8c40f4ced9c96b208a078.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     3307.0,
+     653.0,
+     3349.0,
+     730.0
+    ],
+    "panel": "170_png_jpg.rf.de97350634e8c40f4ced9c96b208a078.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     3322.0,
+     426.0,
+     3355.0,
+     505.0
+    ],
+    "panel": "170_png_jpg.rf.de97350634e8c40f4ced9c96b208a078.jpg"
+   }
+  ]
+ },
+ {
+  "sheet": "complex_03.png",
+  "tier": "complex",
+  "width": 4220,
+  "height": 1560,
+  "panels": [
+   "195_png_jpg.rf.86dc1d4b2875e8d0b84026f7a9fa27aa.jpg",
+   "gate-valve-symbols_14_png_jpg.rf.e3da93e3db463a583325bdebc8b0a350.jpg",
+   "0018_jpg.rf.701c0ff5c4f34a3dd3fdd60fe4af6991.jpg",
+   "965_png_jpg.rf.59da82f73bd266bab1e8ab0d01fcc427.jpg",
+   "process-p-id-diagram_46_png_jpg.rf.adf33509b0ab1b1600497c8dfb313e4a.jpg",
+   "231_jpg.rf.d6868eb1e34a0aa28db2dc0e1d6cfbab.jpg",
+   "01_jpg.rf.d35525a2ba2d02d6574219b830b4e180.jpg",
+   "different-types-of-p-id-diagram_72_png_jpg.rf.a9fdd88a753926a511ed88c5492aba86.jpg",
+   "184_png_jpg.rf.3a0cf031a2016252683adc673e6c7049.jpg"
+  ],
+  "symbols": [
+   {
+    "class": "gate_valve",
+    "box": [
+     347.0,
+     119.0,
+     475.0,
+     224.0
+    ],
+    "panel": "195_png_jpg.rf.86dc1d4b2875e8d0b84026f7a9fa27aa.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     584.0,
+     90.0,
+     705.0,
+     225.0
+    ],
+    "panel": "195_png_jpg.rf.86dc1d4b2875e8d0b84026f7a9fa27aa.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     105.0,
+     300.0,
+     261.0,
+     446.0
+    ],
+    "panel": "195_png_jpg.rf.86dc1d4b2875e8d0b84026f7a9fa27aa.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     324.0,
+     306.0,
+     490.0,
+     444.0
+    ],
+    "panel": "195_png_jpg.rf.86dc1d4b2875e8d0b84026f7a9fa27aa.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     585.0,
+     328.0,
+     704.0,
+     440.0
+    ],
+    "panel": "195_png_jpg.rf.86dc1d4b2875e8d0b84026f7a9fa27aa.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     177.0,
+     545.0,
+     313.0,
+     660.0
+    ],
+    "panel": "195_png_jpg.rf.86dc1d4b2875e8d0b84026f7a9fa27aa.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     487.0,
+     515.0,
+     648.0,
+     666.0
+    ],
+    "panel": "195_png_jpg.rf.86dc1d4b2875e8d0b84026f7a9fa27aa.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     934.0,
+     118.0,
+     1244.0,
+     606.0
+    ],
+    "panel": "gate-valve-symbols_14_png_jpg.rf.e3da93e3db463a583325bdebc8b0a350.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1697.0,
+     230.0,
+     1759.0,
+     317.0
+    ],
+    "panel": "0018_jpg.rf.701c0ff5c4f34a3dd3fdd60fe4af6991.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     2414.0,
+     238.0,
+     2447.0,
+     306.0
+    ],
+    "panel": "965_png_jpg.rf.59da82f73bd266bab1e8ab0d01fcc427.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     2346.0,
+     426.0,
+     2375.0,
+     497.0
+    ],
+    "panel": "965_png_jpg.rf.59da82f73bd266bab1e8ab0d01fcc427.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     2409.0,
+     601.0,
+     2445.0,
+     660.0
+    ],
+    "panel": "965_png_jpg.rf.59da82f73bd266bab1e8ab0d01fcc427.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     2520.0,
+     404.0,
+     2548.0,
+     472.0
+    ],
+    "panel": "965_png_jpg.rf.59da82f73bd266bab1e8ab0d01fcc427.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     2961.0,
+     191.0,
+     3038.0,
+     295.0
+    ],
+    "panel": "process-p-id-diagram_46_png_jpg.rf.adf33509b0ab1b1600497c8dfb313e4a.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     3041.0,
+     445.0,
+     3103.0,
+     515.0
+    ],
+    "panel": "process-p-id-diagram_46_png_jpg.rf.adf33509b0ab1b1600497c8dfb313e4a.jpg"
+   },
+   {
+    "class": "needle_valve",
+    "box": [
+     3513.0,
+     168.0,
+     3585.0,
+     276.0
+    ],
+    "panel": "231_jpg.rf.d6868eb1e34a0aa28db2dc0e1d6cfbab.jpg"
+   },
+   {
+    "class": "needle_valve",
+    "box": [
+     3502.0,
+     274.0,
+     3580.0,
+     366.0
+    ],
+    "panel": "231_jpg.rf.d6868eb1e34a0aa28db2dc0e1d6cfbab.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     3511.0,
+     470.0,
+     3584.0,
+     605.0
+    ],
+    "panel": "231_jpg.rf.d6868eb1e34a0aa28db2dc0e1d6cfbab.jpg"
+   },
+   {
+    "class": "relief_valve",
+    "box": [
+     3611.0,
+     443.0,
+     3686.0,
+     602.0
+    ],
+    "panel": "231_jpg.rf.d6868eb1e34a0aa28db2dc0e1d6cfbab.jpg"
+   },
+   {
+    "class": "diaphragm_valve",
+    "box": [
+     3611.0,
+     279.0,
+     3688.0,
+     362.0
+    ],
+    "panel": "231_jpg.rf.d6868eb1e34a0aa28db2dc0e1d6cfbab.jpg"
+   },
+   {
+    "class": "diaphragm_valve",
+    "box": [
+     3615.0,
+     178.0,
+     3704.0,
+     284.0
+    ],
+    "panel": "231_jpg.rf.d6868eb1e34a0aa28db2dc0e1d6cfbab.jpg"
+   },
+   {
+    "class": "plug_valve",
+    "box": [
+     3696.0,
+     230.0,
+     3801.0,
+     360.0
+    ],
+    "panel": "231_jpg.rf.d6868eb1e34a0aa28db2dc0e1d6cfbab.jpg"
+   },
+   {
+    "class": "control_valve",
+    "box": [
+     3726.0,
+     453.0,
+     3794.0,
+     591.0
+    ],
+    "panel": "231_jpg.rf.d6868eb1e34a0aa28db2dc0e1d6cfbab.jpg"
+   },
+   {
+    "class": "angle_valve",
+    "box": [
+     3832.0,
+     217.0,
+     3899.0,
+     368.0
+    ],
+    "panel": "231_jpg.rf.d6868eb1e34a0aa28db2dc0e1d6cfbab.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     3928.0,
+     197.0,
+     4010.0,
+     369.0
+    ],
+    "panel": "231_jpg.rf.d6868eb1e34a0aa28db2dc0e1d6cfbab.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     3932.0,
+     480.0,
+     4005.0,
+     593.0
+    ],
+    "panel": "231_jpg.rf.d6868eb1e34a0aa28db2dc0e1d6cfbab.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     4028.0,
+     236.0,
+     4106.0,
+     360.0
+    ],
+    "panel": "231_jpg.rf.d6868eb1e34a0aa28db2dc0e1d6cfbab.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     4025.0,
+     447.0,
+     4106.0,
+     593.0
+    ],
+    "panel": "231_jpg.rf.d6868eb1e34a0aa28db2dc0e1d6cfbab.jpg"
+   },
+   {
+    "class": "actuator",
+    "box": [
+     194.0,
+     779.0,
+     287.0,
+     932.0
+    ],
+    "panel": "01_jpg.rf.d35525a2ba2d02d6574219b830b4e180.jpg"
+   },
+   {
+    "class": "actuator",
+    "box": [
+     521.0,
+     782.0,
+     624.0,
+     939.0
+    ],
+    "panel": "01_jpg.rf.d35525a2ba2d02d6574219b830b4e180.jpg"
+   },
+   {
+    "class": "actuator",
+    "box": [
+     531.0,
+     1085.0,
+     622.0,
+     1249.0
+    ],
+    "panel": "01_jpg.rf.d35525a2ba2d02d6574219b830b4e180.jpg"
+   },
+   {
+    "class": "actuator",
+    "box": [
+     186.0,
+     1089.0,
+     280.0,
+     1243.0
+    ],
+    "panel": "01_jpg.rf.d35525a2ba2d02d6574219b830b4e180.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     955.0,
+     1195.0,
+     1014.0,
+     1263.0
+    ],
+    "panel": "different-types-of-p-id-diagram_72_png_jpg.rf.a9fdd88a753926a511ed88c5492aba86.jpg"
+   },
+   {
+    "class": "flow_instrument",
+    "box": [
+     1034.0,
+     1173.0,
+     1071.0,
+     1250.0
+    ],
+    "panel": "different-types-of-p-id-diagram_72_png_jpg.rf.a9fdd88a753926a511ed88c5492aba86.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1094.0,
+     1175.0,
+     1121.0,
+     1221.0
+    ],
+    "panel": "different-types-of-p-id-diagram_72_png_jpg.rf.a9fdd88a753926a511ed88c5492aba86.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1200.0,
+     1120.0,
+     1227.0,
+     1165.0
+    ],
+    "panel": "different-types-of-p-id-diagram_72_png_jpg.rf.a9fdd88a753926a511ed88c5492aba86.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1197.0,
+     1052.0,
+     1224.0,
+     1098.0
+    ],
+    "panel": "different-types-of-p-id-diagram_72_png_jpg.rf.a9fdd88a753926a511ed88c5492aba86.jpg"
+   },
+   {
+    "class": "flow_instrument",
+    "box": [
+     1197.0,
+     909.0,
+     1223.0,
+     944.0
+    ],
+    "panel": "different-types-of-p-id-diagram_72_png_jpg.rf.a9fdd88a753926a511ed88c5492aba86.jpg"
+   },
+   {
+    "class": "relief_valve",
+    "box": [
+     1599.0,
+     823.0,
+     1663.0,
+     947.0
+    ],
+    "panel": "184_png_jpg.rf.3a0cf031a2016252683adc673e6c7049.jpg"
+   },
+   {
+    "class": "relief_valve",
+    "box": [
+     1926.0,
+     831.0,
+     2002.0,
+     947.0
+    ],
+    "panel": "184_png_jpg.rf.3a0cf031a2016252683adc673e6c7049.jpg"
+   },
+   {
+    "class": "pipe_fitting",
+    "box": [
+     1553.0,
+     1043.0,
+     1603.0,
+     1079.0
+    ],
+    "panel": "184_png_jpg.rf.3a0cf031a2016252683adc673e6c7049.jpg"
+   },
+   {
+    "class": "pipe_fitting",
+    "box": [
+     1976.0,
+     1044.0,
+     2034.0,
+     1082.0
+    ],
+    "panel": "184_png_jpg.rf.3a0cf031a2016252683adc673e6c7049.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1951.0,
+     1084.0,
+     1984.0,
+     1162.0
+    ],
+    "panel": "184_png_jpg.rf.3a0cf031a2016252683adc673e6c7049.jpg"
+   },
+   {
+    "class": "relief_valve",
+    "box": [
+     1755.0,
+     1054.0,
+     1787.0,
+     1131.0
+    ],
+    "panel": "184_png_jpg.rf.3a0cf031a2016252683adc673e6c7049.jpg"
+   },
+   {
+    "class": "relief_valve",
+    "box": [
+     1593.0,
+     1082.0,
+     1642.0,
+     1170.0
+    ],
+    "panel": "184_png_jpg.rf.3a0cf031a2016252683adc673e6c7049.jpg"
+   },
+   {
+    "class": "ball_valve",
+    "box": [
+     1735.0,
+     951.0,
+     1788.0,
+     1044.0
+    ],
+    "panel": "184_png_jpg.rf.3a0cf031a2016252683adc673e6c7049.jpg"
+   }
+  ]
+ },
+ {
+  "sheet": "complex_04.png",
+  "tier": "complex",
+  "width": 4220,
+  "height": 1560,
+  "panels": [
+   "221_png_jpg.rf.32ca5d2d62ab09432fbeade753e6d4e0.jpg",
+   "different-types-of-p-id-diagram_68_png_jpg.rf.831327b620cdecd2079b37b53422eee6.jpg",
+   "basic-simple-valves-p-id-diagram_77_png_jpg.rf.eccad7fcaff96ab46b607f92165a5ce9.jpg",
+   "0018_jpg.rf.701c0ff5c4f34a3dd3fdd60fe4af6991.jpg",
+   "valves-images-in-p-id-Diagrams_15_png_jpg.rf.36630596a168db855a9a7c187e0f8dcf.jpg",
+   "14_png_jpg.rf.e72805fecded18f0c498931c9c85a7d9.jpg",
+   "process-p-id-diagram_52_png_jpg.rf.c311a9d5d32b75d142ecfe57a9f5c67e.jpg",
+   "233_jpg.rf.24e421e15013e84c38c2ad84ac06aae6.jpg",
+   "986_png_jpg.rf.8d09b8e1b7c6d6e48f587fc561d3d251.jpg"
+  ],
+  "symbols": [
+   {
+    "class": "actuator",
+    "box": [
+     274.0,
+     144.0,
+     332.0,
+     241.0
+    ],
+    "panel": "221_png_jpg.rf.32ca5d2d62ab09432fbeade753e6d4e0.jpg"
+   },
+   {
+    "class": "actuator",
+    "box": [
+     274.0,
+     348.0,
+     339.0,
+     450.0
+    ],
+    "panel": "221_png_jpg.rf.32ca5d2d62ab09432fbeade753e6d4e0.jpg"
+   },
+   {
+    "class": "actuator",
+    "box": [
+     516.0,
+     352.0,
+     621.0,
+     468.0
+    ],
+    "panel": "221_png_jpg.rf.32ca5d2d62ab09432fbeade753e6d4e0.jpg"
+   },
+   {
+    "class": "actuator",
+    "box": [
+     605.0,
+     135.0,
+     660.0,
+     244.0
+    ],
+    "panel": "221_png_jpg.rf.32ca5d2d62ab09432fbeade753e6d4e0.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     782.0,
+     118.0,
+     877.0,
+     254.0
+    ],
+    "panel": "different-types-of-p-id-diagram_68_png_jpg.rf.831327b620cdecd2079b37b53422eee6.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     936.0,
+     105.0,
+     999.0,
+     234.0
+    ],
+    "panel": "different-types-of-p-id-diagram_68_png_jpg.rf.831327b620cdecd2079b37b53422eee6.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     1074.0,
+     111.0,
+     1150.0,
+     244.0
+    ],
+    "panel": "different-types-of-p-id-diagram_68_png_jpg.rf.831327b620cdecd2079b37b53422eee6.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     783.0,
+     510.0,
+     896.0,
+     632.0
+    ],
+    "panel": "different-types-of-p-id-diagram_68_png_jpg.rf.831327b620cdecd2079b37b53422eee6.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     918.0,
+     492.0,
+     1006.0,
+     644.0
+    ],
+    "panel": "different-types-of-p-id-diagram_68_png_jpg.rf.831327b620cdecd2079b37b53422eee6.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     1059.0,
+     504.0,
+     1146.0,
+     634.0
+    ],
+    "panel": "different-types-of-p-id-diagram_68_png_jpg.rf.831327b620cdecd2079b37b53422eee6.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     1223.0,
+     495.0,
+     1291.0,
+     674.0
+    ],
+    "panel": "different-types-of-p-id-diagram_68_png_jpg.rf.831327b620cdecd2079b37b53422eee6.jpg"
+   },
+   {
+    "class": "actuator",
+    "box": [
+     1331.0,
+     366.0,
+     1396.0,
+     553.0
+    ],
+    "panel": "different-types-of-p-id-diagram_68_png_jpg.rf.831327b620cdecd2079b37b53422eee6.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     1785.0,
+     625.0,
+     1830.0,
+     669.0
+    ],
+    "panel": "basic-simple-valves-p-id-diagram_77_png_jpg.rf.eccad7fcaff96ab46b607f92165a5ce9.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1857.0,
+     513.0,
+     1896.0,
+     548.0
+    ],
+    "panel": "basic-simple-valves-p-id-diagram_77_png_jpg.rf.eccad7fcaff96ab46b607f92165a5ce9.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1720.0,
+     507.0,
+     1758.0,
+     553.0
+    ],
+    "panel": "basic-simple-valves-p-id-diagram_77_png_jpg.rf.eccad7fcaff96ab46b607f92165a5ce9.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     1782.0,
+     458.0,
+     1828.0,
+     554.0
+    ],
+    "panel": "basic-simple-valves-p-id-diagram_77_png_jpg.rf.eccad7fcaff96ab46b607f92165a5ce9.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     2377.0,
+     230.0,
+     2439.0,
+     317.0
+    ],
+    "panel": "0018_jpg.rf.701c0ff5c4f34a3dd3fdd60fe4af6991.jpg"
+   },
+   {
+    "class": "needle_valve",
+    "box": [
+     3074.0,
+     282.0,
+     3227.0,
+     420.0
+    ],
+    "panel": "valves-images-in-p-id-Diagrams_15_png_jpg.rf.36630596a168db855a9a7c187e0f8dcf.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     2822.0,
+     478.0,
+     2963.0,
+     585.0
+    ],
+    "panel": "valves-images-in-p-id-Diagrams_15_png_jpg.rf.36630596a168db855a9a7c187e0f8dcf.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     3676.0,
+     275.0,
+     3940.0,
+     562.0
+    ],
+    "panel": "14_png_jpg.rf.e72805fecded18f0c498931c9c85a7d9.jpg"
+   },
+   {
+    "class": "actuator",
+    "box": [
+     390.0,
+     1205.0,
+     424.0,
+     1247.0
+    ],
+    "panel": "process-p-id-diagram_52_png_jpg.rf.c311a9d5d32b75d142ecfe57a9f5c67e.jpg"
+   },
+   {
+    "class": "ball_valve",
+    "box": [
+     280.0,
+     1297.0,
+     309.0,
+     1343.0
+    ],
+    "panel": "process-p-id-diagram_52_png_jpg.rf.c311a9d5d32b75d142ecfe57a9f5c67e.jpg"
+   },
+   {
+    "class": "ball_valve",
+    "box": [
+     833.0,
+     905.0,
+     916.0,
+     1067.0
+    ],
+    "panel": "233_jpg.rf.24e421e15013e84c38c2ad84ac06aae6.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     830.0,
+     1135.0,
+     911.0,
+     1290.0
+    ],
+    "panel": "233_jpg.rf.24e421e15013e84c38c2ad84ac06aae6.jpg"
+   },
+   {
+    "class": "butterfly_valve",
+    "box": [
+     968.0,
+     890.0,
+     1063.0,
+     1061.0
+    ],
+    "panel": "233_jpg.rf.24e421e15013e84c38c2ad84ac06aae6.jpg"
+   },
+   {
+    "class": "diaphragm_valve",
+    "box": [
+     970.0,
+     1138.0,
+     1061.0,
+     1287.0
+    ],
+    "panel": "233_jpg.rf.24e421e15013e84c38c2ad84ac06aae6.jpg"
+   },
+   {
+    "class": "needle_valve",
+    "box": [
+     1108.0,
+     1103.0,
+     1200.0,
+     1289.0
+    ],
+    "panel": "233_jpg.rf.24e421e15013e84c38c2ad84ac06aae6.jpg"
+   },
+   {
+    "class": "plug_valve",
+    "box": [
+     1106.0,
+     910.0,
+     1207.0,
+     1061.0
+    ],
+    "panel": "233_jpg.rf.24e421e15013e84c38c2ad84ac06aae6.jpg"
+   },
+   {
+    "class": "needle_valve",
+    "box": [
+     1256.0,
+     918.0,
+     1355.0,
+     1067.0
+    ],
+    "panel": "233_jpg.rf.24e421e15013e84c38c2ad84ac06aae6.jpg"
+   },
+   {
+    "class": "diaphragm_valve",
+    "box": [
+     1241.0,
+     1120.0,
+     1338.0,
+     1305.0
+    ],
+    "panel": "233_jpg.rf.24e421e15013e84c38c2ad84ac06aae6.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1509.0,
+     887.0,
+     1551.0,
+     954.0
+    ],
+    "panel": "986_png_jpg.rf.8d09b8e1b7c6d6e48f587fc561d3d251.jpg"
+   },
+   {
+    "class": "relief_valve",
+    "box": [
+     1464.0,
+     1033.0,
+     1530.0,
+     1146.0
+    ],
+    "panel": "986_png_jpg.rf.8d09b8e1b7c6d6e48f587fc561d3d251.jpg"
+   },
+   {
+    "class": "relief_valve",
+    "box": [
+     2025.0,
+     1018.0,
+     2067.0,
+     1096.0
+    ],
+    "panel": "986_png_jpg.rf.8d09b8e1b7c6d6e48f587fc561d3d251.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1497.0,
+     1263.0,
+     1545.0,
+     1329.0
+    ],
+    "panel": "986_png_jpg.rf.8d09b8e1b7c6d6e48f587fc561d3d251.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1566.0,
+     1307.0,
+     1589.0,
+     1370.0
+    ],
+    "panel": "986_png_jpg.rf.8d09b8e1b7c6d6e48f587fc561d3d251.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1842.0,
+     1334.0,
+     1865.0,
+     1406.0
+    ],
+    "panel": "986_png_jpg.rf.8d09b8e1b7c6d6e48f587fc561d3d251.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1971.0,
+     1296.0,
+     2009.0,
+     1367.0
+    ],
+    "panel": "986_png_jpg.rf.8d09b8e1b7c6d6e48f587fc561d3d251.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1888.0,
+     1201.0,
+     1916.0,
+     1259.0
+    ],
+    "panel": "986_png_jpg.rf.8d09b8e1b7c6d6e48f587fc561d3d251.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1892.0,
+     966.0,
+     1917.0,
+     1026.0
+    ],
+    "panel": "986_png_jpg.rf.8d09b8e1b7c6d6e48f587fc561d3d251.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1892.0,
+     827.0,
+     1920.0,
+     895.0
+    ],
+    "panel": "986_png_jpg.rf.8d09b8e1b7c6d6e48f587fc561d3d251.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1982.0,
+     882.0,
+     2027.0,
+     937.0
+    ],
+    "panel": "986_png_jpg.rf.8d09b8e1b7c6d6e48f587fc561d3d251.jpg"
+   },
+   {
+    "class": "relief_valve",
+    "box": [
+     1749.0,
+     770.0,
+     1809.0,
+     870.0
+    ],
+    "panel": "986_png_jpg.rf.8d09b8e1b7c6d6e48f587fc561d3d251.jpg"
+   }
+  ]
+ },
+ {
+  "sheet": "complex_05.png",
+  "tier": "complex",
+  "width": 4220,
+  "height": 1560,
+  "panels": [
+   "226_jpg.rf.857780e82f6e496a92757ec76f1b5716.jpg",
+   "88_jpg.rf.78134a8941c37e13da3f281fadb68f64.jpg",
+   "184_png_jpg.rf.3a0cf031a2016252683adc673e6c7049.jpg",
+   "213_jpg.rf.0bff98b89eb2dc18aa0574d0d793cf0a.jpg",
+   "184_jpg.rf.b5a1ab6a5fbc836efe36c2f18feb0c11.jpg",
+   "process-p-id-diagram_46_png_jpg.rf.adf33509b0ab1b1600497c8dfb313e4a.jpg",
+   "120_jpg.rf.5303f02bed2273cbced45f0152fb79b6.jpg",
+   "different-types-of-p-id-diagram_72_png_jpg.rf.a9fdd88a753926a511ed88c5492aba86.jpg"
+  ],
+  "symbols": [
+   {
+    "class": "gate_valve",
+    "box": [
+     191.0,
+     110.0,
+     243.0,
+     202.0
+    ],
+    "panel": "226_jpg.rf.857780e82f6e496a92757ec76f1b5716.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     190.0,
+     223.0,
+     250.0,
+     300.0
+    ],
+    "panel": "226_jpg.rf.857780e82f6e496a92757ec76f1b5716.jpg"
+   },
+   {
+    "class": "ball_valve",
+    "box": [
+     194.0,
+     315.0,
+     242.0,
+     372.0
+    ],
+    "panel": "226_jpg.rf.857780e82f6e496a92757ec76f1b5716.jpg"
+   },
+   {
+    "class": "plug_valve",
+    "box": [
+     198.0,
+     405.0,
+     244.0,
+     470.0
+    ],
+    "panel": "226_jpg.rf.857780e82f6e496a92757ec76f1b5716.jpg"
+   },
+   {
+    "class": "butterfly_valve",
+    "box": [
+     197.0,
+     496.0,
+     238.0,
+     548.0
+    ],
+    "panel": "226_jpg.rf.857780e82f6e496a92757ec76f1b5716.jpg"
+   },
+   {
+    "class": "check_valve",
+    "box": [
+     194.0,
+     603.0,
+     248.0,
+     667.0
+    ],
+    "panel": "226_jpg.rf.857780e82f6e496a92757ec76f1b5716.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     387.0,
+     110.0,
+     454.0,
+     187.0
+    ],
+    "panel": "226_jpg.rf.857780e82f6e496a92757ec76f1b5716.jpg"
+   },
+   {
+    "class": "needle_valve",
+    "box": [
+     397.0,
+     315.0,
+     450.0,
+     385.0
+    ],
+    "panel": "226_jpg.rf.857780e82f6e496a92757ec76f1b5716.jpg"
+   },
+   {
+    "class": "diaphragm_valve",
+    "box": [
+     396.0,
+     486.0,
+     452.0,
+     554.0
+    ],
+    "panel": "226_jpg.rf.857780e82f6e496a92757ec76f1b5716.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     403.0,
+     563.0,
+     447.0,
+     718.0
+    ],
+    "panel": "226_jpg.rf.857780e82f6e496a92757ec76f1b5716.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     670.0,
+     121.0,
+     714.0,
+     205.0
+    ],
+    "panel": "226_jpg.rf.857780e82f6e496a92757ec76f1b5716.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     679.0,
+     212.0,
+     717.0,
+     305.0
+    ],
+    "panel": "226_jpg.rf.857780e82f6e496a92757ec76f1b5716.jpg"
+   },
+   {
+    "class": "angle_valve",
+    "box": [
+     682.0,
+     325.0,
+     716.0,
+     386.0
+    ],
+    "panel": "226_jpg.rf.857780e82f6e496a92757ec76f1b5716.jpg"
+   },
+   {
+    "class": "actuator",
+    "box": [
+     1036.0,
+     160.0,
+     1193.0,
+     670.0
+    ],
+    "panel": "88_jpg.rf.78134a8941c37e13da3f281fadb68f64.jpg"
+   },
+   {
+    "class": "relief_valve",
+    "box": [
+     1599.0,
+     143.0,
+     1663.0,
+     267.0
+    ],
+    "panel": "184_png_jpg.rf.3a0cf031a2016252683adc673e6c7049.jpg"
+   },
+   {
+    "class": "relief_valve",
+    "box": [
+     1926.0,
+     151.0,
+     2002.0,
+     267.0
+    ],
+    "panel": "184_png_jpg.rf.3a0cf031a2016252683adc673e6c7049.jpg"
+   },
+   {
+    "class": "pipe_fitting",
+    "box": [
+     1553.0,
+     363.0,
+     1603.0,
+     399.0
+    ],
+    "panel": "184_png_jpg.rf.3a0cf031a2016252683adc673e6c7049.jpg"
+   },
+   {
+    "class": "pipe_fitting",
+    "box": [
+     1976.0,
+     364.0,
+     2034.0,
+     402.0
+    ],
+    "panel": "184_png_jpg.rf.3a0cf031a2016252683adc673e6c7049.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1951.0,
+     404.0,
+     1984.0,
+     482.0
+    ],
+    "panel": "184_png_jpg.rf.3a0cf031a2016252683adc673e6c7049.jpg"
+   },
+   {
+    "class": "relief_valve",
+    "box": [
+     1755.0,
+     374.0,
+     1787.0,
+     451.0
+    ],
+    "panel": "184_png_jpg.rf.3a0cf031a2016252683adc673e6c7049.jpg"
+   },
+   {
+    "class": "relief_valve",
+    "box": [
+     1593.0,
+     402.0,
+     1642.0,
+     490.0
+    ],
+    "panel": "184_png_jpg.rf.3a0cf031a2016252683adc673e6c7049.jpg"
+   },
+   {
+    "class": "ball_valve",
+    "box": [
+     1735.0,
+     271.0,
+     1788.0,
+     364.0
+    ],
+    "panel": "184_png_jpg.rf.3a0cf031a2016252683adc673e6c7049.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     2243.0,
+     305.0,
+     2313.0,
+     381.0
+    ],
+    "panel": "213_jpg.rf.0bff98b89eb2dc18aa0574d0d793cf0a.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     2580.0,
+     314.0,
+     2660.0,
+     385.0
+    ],
+    "panel": "213_jpg.rf.0bff98b89eb2dc18aa0574d0d793cf0a.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     2308.0,
+     423.0,
+     2367.0,
+     535.0
+    ],
+    "panel": "213_jpg.rf.0bff98b89eb2dc18aa0574d0d793cf0a.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     2529.0,
+     422.0,
+     2581.0,
+     539.0
+    ],
+    "panel": "213_jpg.rf.0bff98b89eb2dc18aa0574d0d793cf0a.jpg"
+   },
+   {
+    "class": "globe_valve",
+    "box": [
+     2371.0,
+     152.0,
+     2484.0,
+     410.0
+    ],
+    "panel": "213_jpg.rf.0bff98b89eb2dc18aa0574d0d793cf0a.jpg"
+   },
+   {
+    "class": "relief_valve",
+    "box": [
+     2959.0,
+     143.0,
+     3023.0,
+     267.0
+    ],
+    "panel": "184_jpg.rf.b5a1ab6a5fbc836efe36c2f18feb0c11.jpg"
+   },
+   {
+    "class": "relief_valve",
+    "box": [
+     3286.0,
+     151.0,
+     3362.0,
+     267.0
+    ],
+    "panel": "184_jpg.rf.b5a1ab6a5fbc836efe36c2f18feb0c11.jpg"
+   },
+   {
+    "class": "pipe_fitting",
+    "box": [
+     2913.0,
+     363.0,
+     2963.0,
+     399.0
+    ],
+    "panel": "184_jpg.rf.b5a1ab6a5fbc836efe36c2f18feb0c11.jpg"
+   },
+   {
+    "class": "pipe_fitting",
+    "box": [
+     3336.0,
+     364.0,
+     3394.0,
+     402.0
+    ],
+    "panel": "184_jpg.rf.b5a1ab6a5fbc836efe36c2f18feb0c11.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     3311.0,
+     404.0,
+     3344.0,
+     482.0
+    ],
+    "panel": "184_jpg.rf.b5a1ab6a5fbc836efe36c2f18feb0c11.jpg"
+   },
+   {
+    "class": "relief_valve",
+    "box": [
+     3115.0,
+     374.0,
+     3147.0,
+     451.0
+    ],
+    "panel": "184_jpg.rf.b5a1ab6a5fbc836efe36c2f18feb0c11.jpg"
+   },
+   {
+    "class": "relief_valve",
+    "box": [
+     2953.0,
+     402.0,
+     3002.0,
+     490.0
+    ],
+    "panel": "184_jpg.rf.b5a1ab6a5fbc836efe36c2f18feb0c11.jpg"
+   },
+   {
+    "class": "ball_valve",
+    "box": [
+     3095.0,
+     271.0,
+     3148.0,
+     364.0
+    ],
+    "panel": "184_jpg.rf.b5a1ab6a5fbc836efe36c2f18feb0c11.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     3641.0,
+     191.0,
+     3718.0,
+     295.0
+    ],
+    "panel": "process-p-id-diagram_46_png_jpg.rf.adf33509b0ab1b1600497c8dfb313e4a.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     3721.0,
+     445.0,
+     3783.0,
+     515.0
+    ],
+    "panel": "process-p-id-diagram_46_png_jpg.rf.adf33509b0ab1b1600497c8dfb313e4a.jpg"
+   },
+   {
+    "class": "pipe_fitting",
+    "box": [
+     245.0,
+     1033.0,
+     260.0,
+     1076.0
+    ],
+    "panel": "120_jpg.rf.5303f02bed2273cbced45f0152fb79b6.jpg"
+   },
+   {
+    "class": "pipe_fitting",
+    "box": [
+     149.0,
+     862.0,
+     183.0,
+     887.0
+    ],
+    "panel": "120_jpg.rf.5303f02bed2273cbced45f0152fb79b6.jpg"
+   },
+   {
+    "class": "pipe_fitting",
+    "box": [
+     354.0,
+     935.0,
+     372.0,
+     983.0
+    ],
+    "panel": "120_jpg.rf.5303f02bed2273cbced45f0152fb79b6.jpg"
+   },
+   {
+    "class": "pipe_fitting",
+    "box": [
+     210.0,
+     1152.0,
+     225.0,
+     1195.0
+    ],
+    "panel": "120_jpg.rf.5303f02bed2273cbced45f0152fb79b6.jpg"
+   },
+   {
+    "class": "pipe_fitting",
+    "box": [
+     154.0,
+     1243.0,
+     179.0,
+     1264.0
+    ],
+    "panel": "120_jpg.rf.5303f02bed2273cbced45f0152fb79b6.jpg"
+   },
+   {
+    "class": "pump",
+    "box": [
+     955.0,
+     1195.0,
+     1014.0,
+     1263.0
+    ],
+    "panel": "different-types-of-p-id-diagram_72_png_jpg.rf.a9fdd88a753926a511ed88c5492aba86.jpg"
+   },
+   {
+    "class": "flow_instrument",
+    "box": [
+     1034.0,
+     1173.0,
+     1071.0,
+     1250.0
+    ],
+    "panel": "different-types-of-p-id-diagram_72_png_jpg.rf.a9fdd88a753926a511ed88c5492aba86.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1094.0,
+     1175.0,
+     1121.0,
+     1221.0
+    ],
+    "panel": "different-types-of-p-id-diagram_72_png_jpg.rf.a9fdd88a753926a511ed88c5492aba86.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1200.0,
+     1120.0,
+     1227.0,
+     1165.0
+    ],
+    "panel": "different-types-of-p-id-diagram_72_png_jpg.rf.a9fdd88a753926a511ed88c5492aba86.jpg"
+   },
+   {
+    "class": "gate_valve",
+    "box": [
+     1197.0,
+     1052.0,
+     1224.0,
+     1098.0
+    ],
+    "panel": "different-types-of-p-id-diagram_72_png_jpg.rf.a9fdd88a753926a511ed88c5492aba86.jpg"
+   },
+   {
+    "class": "flow_instrument",
+    "box": [
+     1197.0,
+     909.0,
+     1223.0,
+     944.0
+    ],
+    "panel": "different-types-of-p-id-diagram_72_png_jpg.rf.a9fdd88a753926a511ed88c5492aba86.jpg"
+   }
+  ]
+ }
+]

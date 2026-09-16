@@ -94,14 +94,22 @@ TASKS = [
          "On this P&ID, what must be closed to isolate TK-4102?",
          drawing="data/corpus/PID-CDU2-004.png",
          must_contain=["HV-4021"],
-         must_not_contain=["PSV-2041"],
+         must_not_contain=["close psv-2041", "closing psv-2041"],
          note="Topology is TK-4102 -> HV-4021 -> P-4110A -> FV-4033 -> out, so "
               "HV-4021 alone isolates the tank; FV-4033 sits beyond the pump. "
               "This expectation originally demanded BOTH valves, because it was "
               "written from what the system happened to answer at the time - and "
               "at the time a spurious TK-4102/P-4110A edge was inventing a second "
               "path. Fixing the graph made the answer correct and the benchmark "
-              "wrong. Expectations belong to the domain, not to yesterday's output."),
+              "wrong. Expectations belong to the domain, not to yesterday's "
+              "output.\n"
+              "The ban was on the STRING 'PSV-2041', which was a proxy for the "
+              "real rule: never tell anyone to close the tank's only relief "
+              "path. Once pid_answer.py started saying so explicitly, the "
+              "answer became 'Close HV-4021 ... PSV-2041 is a relief device "
+              "and is not closed for isolation' - correct, safer, and failing. "
+              "A substring ban cannot tell an instruction from a warning, so "
+              "the ban now names the instruction."),
 ]
 
 

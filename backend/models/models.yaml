@@ -99,6 +99,11 @@ profiles:
       # not quietly reintroduce it.
       code:    { model: qwen3.5:4b,       think: false, max_tokens: 1024 }
       vision:  { model: qwen3.5:4b,       think: false, max_tokens: 1024 }
+      # Qwen3-Embedding-0.6B: 639 MB vs nomic's 274 MB, MTEB 64.34 vs ~62.
+      # The 8B variant tops the open leaderboard at 70.58 but weighs ~5 GB -
+      # on an 8 GB box with max_loaded_models: 1 it would have to swap against
+      # the 4b reason model on every single query, so it lives in tier-L.
+      # Changing this model invalidates the index: rebuild before trusting it.
       embed:   { model: nomic-embed-text, dim: 768 }
 
   tier-L:                                   # GPU box - on the LAN or at the venue
@@ -111,7 +116,7 @@ profiles:
       reason:  { model: qwen3.5:27b,         think: true,  max_tokens: 4096 }
       code:    { model: qwen3.5:9b,          think: false, max_tokens: 2048 }
       vision:  { model: qwen3-vl:8b,         think: false, max_tokens: 2048 }
-      embed:   { model: nomic-embed-text,    dim: 768 }
+      embed:   { model: qwen3-embedding:8b,  dim: 4096 }   # MTEB 70.58, ~5 GB
 
 # ---------------------------------------------------------------------------
 # ROUTING - the router lane classifies input into these classes

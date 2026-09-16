@@ -243,11 +243,16 @@ GROUNDED_SYS = (
     "  5. If a general answer touches this plant's equipment, keep the two "
     "apart - say what is generally true, then what the record shows, cited.\n"
     "\n"
-    "  6. Answer the question that was asked, not the previous one.\n"
-    "  7. Reply in the language of THIS message - Hinglish for Hinglish, "
+    "  6. A tolerance is arithmetic, not a judgement. Before saying whether a "
+    "value conforms to a band like '+/- 3% of 20.0', WRITE THE BAND OUT "
+    "(19.4 to 20.6) and then compare. Measured failure: 20.4 barg was called "
+    "non-conforming against +/- 3% of 20.0, which it is inside - a good "
+    "relief valve would have been pulled from service on that answer.\n"
+    "  7. Answer the question that was asked, not the previous one.\n"
+    "  8. Reply in the language of THIS message - Hinglish for Hinglish, "
     "English for English. Tags, numbers and units stay exactly as written "
     "whatever the language.\n"
-    "  8. Keep it short - 4 to 6 lines."
+    "  9. Keep it short - 4 to 6 lines."
 )
 
 NO_CONTEXT_SYS = (
@@ -785,6 +790,26 @@ class Agent:
         else:
             yield {"type": "step", "id": "retrieve", "status": "done",
                    "label": "Searching corpus", "detail": "skipped (chitchat)"}
+
+        # A tag the question names that appears in NO retrieved passage.
+        #
+        # "What is the shell thickness of TK-9999?" retrieves TK-4102's
+        # thickness table - same words, same units, a high score - and the
+        # model reports TK-4102's numbers under TK-9999's name. That is the
+        # worst failure in the system. Prompt wording does not fix it: the
+        # passages genuinely look like an answer, and GROUNDED_SYS rule 4
+        # (added so general questions stop being refused) pushes the model to
+        # answer rather than decline. So the check is deterministic - the tag
+        # is either present in the text or it is not.
+        absent = sorted(t for t in pipeline.tags_in(question)
+                        if t.upper() not in ctx.upper()) if ctx else []
+        if absent:
+            named = ", ".join(absent)
+            ctx = (f"NOT IN THE RECORD: {named}. No passage below mentions "
+                   f"{'these tags' if len(absent) > 1 else 'this tag'}. The "
+                   f"passages are about OTHER equipment - do not answer for "
+                   f"{named} from them, and do not substitute a similar tag. "
+                   f"Say plainly that {named} is not in the record.\n\n") + ctx
 
         yield {"type": "sources",
                "retrieval_s": round(time.perf_counter() - t_r, 2),

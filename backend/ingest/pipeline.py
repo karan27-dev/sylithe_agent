@@ -186,10 +186,55 @@ def _split(text: str, budget: int = CHUNK_CHARS,
     return parts
 
 
+# How much of the provenance line to keep. A cap, not a target - the line
+# exists to make the table findable, not to restate the document.
+MAX_CONTEXT_CHARS = 240
+
+
+def _context_line(source: Path, heading: str, text: str,
+                  doc_tags: list[str]) -> str:
+    """
+    The subject line a serialised table loses.
+
+    docling exports a table cell-by-cell as "<row>, <Column> = <value>. ", so
+    a UT survey becomes "Shell Course-1, Survey 15-Mar-2026 (mm) = 11.6." -
+    correct, complete, and containing neither the vessel's tag nor the word
+    thickness. Measured on the industry benchmark: asked for the Course-1
+    thickness of V-7101, that chunk did not reach the top 5, while the prose
+    chunk of the SAME document did. Retrieval had found the right report and
+    the wrong paragraph, so the agent truthfully said there was no survey.
+
+    Both retrieval paths fail on such a chunk for the same reason - it has no
+    subject. Tag boosting cannot fire because the tag is absent, and the
+    embedding of a grid of numbers sits far from a natural-language question.
+    tools/actions.py works around this for one task by bypassing ranked
+    retrieval entirely; this puts the subject back so every table benefits.
+
+    Prose is left alone. It already names its subject, and prefixing it would
+    only dilute the text that is doing the matching.
+
+    The line may say WHERE the table came from, never WHAT IT CONTAINS. A
+    first version also grafted on the document's other tags ("concerns V-7101,
+    E-7204"), which reads as harmless and is not: tools/actions.py decides
+    which documents mention a tag by searching chunk text, so a bulletin whose
+    rows never mention PSV-201 started being returned for a PSV-201 query. A
+    grafted tag is a claim about content, and claims must come from the
+    document, not from the chunker. Provenance only.
+    """
+    bits = [source.stem.replace("_", " ").strip()]
+    if heading:
+        bits.append(heading)
+    return " · ".join(bits)[:MAX_CONTEXT_CHARS]
+
+
 def _chunk_document(doc, source: Path) -> Iterator[Chunk]:
     """
     HierarchicalChunker gives a heading breadcrumb and needs no HF tokenizer,
     which is what the air gap requires.
+
+    Table chunks are given back the subject the serialiser drops - see
+    _context_line. That needs the whole document first, so chunks are
+    collected rather than streamed straight out.
     """
     from docling.chunking import HierarchicalChunker
 
@@ -231,6 +276,20 @@ def _chunk_document(doc, source: Path) -> Iterator[Chunk]:
             yield from flush()
 
     yield from flush()
+
+
+def _with_context(chunks: list[Chunk], source: Path) -> list[Chunk]:
+    """Graft the document's subject onto its tables. Prose is untouched."""
+    if not any(c.kind == "table" for c in chunks):
+        return chunks
+    out = []
+    for c in chunks:
+        if c.kind != "table":
+            out.append(c)
+            continue
+        line = _context_line(source, c.heading, c.text, [])
+        out.append(_mk(f"{line}\n{c.text}", source, c.page, c.heading, c.kind))
+    return out
 
 
 def _mk(text: str, source: Path, page: int, heading: str, kind: str) -> Chunk:
@@ -287,7 +346,7 @@ def convert(path: Path, converter=None) -> list[Chunk]:
     _quiet()
     converter = converter or _converter()
     res = converter.convert(str(path))
-    chunks = list(_chunk_document(res.document, path))
+    chunks = _with_context(list(_chunk_document(res.document, path)), path)
 
     # Refuse to index our own output. A generated approval note is a CONCLUSION
     # drawn from the corpus, not evidence in it. Indexed anyway, it competes

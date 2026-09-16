@@ -44,6 +44,34 @@ _ABOVE_WORDS = {"exceeds", "exceed", "is above", "is over",
 
 _NUMBER_TOKEN = re.compile(r"\b\d+(?:\.\d+)?\b")
 
+# "<value> ... +/- <tol>% ... <reference>" - a tolerance band, which a small
+# model states and then judges without ever computing.
+#
+# Root cause of the failure this fixes: asked whether PSV-7304 conformed, the
+# answer was "as-found 20.4 barg exceeds the requirement of +/- 3% around its
+# specified 20.0 barg, making it non-conforming". Every number is correct and
+# correctly sourced. The band is 19.4 to 20.6, so 20.4 is INSIDE it. The
+# model asserted the verdict without doing the multiplication - the same
+# shape of error as "76% exceeds 82%", one step further along.
+#
+# Note which way it is wrong: a conforming relief device was declared
+# non-conforming. In a plant that means a good valve is pulled and sent to
+# the shop. An over-strict answer is not a safe default; it is just a
+# different wrong answer.
+_BAND = re.compile(
+    r"(\d+(?:\.\d+)?)\s*(?:barg|bar|mm|degC)?\b[^.]{0,120}?"
+    r"(?:\+/-|\+\s*/\s*-|±|plus or minus)\s*(\d+(?:\.\d+)?)\s*%"
+    r"[^.]{0,120}?(\d+(?:\.\d+)?)\s*(?:barg|bar|mm|degC)?\b",
+    re.I,
+)
+
+# "non-conforming" contains "conforming", so the outside-words are tested
+# first and the inside test explicitly excludes a preceding negation.
+_OUTSIDE_WORDS = ("non-conform", "nonconform", "not conform", "does not meet",
+                  "outside", "exceeds", "fails", "failed", "breach")
+_INSIDE_WORDS = ("within", "conforms", "conforming", "acceptable",
+                 "satisfies", "meets")
+
 
 @dataclass
 class Issue:
@@ -81,6 +109,34 @@ def _check_relation(sentence: str) -> Issue | None:
     return None
 
 
+def _check_band(sentence: str) -> Issue | None:
+    stripped = re.sub(r"\[\d+\]", "", sentence)
+    m = _BAND.search(stripped)
+    if not m:
+        return None
+    value, tol, ref = (float(m.group(i)) for i in (1, 2, 3))
+    if ref == 0:
+        return None
+    low, high = ref * (1 - tol / 100), ref * (1 + tol / 100)
+    inside = low <= value <= high
+
+    low_s = stripped.lower()
+    claims_outside = any(w in low_s for w in _OUTSIDE_WORDS)
+    claims_inside = (not claims_outside
+                     and any(w in low_s for w in _INSIDE_WORDS))
+    if not claims_outside and not claims_inside:
+        return None                       # states the band, judges nothing
+    if inside == claims_inside:
+        return None
+
+    verdict = "inside" if inside else "outside"
+    return Issue(
+        sentence=sentence,
+        reason=(f"band check failed: +/-{tol:g}% of {ref:g} is "
+                f"{low:g} to {high:g}, so {value:g} is {verdict} the band"),
+    )
+
+
 def _check_unsupported_numbers(sentence: str, passage_text: str) -> Issue | None:
     # Citation markers ([1], [2], ...) are references, not claimed figures -
     # strip them before scanning, or every cited sentence flags itself on
@@ -110,10 +166,23 @@ def verify_claims(answer: str, passages: list[str]) -> list[Issue]:
     all_passage_text = "\n".join(passages)
     issues: list[Issue] = []
     for sentence in _split_sentences(answer):
+        band_issue = _check_band(sentence)
+        if band_issue:
+            issues.append(band_issue)
+            continue        # one flag per sentence is enough
+        if _BAND.search(re.sub(r"\[\d+\]", "", sentence)):
+            # A correctly worked band names numbers no passage contains: the
+            # band's own endpoints. Asked to write "+/- 3% of 20.0" out, the
+            # answer says "19.4 to 20.6" - derived, checkable, and absent from
+            # every source. The unsupported-number check flagged exactly the
+            # arithmetic we asked the model to show, so a right answer came
+            # back marked "needs review". A sentence whose band checks out has
+            # already been verified more strongly than that check can manage.
+            continue
         rel_issue = _check_relation(sentence)
         if rel_issue:
             issues.append(rel_issue)
-            continue        # one flag per sentence is enough
+            continue
         if re.search(r"\[\d+\]", sentence):
             num_issue = _check_unsupported_numbers(sentence, all_passage_text)
             if num_issue:

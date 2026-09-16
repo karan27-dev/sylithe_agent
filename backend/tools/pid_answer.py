@@ -66,6 +66,19 @@ def describe(image: str | Path, conf: float = 0.25) -> dict:
             lines.append(f"\nTO ISOLATE {t}, CLOSE exactly {len(iso)} "
                          f"valve(s): {', '.join(iso)}")
 
+    # One line per tag, and the question is about ONE of them.
+    #
+    # tier-S answered "close HV-4021" and stopped. tier-M reads the whole
+    # block and helpfully adds the neighbouring tags' lines too - so asked how
+    # to isolate TK-4102 it also named PSV-2041, the tank's only relief path.
+    # Telling a technician to close a relief device is a safety error, and the
+    # bigger model produced it precisely because it summarised more.
+    if tagged:
+        lines.append("\nEach TO ISOLATE line above answers exactly one tag. "
+                     "Answer only the line for the tag in the question. Do "
+                     "not mention other tags' isolation, and never list a "
+                     "relief device (PSV/PRV) as something to close.")
+
     return {"text": "\n".join(lines), "graph": g, "raw": r,
             "tags": sorted(tagged)}
 

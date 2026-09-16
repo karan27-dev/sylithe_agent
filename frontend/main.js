@@ -178,8 +178,6 @@ function addBotStatic(m){
 
 /* ---------- ask ---------- */
 
-const STEP_ICON = { running: '<span class="spin"></span>', done: "\u2713",
-                    warn: "!", fail: "\u2717" };
 const FILE_TAG = { docx: "DOC", xlsx: "XLS", pptx: "PPT" };
 
 function fileCard(f){
@@ -214,7 +212,7 @@ async function ask(){
   bot.innerHTML = `
     <div class="activity open">
       <div class="act-head"><span class="chev">\u203a</span>
-        <span class="lbl">Working</span><span class="el"></span></div>
+        <span class="lbl"><span class="shimmer">Working</span></span><span class="el"></span></div>
       <div class="act-body"></div>
     </div>
     <div class="prose"></div>
@@ -230,6 +228,14 @@ async function ask(){
         prose = bot.querySelector(".prose"),
         outEl = bot.querySelector(".outfiles"),
         meta  = bot.querySelector(".meta");
+
+  // The header doubles as the accordion label: shimmering while the run is
+  // live, plain once it has something final to say.
+  function lblText(txt, live){
+    const lbl = head.querySelector(".lbl");
+    lbl.innerHTML = live ? `<span class="shimmer"></span>` : "";
+    (live ? lbl.firstChild : lbl).textContent = txt;
+  }
 
   head.onclick = () => act.classList.toggle("open");
 
@@ -249,8 +255,10 @@ async function ask(){
       body.appendChild(row);
     }
     row.className = "stp " + ({running:"run",done:"done",warn:"warn",fail:"fail"}[ev.status]);
-    row.innerHTML = `<span class="ico">${STEP_ICON[ev.status]}</span>
-      <span class="nm">${esc(ev.label)}</span>
+    row.innerHTML = `<span class="rail"><span class="dot"></span>
+        <span class="line"></span></span>
+      <span class="nm">${ev.status === "running"
+        ? `<span class="shimmer">${esc(ev.label)}</span>` : esc(ev.label)}</span>
       <span class="dt">${ev.detail ? esc(ev.detail) : ""}</span>`;
     // The panel row IS the live indicator - it already carries a spinner and
     // the current label. A second standalone line below it showed the same
@@ -265,15 +273,14 @@ async function ask(){
 
   es.addEventListener("plan", e => {
     const d = JSON.parse(e.data);
-    head.querySelector(".lbl").textContent =
-      d.deliverable ? `Working \u00b7 will produce a ${d.deliverable.toUpperCase()} file`
-                    : "Working";
+    lblText(d.deliverable
+      ? `Working \u00b7 will produce a ${d.deliverable.toUpperCase()} file`
+      : "Working", true);
   });
 
   es.addEventListener("route", e => {
     const d = JSON.parse(e.data);
-    head.querySelector(".lbl").textContent =
-      head.querySelector(".lbl").textContent.replace("Working", d.model);
+    lblText(head.querySelector(".lbl").textContent.replace("Working", d.model), true);
   });
 
   es.addEventListener("sources", e => {
@@ -324,10 +331,10 @@ async function ask(){
       navigator.clipboard?.writeText(answer); toast("Copied");
     };
     wireSources(bot);
-    head.querySelector(".lbl").textContent =
-      (d.files && d.files.length)
-        ? `${d.model} \u00b7 produced ${d.files.length} file`
-        : d.model;
+    const nSteps = body.querySelectorAll(".stp").length;
+    lblText((d.files && d.files.length)
+      ? `${d.model} \u00b7 produced ${d.files.length} file`
+      : `${d.model} \u00b7 ${nSteps} step${nSteps === 1 ? "" : "s"}`, false);
     act.classList.remove("open");        // collapse once finished
     finish(); loadChats(); pollSov();
   });
@@ -344,7 +351,8 @@ async function ask(){
     bot.querySelectorAll(".caret").forEach(c => c.remove());
     bot.querySelectorAll(".stp.run").forEach(r => {
       r.className = "stp done";
-      r.querySelector(".ico").textContent = "\u2713";
+      const sh = r.querySelector(".nm .shimmer");
+      if(sh) sh.replaceWith(sh.textContent);
     });
     qEl.focus();
   }
@@ -480,7 +488,7 @@ function analyseFolder(path){
   bot.innerHTML = `
     <div class="activity open">
       <div class="act-head"><span class="chev">\u203a</span>
-        <span class="lbl">Reading ${esc(name)}</span><span class="el"></span></div>
+        <span class="lbl"><span class="shimmer">Reading ${esc(name)}</span></span><span class="el"></span></div>
       <div class="act-body"></div>
     </div>
     <div class="fprev" id="fscan" hidden></div>
@@ -493,6 +501,14 @@ function analyseFolder(path){
         body = bot.querySelector(".act-body"), elEl = bot.querySelector(".el"),
         fscan = bot.querySelector("#fscan"), prose = bot.querySelector(".prose"),
         meta = bot.querySelector(".meta");
+  // The header doubles as the accordion label: shimmering while the run is
+  // live, plain once it has something final to say.
+  function lblText(txt, live){
+    const lbl = head.querySelector(".lbl");
+    lbl.innerHTML = live ? `<span class="shimmer"></span>` : "";
+    (live ? lbl.firstChild : lbl).textContent = txt;
+  }
+
   head.onclick = () => act.classList.toggle("open");
 
   const t0 = Date.now();
@@ -505,8 +521,10 @@ function analyseFolder(path){
     if(!row){ row = document.createElement("div"); row.dataset.step = ev.id;
               body.appendChild(row); }
     row.className = "stp " + ({running:"run",done:"done",warn:"warn",fail:"fail"}[ev.status]);
-    row.innerHTML = `<span class="ico">${STEP_ICON[ev.status]}</span>
-      <span class="nm">${esc(ev.label)}</span>
+    row.innerHTML = `<span class="rail"><span class="dot"></span>
+        <span class="line"></span></span>
+      <span class="nm">${ev.status === "running"
+        ? `<span class="shimmer">${esc(ev.label)}</span>` : esc(ev.label)}</span>
       <span class="dt">${ev.detail ? esc(ev.detail) : ""}</span>`;
   }
 
@@ -550,7 +568,7 @@ function analyseFolder(path){
     meta.innerHTML = bits.map(b => `<span>${b}</span>`).join("");
     wireSources(bot);
     act.classList.remove("open");
-    head.querySelector(".lbl").textContent = `${esc(name)} \u00b7 ${d.files || 0} files`;
+    lblText(`${name} \u00b7 ${d.files || 0} files`, false);
     finish(); pollSov();
   });
 
@@ -561,7 +579,8 @@ function analyseFolder(path){
     bot.querySelectorAll(".caret").forEach(c => c.remove());
     bot.querySelectorAll(".stp.run").forEach(r => {
       r.className = "stp done";
-      r.querySelector(".ico").textContent = "\u2713";
+      const sh = r.querySelector(".nm .shimmer");
+      if(sh) sh.replaceWith(sh.textContent);
     });
     qEl.focus();
   }

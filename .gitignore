@@ -46,3 +46,12 @@ backend/data/pid_yolo/
 backend/data/pid_model/
 backend/data/pid_samples/
 backend/data/pid_dataset_colab.zip
+
+# Benchmark sheets are generated, deterministically, by
+#   python -m tools.make_pid_bench_real   (detection set)
+#   python -m tools.make_pid_bench        (structure set)
+# Both seed their RNG, so the images rebuild byte-identical from the scripts.
+# The ground truth, records and scores ARE committed - they are the benchmark;
+# the 13 MB of PNGs are just its rendering.
+backend/data/bench_pid/*.png
+backend/data/bench_pid_real/*.png

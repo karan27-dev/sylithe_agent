@@ -39,6 +39,16 @@ WEIGHTS = WEIGHTS_ONNX if WEIGHTS_ONNX.exists() else WEIGHTS_PT
 # 24 px ball valve back below what it learned to see.
 IMGSZ = 1024
 
+# Sheets wider (or taller) than this are cut into overlapping tiles instead of
+# being scaled down in one pass - see detect() for the measured difference.
+# 2048 is deliberately above any drawing that already fits comfortably, so
+# small test images keep the fast single-pass path.
+TILE_ABOVE = 2048
+TILE_PX = 1024          # matches IMGSZ: each tile runs at native resolution
+TILE_OVERLAP = 0.2      # a symbol on a tile seam still lands whole in one tile
+MAX_DET = 1000          # ultralytics defaults to 300; a dense sheet exceeds it
+OCR_TILE_PX = 1280      # text needs more context than a symbol does
+
 # ISA-style equipment and instrument tags: letters, then a loop number,
 # optionally a suffix letter for duplicates (P-4110A vs P-4110B).
 TAG = re.compile(r"\b([A-Z]{1,4})\s?[-–]\s?(\d{2,5})([A-Z])?\b")
@@ -113,8 +123,60 @@ def _engine():
     return _ocr
 
 
-def read_text(image: str | Path, min_score: float = 0.5) -> list[TextBox]:
-    """Every text box on the page, with its centre. One OCR pass."""
+def _ocr_boxes(src, min_score: float, dx: float = 0.0,
+               dy: float = 0.0) -> list[TextBox]:
+    res, _ = _engine()(src)
+    out = []
+    for box, txt, score in (res or []):
+        if score < min_score or not txt.strip():
+            continue
+        out.append(TextBox(
+            text=txt.strip(),
+            cx=sum(p[0] for p in box) / 4 + dx,
+            cy=sum(p[1] for p in box) / 4 + dy,
+            score=float(score)))
+    return out
+
+
+def read_text(image: str | Path, min_score: float = 0.5,
+              tile: bool | None = None) -> list[TextBox]:
+    """Every text box on the page, with its centre.
+
+    The detector was tiled first and the tags were left on a single pass, which
+    hid a second copy of the same bug. RapidOCR resizes internally to a few
+    hundred pixels on the long side, so on a 6400x4300 sheet a tag is a smear:
+    measured, the same reader returns 'TB-101', 'GV-102' on a 1600 px sheet and
+    'ere', '3 102', 'ze' on a 6400 px one - 0% of tags recovered. Symbols were
+    being found and then had no name, which makes an isolation answer
+    impossible however good detection is.
+    """
+    from PIL import Image
+
+    Image.MAX_IMAGE_PIXELS = None
+    img = Image.open(str(image)).convert("RGB")
+    w, h = img.size
+    if tile is None:
+        tile = max(w, h) > TILE_ABOVE
+    if not tile:
+        return _ocr_boxes(str(image), min_score)
+
+    import numpy as np
+
+    found: list[TextBox] = []
+    for x, y in _tiles(w, h, OCR_TILE_PX, TILE_OVERLAP):
+        crop = img.crop((x, y, min(x + OCR_TILE_PX, w), min(y + OCR_TILE_PX, h)))
+        found += _ocr_boxes(np.asarray(crop), min_score, x, y)
+
+    # The same tag read twice in an overlap is one tag, not two.
+    kept: list[TextBox] = []
+    for t in sorted(found, key=lambda z: -z.score):
+        if not any(o.text == t.text and abs(o.cx - t.cx) < OCR_TILE_PX * 0.1
+                   and abs(o.cy - t.cy) < OCR_TILE_PX * 0.1 for o in kept):
+            kept.append(t)
+    return kept
+
+
+def _read_text_unused(image: str | Path, min_score: float = 0.5) -> list[TextBox]:
     res, _ = _engine()(str(image))
     out = []
     for box, txt, score in (res or []):
@@ -174,23 +236,86 @@ def tags_only(boxes: list[TextBox]) -> list[TextBox]:
 # detection
 # ---------------------------------------------------------------------------
 
+def _iou(a: Symbol, b: Symbol) -> float:
+    x1, y1 = max(a.x1, b.x1), max(a.y1, b.y1)
+    x2, y2 = min(a.x2, b.x2), min(a.y2, b.y2)
+    inter = max(0.0, x2 - x1) * max(0.0, y2 - y1)
+    if inter <= 0:
+        return 0.0
+    ar = lambda s: (s.x2 - s.x1) * (s.y2 - s.y1)
+    return inter / (ar(a) + ar(b) - inter)
+
+
+def _dedupe(syms: list[Symbol], thr: float = 0.5) -> list[Symbol]:
+    """Overlapping tiles see the same symbol twice. Keep the confident copy."""
+    kept: list[Symbol] = []
+    for s in sorted(syms, key=lambda z: -z.conf):
+        if not any(_iou(s, k) > thr for k in kept):
+            kept.append(s)
+    return kept
+
+
+def _tiles(w: int, h: int, tile: int, overlap: float):
+    step = max(1, int(tile * (1 - overlap)))
+    ys = list(range(0, max(h - tile, 0) + step, step)) or [0]
+    xs = list(range(0, max(w - tile, 0) + step, step)) or [0]
+    for y in ys:
+        for x in xs:
+            yield min(x, max(w - tile, 0)), min(y, max(h - tile, 0))
+
+
 def detect(image: str | Path, weights: Path = WEIGHTS,
-           conf: float = 0.25) -> list[Symbol]:
-    """Stage 1. Returns [] with a clear message if the model is not trained."""
+           conf: float = 0.25, tile: bool | None = None) -> list[Symbol]:
+    """Stage 1. Returns [] with a clear message if the model is not trained.
+
+    A real plant P&ID is around 7168x4562. Handing that to a detector trained
+    at 1024 means the whole sheet is squeezed down by 7x, so a 40 px valve
+    arrives as 6 px and there is nothing left to recognise. Measured on 20
+    Digitize-PID val sheets (2497 symbols, class-agnostic, IoU 0.5):
+
+        whole sheet, one pass    recall 14.5%   precision 73.6%
+        overlapping tiles        recall 26.0%   precision 81.1%
+
+    Note precision goes UP. Tiling is not trading accuracy for recall - the
+    detector was never wrong, it was being shown a sheet it could not see.
+    The cost is time: one pass is ~0.5s, tiling ~23s on this machine.
+
+    Small drawings still take the single pass - they already fit, and tiling
+    them would only add latency.
+    """
     if not Path(weights).exists():
         return []
     import os
     os.environ.setdefault("YOLO_OFFLINE", "1")
+    from PIL import Image
     from ultralytics import YOLO
 
-    res = YOLO(str(weights), task="detect").predict(
-        str(image), imgsz=IMGSZ, conf=conf, verbose=False)
-    out = []
-    for r in res:
-        for b in r.boxes:
-            x1, y1, x2, y2 = (float(v) for v in b.xyxy[0])
-            out.append(Symbol(r.names[int(b.cls)], float(b.conf), x1, y1, x2, y2))
-    return out
+    Image.MAX_IMAGE_PIXELS = None          # plant sheets trip the bomb guard
+    img = Image.open(str(image)).convert("RGB")
+    w, h = img.size
+    if tile is None:
+        tile = max(w, h) > TILE_ABOVE
+
+    model = YOLO(str(weights), task="detect")
+
+    def run(src, dx: int = 0, dy: int = 0) -> list[Symbol]:
+        out = []
+        for r in model.predict(src, imgsz=IMGSZ, conf=conf,
+                               verbose=False, max_det=MAX_DET):
+            for b in r.boxes:
+                x1, y1, x2, y2 = (float(v) for v in b.xyxy[0])
+                out.append(Symbol(r.names[int(b.cls)], float(b.conf),
+                                  x1 + dx, y1 + dy, x2 + dx, y2 + dy))
+        return out
+
+    if not tile:
+        return run(str(image))
+
+    found: list[Symbol] = []
+    for x, y in _tiles(w, h, TILE_PX, TILE_OVERLAP):
+        crop = img.crop((x, y, min(x + TILE_PX, w), min(y + TILE_PX, h)))
+        found += run(crop, x, y)
+    return _dedupe(found)
 
 
 # ---------------------------------------------------------------------------

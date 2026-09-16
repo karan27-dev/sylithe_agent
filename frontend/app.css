@@ -344,3 +344,46 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
        transition:width .3s ease}
 
 
+
+/* ============ shimmer status ============
+   The "Agent is thinking..." line, as a light sweep across the text rather
+   than a spinner. Ported from a React/motion component: the original animated
+   background-position with a JS animation library, which here would mean npm,
+   a bundler and a build step on a machine that is meant to have none. The
+   effect is a moving gradient clipped to the text - CSS does that natively. */
+.shimmer{
+  display:inline-block;
+  background-image:
+    linear-gradient(90deg, transparent calc(50% - var(--sweep, 40px)),
+                    var(--shimmer-hi), transparent calc(50% + var(--sweep, 40px))),
+    linear-gradient(var(--shimmer-lo), var(--shimmer-lo));
+  background-repeat:no-repeat, padding-box;
+  background-size:250% 100%, auto;
+  -webkit-background-clip:text; background-clip:text;
+  color:transparent;
+  animation:shimmer 2s linear infinite;
+}
+:root{ --shimmer-lo:#a8a69e; --shimmer-hi:#1f1e1d; }
+:root:not([data-theme="light"]) { --shimmer-lo:#6c6a64; --shimmer-hi:#f5f4ef; }
+[data-theme="dark"]{ --shimmer-lo:#6c6a64; --shimmer-hi:#f5f4ef; }
+[data-theme="light"]{ --shimmer-lo:#a8a69e; --shimmer-hi:#1f1e1d; }
+@keyframes shimmer{ from{background-position:100% center} to{background-position:0% center} }
+@media (prefers-reduced-motion: reduce){
+  .shimmer{ animation:none; color:var(--dim); background:none; }
+}
+
+/* ---- reasoning timeline: a dot per step, joined by a line ---- */
+.stp{position:relative}
+.act-body{padding-left:4px}
+.stp .rail{width:14px;flex:none;margin-block:-6px;padding-top:9px;
+           display:flex;flex-direction:column;
+           align-items:center;align-self:stretch}
+.stp .dot{width:7px;height:7px;border-radius:50%;background:var(--line2);flex:none}
+.stp.run .dot{background:var(--accent);
+              box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent)}
+.stp.done .dot{background:var(--ok)}
+.stp.warn .dot{background:var(--warn)}
+.stp.fail .dot{background:var(--bad)}
+.stp .line{width:2px;flex:1;min-height:6px;background:var(--line);
+           border-radius:2px;margin-top:3px}
+.stp:last-child .line{background:linear-gradient(to bottom,var(--line),transparent)}

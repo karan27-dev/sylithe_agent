@@ -1,0 +1,5 @@
+tag,service_class,specified_set_barg,as_found_barg,as_left_barg,test_date,certificate
+PSV-7301,Class-A,20.0,18.2,20.0,2026-02-11,PSVC-2026-0331
+PSV-7302,Class-A,20.0,15.4,20.0,2026-02-11,PSVC-2026-0332
+PSV-7303,Class-B,16.0,15.8,16.0,2026-02-12,PSVC-2026-0333
+PSV-7304,Class-A,20.0,20.4,20.0,2026-02-12,PSVC-2026-0334

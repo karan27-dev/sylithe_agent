@@ -1,0 +1,4 @@
+ncr,raised,equipment,description,status,closed,reference
+NCR-2026-0412,2026-02-13,PSV-7302,As-found set pressure 15.4 barg against specified 20.0 barg - outside +/-3% band per SOP-7201 Rev 3. No deviation in force.,OPEN,,PSVC-2026-0332
+NCR-2026-0408,2026-01-27,V-7101,Course-1 thickness approaching t-min - monitor at reduced interval.,OPEN,,IR-2026-7101
+NCR-2025-0377,2025-11-04,P-7110B,Mechanical seal leak - seal replaced and unit returned to service.,CLOSED,2025-11-09,WO-2025-8841

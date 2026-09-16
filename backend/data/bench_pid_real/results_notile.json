@@ -1,0 +1,54 @@
+{
+ "easy": {
+  "sheets": 5.0,
+  "gt": 49.0,
+  "pred": 45.0,
+  "hit": 39.0,
+  "cls": 37.0,
+  "gt_tags": 0.0,
+  "tag_hit": 0.0,
+  "gt_edges": 0.0,
+  "edge_hit": 0.0,
+  "pred_edges": 25.0,
+  "sec": 18.568722625997907
+ },
+ "hard": {
+  "sheets": 5.0,
+  "gt": 86.0,
+  "pred": 47.0,
+  "hit": 34.0,
+  "cls": 33.0,
+  "gt_tags": 0.0,
+  "tag_hit": 0.0,
+  "gt_edges": 0.0,
+  "edge_hit": 0.0,
+  "pred_edges": 55.0,
+  "sec": 27.52826983399791
+ },
+ "very_hard": {
+  "sheets": 5.0,
+  "gt": 141.0,
+  "pred": 91.0,
+  "hit": 73.0,
+  "cls": 61.0,
+  "gt_tags": 0.0,
+  "tag_hit": 0.0,
+  "gt_edges": 0.0,
+  "edge_hit": 0.0,
+  "pred_edges": 61.0,
+  "sec": 27.666874916998495
+ },
+ "complex": {
+  "sheets": 5.0,
+  "gt": 220.0,
+  "pred": 56.0,
+  "hit": 39.0,
+  "cls": 30.0,
+  "gt_tags": 0.0,
+  "tag_hit": 0.0,
+  "gt_edges": 0.0,
+  "edge_hit": 0.0,
+  "pred_edges": 25.0,
+  "sec": 24.040044957997452
+ }
+}

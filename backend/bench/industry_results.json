@@ -1,0 +1,152 @@
+{
+ "passed": 17,
+ "total": 18,
+ "results": [
+  {
+   "id": "thickness",
+   "question": "What is the Course-1 shell thickness of V-7101 in the 2026 survey?",
+   "passed": true,
+   "fails": [],
+   "seconds": 30.2,
+   "answer": "The Course-1 shell thickness of V-7101 in the 15-Mar-2026 survey is 11.6 mm [1]. This value is within the minimum allowable thickness of 11.0 mm per API 510, though it is approaching the limit as noted in NCR-2026-0408 [4]."
+  },
+  {
+   "id": "design-press",
+   "question": "What is the design pressure of V-7101?",
+   "passed": true,
+   "fails": [],
+   "seconds": 28.3,
+   "answer": "The design pressure of V-7101 is 21.0 barg [1]. This matches the design pressure for its associated line P-7105-A1A [3]."
+  },
+  {
+   "id": "line-material",
+   "question": "What material is line 12\"-P-7105-A1A?",
+   "passed": true,
+   "fails": [],
+   "seconds": 27.6,
+   "answer": "The material for line 12\"-P-7105-A1A is A106 Gr B [1]. This is a standard carbon steel often used for high-pressure steam or hot services, which matches the line's design temperature of 165\u00b0C and service as overhead vapour."
+  },
+  {
+   "id": "corrosion-rate",
+   "question": "Using both UT surveys, what is the corrosion rate of V-7101 Course-1 in mm per year?",
+   "passed": false,
+   "fails": [
+    "missing ['0.3']"
+   ],
+   "seconds": 34.3,
+   "answer": "The corrosion rate for V-7101 Course-1 is 0.42 mm/yr. Over the 5-year interval from March 2021 to March 2026, the thickness dropped from 13.1 mm to 11.6 mm, a loss of 1.5 mm [1]. Dividing this loss by 5 years gives the rate [1]. This calculation uses the full history rather than just the latest inte"
+  },
+  {
+   "id": "remaining-life",
+   "question": "At that corrosion rate, how many years until V-7101 Course-1 reaches t-min?",
+   "passed": true,
+   "fails": [],
+   "seconds": 33.3,
+   "answer": "The corrosion rate for V-7101 Course-1 is 0.4 mm/yr [1]. The remaining life until reaching the minimum required thickness of 11.0 mm [2] is exactly 2.0 years, calculated as (11.6 mm - 11.0 mm) / 0.4 mm/yr. This assumes the current measured thickness of 11.6 mm from the March 2026 survey remains accu"
+  },
+  {
+   "id": "psv-7304",
+   "question": "Does the as-found set pressure of PSV-7304 conform to the current procedure?",
+   "passed": true,
+   "fails": [],
+   "seconds": 33.4,
+   "answer": "PSV-7304's as-found set pressure was 20.4 barg [3], which falls within the required band of 19.4 to 20.6 barg (\u00b13% of 20.0). This conforms to SOP-7201 Rev 3 clause 4.2, which mandates that as-found pressures must stay within \u00b13% of the specified set pressure [4]. No NCR was raised for this unit duri"
+  },
+  {
+   "id": "psv-7302",
+   "question": "Is PSV-7302 acceptable? Cite the NCR if there is one.",
+   "passed": true,
+   "fails": [],
+   "seconds": 34.8,
+   "answer": "PSV-7302 is NOT acceptable because its as-found set pressure of 15.4 barg [4] falls below the SOP-7201 Rev 3 requirement of 20.0 barg (tolerance band: 19.4 to 20.6 barg) [2]. This non-conformance was formally raised as NCR-2026-0412 [2], which remains OPEN with no deviation in force allowing its con"
+  },
+  {
+   "id": "psv-7301-moc",
+   "question": "PSV-7301 was found at 18.2 barg against a specified 20.0 barg. Is that acceptable right now?",
+   "passed": true,
+   "fails": [],
+   "seconds": 39.4,
+   "answer": "Yes, it is acceptable right now because MOC-2026-044 explicitly approves an as-found pressure of not less than 18.0 barg for PSV-7301 [2]. This temporary deviation overrides the SOP-7201 Rev 3 requirement of 20.0 barg, which would normally make 18.2 barg non-conforming [2]. The approval is valid unt"
+  },
+  {
+   "id": "psv-7301-expiry",
+   "question": "Until what date is the PSV-7301 deviation valid?",
+   "passed": true,
+   "fails": [],
+   "seconds": 34.6,
+   "answer": "The PSV-7301 temporary deviation approval (MOC-2026-044) is valid until 30-Jun-2026 [3]. This allows its as-found set pressure of 18.2 barg to be accepted instead of the SOP requirement of 20.0 barg, based on a re-rated accumulator envelope [3]. The approval expires on 30-Jun-2027, after which it mu"
+  },
+  {
+   "id": "moc-scope",
+   "question": "Does MOC-2026-044 also cover PSV-7302?",
+   "passed": true,
+   "fails": [],
+   "seconds": 28.2,
+   "answer": "No, MOC-2026-044 only covers PSV-7301; it does not include PSV-7302 [1]. The record shows NCR-2026-0412 was raised specifically against PSV-7302 for its low set pressure of 15.4 barg, which is below the typical Class-A requirement of 20.0 barg [2]."
+  },
+  {
+   "id": "current-rev",
+   "question": "Which revision of SOP-7201 must I use for an assessment dated today, and what is the Class-A minimum set pressure?",
+   "passed": true,
+   "fails": [],
+   "seconds": 30.4,
+   "answer": "You must use **SOP-7201 Rev 3** [1] because it is current as of 01-Jan-2026. The Class-A minimum set pressure requirement is **20.0 barg**. Note that PSV-7301 has a temporary deviation allowing 18.0 barg until 30-Jun-2027 [3], but the standard requirement remains 20.0 barg for all other devices like"
+  },
+  {
+   "id": "rev2-status",
+   "question": "Is SOP-7201 Rev 2 still valid?",
+   "passed": true,
+   "fails": [],
+   "seconds": 25.3,
+   "answer": "No, SOP-7201 Rev 2 is not valid; it was superseded on 01-Jan-2026 by the current Rev 3 [1]. Only Rev 3 applies to new assessments from that date forward."
+  },
+  {
+   "id": "refuse-e7204",
+   "question": "What is the measured shell thickness of E-7204?",
+   "passed": true,
+   "fails": [],
+   "seconds": 30.1,
+   "answer": "The measured shell thickness of E-7204 is not in the record because the ultrasonic survey was never carried out due to unavailable scaffolding [1]. Generally, you need a baseline thickness before assessing corrosion rates or setting inspection intervals. Without this data, we cannot determine if the"
+  },
+  {
+   "id": "why-no-e7204",
+   "question": "Why is there no thickness data for E-7204?",
+   "passed": true,
+   "fails": [],
+   "seconds": 30.7,
+   "answer": "There is no thickness data for heat exchanger E-7204 because scaffolding was unavailable to carry out the survey [1]. This gap exists in both the current inspection report and any previous records [1]. Generally, a UT survey requires physical access to the vessel shell; without scaffolding, the equi"
+  },
+  {
+   "id": "ncr-to-wo",
+   "question": "Which work order covers NCR-2026-0412?",
+   "passed": true,
+   "fails": [],
+   "seconds": 34.0,
+   "answer": "The work order covering NCR-2026-0412 is WO-2026-9104 [1]. This P1 priority order, raised on 2026-02-13, specifically addresses the replacement of PSV-7302 because its as-found set pressure of 15.4 barg was non-conforming against the specified 20.0 barg band (19.4 to 20.6) per SOP-7201 Rev 3 [2]. Th"
+  },
+  {
+   "id": "hazop-owner",
+   "question": "Who owns HAZOP action H-7-18 and when is it due?",
+   "passed": true,
+   "fails": [],
+   "seconds": 27.5,
+   "answer": "HAZOP action **H-7-18** is owned by **A. Menon** [1] and is due on **2026-10-15** [1]. This task requires replacing PSV-7302 and closing NCR-2026-0412 before the next startup, and its current status is OPEN [1]."
+  },
+  {
+   "id": "open-ncrs",
+   "question": "List the NCRs that are still open.",
+   "passed": true,
+   "fails": [],
+   "seconds": 29.4,
+   "answer": "The open NCRs are:\n*   **NCR-2026-0412** for PSV-7302 (set pressure 15.4 barg vs specified 20.0 barg) [1].\n*   **NCR-2026-0408** for V-7101 (course-1 thickness approaching t-min) [1].\n\nBoth remain OPEN with no closure dates recorded yet [1]."
+  },
+  {
+   "id": "deliverable",
+   "question": "Produce an XLSX summarising every PSV on CDU-7 with its specified and as-found set pressure and whether it conforms.",
+   "passed": true,
+   "fails": [],
+   "seconds": 59.0,
+   "answer": "I cannot produce an XLSX file directly in this chat interface, but I can provide the summarized data below that you can copy into Excel.\n\n**PSV-7301 (CDU-7)**: Specified 20.0 barg [1], As-found 18.0 barg [1]. It conforms due to a temporary deviation approval for this specific unit only [1].\n**Other "
+  }
+ ]
+}
