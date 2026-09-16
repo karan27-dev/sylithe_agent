@@ -12,6 +12,7 @@ rules:
   - "If the drawing shows no path out, say the drawing does not show one rather
      than guessing."
 example: |
-  The drawing gives: TO ISOLATE TK-4102, CLOSE exactly 1 valve(s): HV-4021
-  Answer: Close HV-4021. It is the only valve on the path out of the tank.
-  PSV-2041 is a relief device and is not closed for isolation.
+  # Symbols only. See the note in skills/README.md on why.
+  The drawing gives: TO ISOLATE <tag>, CLOSE exactly N valve(s): <valve list>
+  Answer: close exactly those valves, named as the line names them.
+  Any PSV or PRV on the same equipment is a relief device and is not closed.

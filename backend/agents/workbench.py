@@ -983,15 +983,26 @@ class Agent:
             # its own because the model never mentioned the tolerance at all.
             band_note = ""
             if ctx and hits:
+                texts = [h.chunk.text for h in hits]
+                notes = []
                 try:
                     from tools import tolerance as tol
-                    band_note = tol.format_bands(
-                        tol.bands_in([h.chunk.text for h in hits]))
+                    notes.append(tol.format_bands(tol.bands_in(texts)))
                 except Exception:
-                    band_note = ""
+                    pass
+                # Same reason as the band: with the skill corrected the model
+                # reached for the right CML and the right two surveys and then
+                # divided wrong - 1.08 mm/yr against a true 0.500. Arithmetic
+                # is not a language task.
+                try:
+                    from tools import thickness as thk
+                    notes.append(thk.format_wastage(thk.wastage_in(texts)))
+                except Exception:
+                    pass
+                band_note = "\n\n".join(n for n in notes if n)
             if band_note:
                 yield {"type": "step", "id": "band", "status": "done",
-                       "label": "Computing tolerance band",
+                       "label": "Computing the arithmetic",
                        "detail": band_note.splitlines()[-1].strip()[:110]}
             # Only when there IS a band. A first version interpolated the
             # note unconditionally, so every question without one gained two

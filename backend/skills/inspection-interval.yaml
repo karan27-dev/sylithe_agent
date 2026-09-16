@@ -1,0 +1,23 @@
+name: inspection-interval
+title: Next inspection due date
+when: ["next inspection", "inspection due", "when is the next", "interval",
+       "re-inspection", "reinspection", "due date", "next survey"]
+rules:
+  - "The interval is NOT the gap between the last two surveys, and it is NOT a
+     textbook default. It comes from the governing policy in the passages."
+  - "The usual rule is the LESSER of half the remaining life or the policy
+     ceiling (commonly 10 years). Compute both and say which one governs."
+  - "Half the remaining life requires the remaining life first. If the rate
+     cannot be derived, the interval cannot be either - say that rather than
+     assuming a figure."
+  - "Count from the date of the most recent survey, and give that date."
+example: |
+  # Symbols only. See the note in skills/README.md on why.
+  life    = <remaining life, years>
+  ceiling = <policy ceiling, years>
+
+  interval = min(life / 2, ceiling)
+  due      = <most recent survey date> + interval
+checks:
+  - pattern: "year"
+    why: "An interval with no unit of time is not an answer."

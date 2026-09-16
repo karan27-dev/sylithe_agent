@@ -1,21 +1,34 @@
 name: relief-device
-title: Relief device compliance
-when: ["psv", "prv", "relief valve", "set pressure", "barg", "sop-114",
-       "relief device", "safety valve"]
+title: Relief device acceptance
+when: ["psv", "prv", "relief valve", "set pressure", "as-found", "as found",
+       "relief device", "safety valve", "return to service", "pop pressure"]
 rules:
-  - "Compare the AS-FOUND set pressure against the requirement in the governing
-     SOP. Those two numbers usually live in different documents - state both
-     and cite each."
-  - "A set pressure below the requirement is a non-conformance, not a pass.
-     Say so plainly and give the NCR number if the passages carry one."
+  - "Acceptance is a BAND, not an equality. Take the nameplate set pressure,
+     apply the stated tolerance, and WRITE THE TWO LIMITS OUT before giving any
+     verdict. An as-found value that differs from the set pressure is not a
+     failure by itself."
+  - "The tolerance applies to the SET pressure, never to the as-found value."
+  - "Inside the band is CONFORMING. Outside the band is NON-CONFORMING. This is
+     arithmetic and is not open to interpretation: do not clear a device that
+     falls outside because the certificate records no rejection, because the
+     valve was cleaned and lapped, or because no as-left test was performed.
+     A certificate that says acceptance is for the Inspection Engineer to
+     determine is asking you to apply the band, not to assume a pass."
+  - "A device outside the band is non-conforming UNLESS an approved deviation
+     names that exact tag. A deviation for other equipment does not apply."
+  - "State the NCR number if the passages carry one, and say whether an as-left
+     result exists. No as-left test means the device has not been proven reset."
   - "A relief valve is NEVER closed to isolate equipment. If asked what to
      close, exclude every PSV and PRV."
-  - "Do not describe a deviation as acceptable unless a passage explicitly
-     approves it."
 example: |
-  PSV-2041 was found at 12.5 barg [1].
-  SOP-114 requires 14.0 barg for atmospheric storage service [2].
-  12.5 < 14.0, so this is a non-conformance - raised as NCR-2026-0088 [2].
+  # Symbols only. See the note in skills/README.md on why.
+  set_p     = <nameplate set pressure>          # barg
+  tol_pct   = <stated tolerance, percent>
+  as_found  = <governing as-found value>        # barg
+
+  low  = set_p * (1 - tol_pct / 100)
+  high = set_p * (1 + tol_pct / 100)
+  verdict = "conforming" if low <= as_found <= high else "non-conforming"
 checks:
   - pattern: "barg"
-    why: "A set pressure without its unit cannot be checked against a spec."
+    why: "A set pressure without its unit cannot be checked against a band."

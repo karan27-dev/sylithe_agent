@@ -1,29 +1,34 @@
 name: corrosion-rate
 title: Corrosion rate and remaining life
 when: ["corrosion rate", "remaining life", "thickness loss", "wall loss",
-       "how long", "mm/yr", "metal loss"]
+       "how long", "mm/yr", "metal loss", "cml", "t-min", "tmin"]
 rules:
-  - "Corrosion rate = (nominal thickness - measured thickness) divided by the
-     inspection interval expressed in YEARS. An interval given in months must
-     be divided by 12 first."
-  - "Remaining life = (measured thickness - minimum required thickness) divided
-     by the corrosion rate. Use the MINIMUM REQUIRED thickness from the
-     approval note or API 653 calculation, never the nominal."
-  - "Every thickness is in mm and every rate is in mm/yr. Never mix a pressure
-     in barg into a thickness calculation - they are different quantities that
-     happen to be similar numbers."
-  - "Use the figures for the equipment that was asked about. A passage may hold
-     rows for several tags."
+  - "Corrosion rate is measured between TWO SURVEYS of the same location:
+     rate = (earlier reading - most recent reading) / (years between the two
+     surveys). Nominal thickness is NOT a survey. Subtracting the measurement
+     from nominal assumes the metal was at nominal on the day the clock
+     started, which is only true when no earlier survey exists."
+  - "When only ONE survey exists, a corrosion rate CANNOT be derived. Say so.
+     Do not substitute nominal for the earlier reading to produce a number."
+  - "Use the GOVERNING location - the thinnest CML - not an average of all
+     CMLs, and not whichever row appears first."
+  - "Remaining life = (most recent reading - minimum required thickness) /
+     rate. Measure from the CURRENT thickness, never from nominal."
+  - "A report that says it has deliberately not calculated the rate is telling
+     you to calculate it, not that it cannot be calculated. If the readings and
+     the interval are in the passages, do the arithmetic and show it."
+  - "Every thickness is in mm and every rate is in mm/yr. An interval in months
+     is divided by 12 first. Never mix a pressure in barg into a thickness
+     calculation - different quantities that happen to be similar numbers."
 example: |
-  # TK-4102, from the passages
-  nominal_mm  = 12.0
-  measured_mm = 11.2
-  months      = 24
-  min_req_mm  = 10.4
+  # Symbols only. See the note in skills/README.md on why.
+  t_earlier = <thinnest CML, earlier survey>    # mm
+  t_recent  = <same CML, most recent survey>    # mm
+  years     = <interval between the two surveys>
+  t_min     = <minimum required thickness>      # mm
 
-  loss = nominal_mm - measured_mm          # 0.8 mm
-  rate = loss / (months / 12)              # 0.40 mm/yr
-  life = (measured_mm - min_req_mm) / rate # 2.0 yr
+  rate = (t_earlier - t_recent) / years         # mm/yr
+  life = (t_recent - t_min) / rate              # years
 checks:
   - pattern: "mm/yr"
     why: "A corrosion rate without its unit is not an answer."

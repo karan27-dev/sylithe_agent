@@ -54,6 +54,22 @@ class Skill:
 _CACHE: list[Skill] | None = None
 
 
+# An ISA-style tag or a bare decimal in an example gets copied into answers as
+# if it were data - see skills/README.md for the two measured cases. Loading
+# refuses rather than warns: a skill that leaks is worse than no skill, because
+# the wrong number arrives wearing a citation.
+_TAG_IN_EXAMPLE = re.compile(r"\b[A-Z]{2,4}-\d{2,5}[A-Z]?\b")
+
+
+def _reject_literals(sk: "Skill") -> str | None:
+    ex = sk.example or ""
+    tag = _TAG_IN_EXAMPLE.search(ex)
+    if tag:
+        return (f"example names {tag.group(0)!r}; use a <placeholder>, or the "
+                f"model will quote it as a fact about other equipment")
+    return None
+
+
 def all_skills(reload: bool = False) -> list[Skill]:
     global _CACHE
     if _CACHE is not None and not reload:
@@ -63,11 +79,16 @@ def all_skills(reload: bool = False) -> list[Skill]:
         for f in sorted(SKILLS_DIR.glob("*.yaml")):
             try:
                 d = yaml.safe_load(f.read_text()) or {}
-                out.append(Skill(
+                sk = Skill(
                     name=d.get("name", f.stem), title=d.get("title", ""),
                     when=d.get("when", []) or [], rules=d.get("rules", []) or [],
                     example=d.get("example", "") or "",
-                    checks=d.get("checks", []) or []))
+                    checks=d.get("checks", []) or [])
+                bad = _reject_literals(sk)
+                if bad:
+                    print(f"  skill {sk.name}: REJECTED - {bad}")
+                    continue
+                out.append(sk)
             except Exception:
                 continue
     _CACHE = out

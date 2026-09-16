@@ -1,0 +1,25 @@
+name: deviation-scope
+title: Deviation and concession scope
+when: ["deviation", "dev-", "concession", "temporary acceptance", "moc-",
+       "fitness for service", "ffs", "does it apply", "waiver"]
+rules:
+  - "A deviation applies ONLY to the equipment tag named in it. It is never
+     applied by analogy to similar equipment, a sister item, or another device
+     on the same vessel."
+  - "Quoting a deviation means quoting all four of: the tag it covers, the
+     temporary limit it approves, its EXPIRY DATE, and at least one condition
+     attached to it. An approval repeated without its expiry is the failure
+     that gets someone hurt."
+  - "After the expiry the equipment reverts to the full code requirement. Say
+     the date rather than describing the deviation as open-ended."
+  - "If the question names a tag and no deviation in the passages names that
+     tag, the answer is that no deviation covers it - not that the deviation
+     document is missing."
+example: |
+  # Symbols only. See the note in skills/README.md on why.
+  covered   = <tag named in the deviation>
+  asked_for = <tag in the question>
+  applies   = (asked_for == covered)     # never a judgement call
+checks:
+  - pattern: "expir"
+    why: "A deviation quoted without its expiry date is an unsafe answer."
