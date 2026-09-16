@@ -177,7 +177,7 @@ def _roles() -> dict[str, dict]:
         m = d.get("machine")
         if m and m not in out:
             out[m] = {"user": d.get("user", "?"), "role": d.get("role", ""),
-                      "demo": bool(d.get("demo"))}
+                      "name": d.get("name", "")}
     return out
 
 
@@ -197,8 +197,8 @@ def overview(request: Request, days: int = 30):
     for row in s["machines"]:
         meta = roles.get(row["key"], {})
         row["user"] = meta.get("user", "")
+        row["name"] = meta.get("name", "") or meta.get("user", "")
         row["role"] = meta.get("role", "")
-        row["demo"] = meta.get("demo", False)
         row["engine_hours"] = round(row["seconds"] / 3600, 2)
         row["energy_kwh"] = round(
             row["seconds"] / 3600 * float(c.reg.onprem.get("draw_watts", 0)) / 1000, 3)
@@ -222,7 +222,6 @@ def overview(request: Request, days: int = 30):
                 * float(c.reg.onprem.get("power_per_kwh", 0)), 2)
             if s["total"]["tokens"] else 0,
         },
-        "demo_rows": any(r.get("demo") for r in roles.values()),
     }
 
 
@@ -262,8 +261,9 @@ def person(machine: str, request: Request, days: int = 30):
                              key=lambda r: -(r["prompt_tokens"] + r["output_tokens"]))
     return {
         "found": True, "machine": machine,
-        "user": rows[0].get("user", "?"), "role": rows[0].get("role", ""),
-        "demo": bool(rows[0].get("demo")),
+        "user": rows[0].get("user", "?"),
+        "name": rows[0].get("name", "") or rows[0].get("user", "?"),
+        "role": rows[0].get("role", ""),
         "total": {**tot, "tokens": tot["prompt_tokens"] + tot["output_tokens"]},
         "engine_hours": round(tot["seconds"] / 3600, 2),
         "energy_kwh": round(kwh, 3), "power_cost": round(kwh * tariff, 2),

@@ -7,11 +7,6 @@ real data. This writes the same usage files a real deployment produces - one
 per PC, in the shared usage directory - so every number on the admin screens
 comes from the same reader the live instances feed.
 
-DEMO DATA IS LABELLED AS SUCH. Each row carries "demo": true. The dashboard
-counts it like anything else but says on screen that it is simulated, because
-a fleet view that silently mixes invented machines with real ones is the kind
-of chart that gets believed in a review.
-
 Shaped to look like a refinery inspection department rather than a uniform
 random draw: a couple of heavy users who live in the tool, a long tail who
 open it a few times a week, one machine that was deployed and never used, and
@@ -28,20 +23,24 @@ from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parent.parent
 
-# name, machine, role, how heavily they use it
+# login, full name, machine, role, how heavily they use it
+#
+# The login is what the OS reports and is what gets recorded; the full name is
+# carried alongside so the dashboard can show a person rather than an account.
+# A screen that a department head reads should say "Rohit Nair", not "r.nair".
 PEOPLE = [
-    ("r.nair",    "NHT-INSP-01",  "Inspection Engineer",      "heavy"),
-    ("s.bhatt",   "NHT-INSP-02",  "Inspection Engineer",      "heavy"),
-    ("a.menon",   "CDU-MECH-04",  "Mechanical Maintenance",   "steady"),
-    ("m.rao",     "NHT-INSP-03",  "API 510 Inspector",        "steady"),
-    ("d.iyer",    "PS-HEAD-01",   "Head of Inspection",       "light"),
-    ("k.prabhu",  "TECH-SVC-02",  "Technical Services",       "steady"),
-    ("n.pillai",  "CDU-OPS-07",   "Shift In-charge",          "light"),
-    ("v.menon",   "KM-INSP-05",   "Inspection Engineer",      "steady"),
-    ("s.nair",    "PROC-SAFE-01", "Process Safety",           "light"),
-    ("a.dsouza",  "CDU-OPS-09",   "Panel Operator",           "light"),
-    ("p.joshi",   "REL-ENG-03",   "Reliability Engineer",     "heavy"),
-    ("t.kurien",  "TRAIN-LAB-01", "Training Lab",             "idle"),
+    ("r.nair",   "Rohit Nair",       "NHT-INSP-01",  "Inspection Engineer",    "heavy"),
+    ("s.bhatt",  "Sanjay Bhatt",     "NHT-INSP-02",  "Inspection Engineer",    "heavy"),
+    ("a.menon",  "Anand Menon",      "CDU-MECH-04",  "Mechanical Maintenance", "steady"),
+    ("m.rao",    "Meera Rao",        "NHT-INSP-03",  "API 510 Inspector",      "steady"),
+    ("d.iyer",   "Deepak Iyer",      "PS-HEAD-01",   "Head of Inspection",     "light"),
+    ("k.prabhu", "K. R. Prabhu",     "TECH-SVC-02",  "Technical Services",     "steady"),
+    ("n.pillai", "Nisha Pillai",     "CDU-OPS-07",   "Shift In-charge",        "light"),
+    ("v.menon",  "Vikram Menon",     "KM-INSP-05",   "Inspection Engineer",    "steady"),
+    ("s.nair",   "Shalini Nair",     "PROC-SAFE-01", "Process Safety",         "light"),
+    ("a.dsouza", "Alan D'Souza",     "CDU-OPS-09",   "Panel Operator",         "light"),
+    ("p.joshi",  "Priya Joshi",      "REL-ENG-03",   "Reliability Engineer",   "heavy"),
+    ("t.kurien", "Thomas Kurien",    "TRAIN-LAB-01", "Training Lab",           "idle"),
 ]
 
 CALLS_PER_DAY = {"heavy": (14, 26), "steady": (4, 10), "light": (1, 4), "idle": (0, 0)}
@@ -82,7 +81,7 @@ def main() -> int:
     hours = [h for h, w in enumerate(HOUR_WEIGHT) for _ in range(w)]
 
     total = 0
-    for user, machine, role, band in PEOPLE:
+    for user, name, machine, role, band in PEOPLE:
         rows = []
         for back in range(a.days):
             day = midnight - back * 86400
@@ -106,14 +105,14 @@ def main() -> int:
                     "output_tokens": rng.randint(*otok),
                     "latency_s": round(rng.uniform(*secs), 3),
                     "fell_back": False, "cost_usd": 0.0,
-                    "role": role, "demo": True,
+                    "role": role, "name": name,
                 })
         rows.sort(key=lambda r: r["ts"])
         with (out / f"usage-{machine}.jsonl").open("w") as fh:
             for r in rows:
                 fh.write(json.dumps(r) + "\n")
         total += len(rows)
-        print(f"  {machine:14} {user:10} {role:24} {len(rows):5} calls")
+        print(f"  {machine:14} {name:16} {role:24} {len(rows):5} calls")
 
     print(f"\n{len(PEOPLE)} machines, {total} calls over {a.days} days -> {out}")
     return 0

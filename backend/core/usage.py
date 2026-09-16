@@ -77,6 +77,9 @@ class Call:
     latency_s: float
     fell_back: bool
     cost_usd: float
+    # Shown instead of the login wherever a person appears. Falls back to the
+    # login when it is not known, which is the case for a live instance.
+    name: str = ""
 
 
 def gpu_rate(onprem: dict) -> float:
@@ -120,7 +123,8 @@ def record(*, tier: str, lane: str, model: str, prompt_tokens: int,
                 lane=lane, model=model, prompt_tokens=int(prompt_tokens or 0),
                 output_tokens=int(output_tokens or 0),
                 latency_s=round(float(latency_s or 0), 3),
-                fell_back=bool(fell_back), cost_usd=round(cost, 6))
+                fell_back=bool(fell_back), cost_usd=round(cost, 6),
+                name=os.environ.get("WORKBENCH_NAME", ""))
     try:
         with _lock:
             USAGE_DIR.mkdir(parents=True, exist_ok=True)

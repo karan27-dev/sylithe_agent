@@ -13,12 +13,20 @@
   --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
   --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,system-ui,sans-serif;
 }
+/* Three states: an explicit choice stamps data-theme on <html>, and with
+   nothing stamped the OS decides. Each palette is written once and referenced
+   twice so a colour can never exist in only one of them. */
 @media (prefers-color-scheme:dark){
-  :root{--bg:#191817;--card:#201f1d;--side:#1d1c1a;--side2:#2a2825;
+  :root:not([data-theme="light"]){--bg:#191817;--card:#201f1d;--side:#1d1c1a;--side2:#2a2825;
     --ink:#f0ece7;--ink2:#d5cfc8;--dim:#9a938c;--dim2:#6f6862;
     --line:#302e2b;--line2:#3d3a36;--accent:#d9794f;--ok:#7aa885;
     --warn:#d0a45a;--bad:#cf6a5b}
 }
+:root[data-theme="dark"]{
+  --bg:#191817;--card:#201f1d;--side:#1d1c1a;--side2:#2a2825;
+  --ink:#f0ece7;--ink2:#d5cfc8;--dim:#9a938c;--dim2:#6f6862;
+  --line:#302e2b;--line2:#3d3a36;--accent:#d9794f;--ok:#7aa885;
+  --warn:#d0a45a;--bad:#cf6a5b}
 /* An author display rule beats the UA stylesheet's [hidden], so #gate{display:grid}
    and #shell{display:flex} kept both panels on screen after a successful sign-in
    and it read as "the button does nothing". Toggling .hidden in JS is only
@@ -158,3 +166,13 @@ tr.dim td{color:var(--dim2)}
 .kv:first-of-type{border-top:none}
 .kv b{font-family:var(--mono);font-size:12.5px;font-weight:600}
 .empty{color:var(--dim2);font-size:13px;padding:18px 0}
+
+
+/* ---- theme button + logo ---- */
+.iconbtn{border:none;background:none;color:var(--dim);cursor:pointer;
+  padding:6px;border-radius:8px;display:grid;place-items:center;flex:none}
+.iconbtn svg{width:17px;height:17px;fill:none;stroke:currentColor;
+  stroke-width:1.7;stroke-linecap:round}
+.iconbtn:hover{background:var(--side2);color:var(--ink)}
+.mark img{width:100%;height:100%;object-fit:contain;border-radius:inherit}
+.mark.file{background:none;padding:0}
