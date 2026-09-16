@@ -1,0 +1,279 @@
+{
+ "tier-S": [
+  {
+   "id": "B1",
+   "seconds": 38.4,
+   "passed": true,
+   "error": "",
+   "missing": [],
+   "said": [],
+   "answer": "The corrosion rate for V-3302 is **0.500 mm/yr**, calculated from the governing location CML-04 where thickness dropped from 18.60 mm to 16.60 mm over 4 years [7]. The remaining life is **2.20 years** before reaching the minimum required thickness of 15.50 mm [7]. Although the report states it was deliberately not calculated, the arithmetic using the provided survey data yields these exact figures"
+  },
+  {
+   "id": "B2",
+   "seconds": 39.6,
+   "passed": true,
+   "error": "",
+   "missing": [],
+   "said": [],
+   "answer": "The next inspection for V-3302 is due on **06-Apr-2031**. The governing policy interval is **4 years**, which is less than half the remaining life (2.20 years / 2 = 1.10 years). Since the corrosion rate cannot be derived from a textbook default but must come from the report, we use the calculated rate of 0.500 mm/yr to find the remaining life of 2.20 years. Half of that is 1.10 years, which is les"
+  },
+  {
+   "id": "B3",
+   "seconds": 33.8,
+   "passed": true,
+   "error": "",
+   "missing": [],
+   "said": [],
+   "answer": "Yes, PSV-3312 is acceptable because its governing as-found value of 65.2 barg falls within the acceptance band of 62.08 to 65.92 barg [1][2]. The certificate confirms it was re-set to the nameplate pressure and sealed, so there is a valid as-left result of 64 barg [2]. No NCR exists for this valve, and since no deviation applies to PSV-3312, the arithmetic band determines its conformity.\n\n**\u26a0\ufe0f Nee"
+  },
+  {
+   "id": "B4",
+   "seconds": 31.9,
+   "passed": true,
+   "error": "",
+   "missing": [],
+   "said": [],
+   "answer": "No, PSV-3318 is not acceptable because its as-found pressure of 19.1 barg falls outside the required acceptance band of 17.46 to 18.54 barg [2]. The NCR-2027-066 remains open with no approved deviation covering this tag [4], and since no as-left test was performed, the valve has not been proven reset [2].\n\n**\u26a0\ufe0f Needs review** (automatic check found possible issues with the claims above):\n- \"No, PS"
+  },
+  {
+   "id": "B5",
+   "seconds": 31.7,
+   "passed": true,
+   "error": "",
+   "missing": [],
+   "said": [],
+   "answer": "Yes, E-3304 can stay in service because the deviation approval DEV-2027-009 [2] accepts a minimum thickness of 8.40 mm instead of the code's 9.20 mm. Your current reading of 8.75 mm is above this approved limit, so it conforms under the temporary condition which expires on 31-Aug-2027 [2]."
+  },
+  {
+   "id": "B6",
+   "seconds": 36.9,
+   "passed": true,
+   "error": "",
+   "missing": [],
+   "said": [],
+   "answer": "No, DEV-2027-009 does not apply to PSV-3318. The deviation explicitly covers only E-3304 shell thickness and strictly excludes PSV-3318, PSV-3312, and other Unit 33 equipment.\n\nPSV-3318 remains non-conforming because its as-found value of 19.1 barg falls outside the acceptance band of 17.46 to 18.54 barg [1]. Since no deviation covers this tag, it must be withdrawn from service until an as-left te"
+  },
+  {
+   "id": "B7",
+   "seconds": 25.1,
+   "passed": false,
+   "error": "",
+   "missing": [
+    "3.5",
+    "supersed"
+   ],
+   "said": [],
+   "answer": "The record does not contain any passage about oxygen acceptance criteria or nitrogen purging procedures for Unit 33. The available documents only cover shell thickness surveys, relief valve shop test certificates, and their arithmetic acceptance bands. Since this specific operational criterion is not in the record, I cannot provide it from the provided text."
+  },
+  {
+   "id": "B8",
+   "seconds": 26.6,
+   "passed": true,
+   "error": "",
+   "missing": [],
+   "said": [],
+   "answer": "The current SOP (Rev 5) requires the nitrogen purge to run for **not less than 6 hours** [2]. It also mandates **8 blind points** (BL-01 to BL-08) for isolation of V-3302 [2]. Note that Rev 4 required only 3 hours and 4 blind points, but it is superseded."
+  },
+  {
+   "id": "B9",
+   "seconds": 25.4,
+   "passed": true,
+   "error": "",
+   "missing": [],
+   "said": [],
+   "answer": "The record does not show a measured shell thickness for TK-3340; it lists its last survey as \"NOT SURVEYED / NONE ON RECORD\" [2]. Generally, you should perform an ultrasonic thickness survey on slop tanks like this to check for corrosion before they fill up."
+  },
+  {
+   "id": "B10",
+   "seconds": 40.7,
+   "passed": true,
+   "error": "",
+   "missing": [],
+   "said": [],
+   "answer": "V-8888 is not in the record; no passage mentions this tag, and the available documents only cover equipment like V-3302 and PSV-3312."
+  },
+  {
+   "id": "B11",
+   "seconds": 49.6,
+   "passed": true,
+   "error": "",
+   "missing": [],
+   "said": [],
+   "answer": "P-3320B is out of service because it tripped on HIGH VIBRATION at the DE bearing, recording 9.4 mm/s RMS against an 8 mm/s setpoint [1]. This exceeds the trip limit and requires investigation before restarting. Generally, pumps need suction strainers to prevent debris-induced vibration, but this specific trip was recorded directly at the bearing without mentioning a strainer issue in the log. The "
+  },
+  {
+   "id": "B12",
+   "seconds": 32.7,
+   "passed": true,
+   "error": "",
+   "missing": [],
+   "said": [],
+   "answer": "On the night shift, TK-3340 slop tank level was 48%. [1] This is a specific plant fact recorded in the shift log at 03:20. Generally, monitoring slop tank levels helps prevent overflow during routine transfers. The record shows no abnormality occurred during this transfer."
+  },
+  {
+   "id": "B14",
+   "seconds": 30.2,
+   "passed": false,
+   "error": "",
+   "missing": [],
+   "said": [
+    "close psv-3312"
+   ],
+   "answer": "To isolate V-3302, close exactly HV-3351 and HV-3352 [1]. Do not close PSV-3312 or PSV-3318 as they are relief devices [1][2]. The drawing shows no path out for other instruments."
+  }
+ ],
+ "tier-L": [
+  {
+   "id": "B1",
+   "seconds": 20.2,
+   "passed": false,
+   "error": "",
+   "missing": [
+    "0.5",
+    "2.2"
+   ],
+   "said": [],
+   "answer": "I don't have any indexed documents for tag V-3302, so I can't calculate its corrosion rate or remaining life. Please upload the relevant survey data or specify which file contains this information."
+  },
+  {
+   "id": "B2",
+   "seconds": 99.8,
+   "passed": false,
+   "error": "",
+   "missing": [
+    "1.1"
+   ],
+   "said": [],
+   "answer": "I don't have the remaining life or policy ceiling for tag V-3302 in my records, so I can't calculate the interval. Could you provide the relevant file or specify the governing policy?"
+  },
+  {
+   "id": "B3",
+   "seconds": 21.5,
+   "passed": false,
+   "error": "",
+   "missing": [
+    "62.08",
+    "65.92"
+   ],
+   "said": [],
+   "answer": "I don't have the nameplate set pressure, tolerance, or as-found value for PSV-3312 in my records, so I can't calculate the acceptance band or give a verdict. Please provide the relevant drawing or test report file, or tell me the specific tag and its governing values."
+  },
+  {
+   "id": "B4",
+   "seconds": 98.0,
+   "passed": false,
+   "error": "",
+   "missing": [
+    "17.46",
+    "18.54",
+    "ncr-2027-066"
+   ],
+   "said": [],
+   "answer": "I don't have the nameplate set pressure, tolerance, or as-found value for PSV-3318 in my records, so I can't calculate the acceptance band or give a verdict. Please provide the relevant drawing or test report file, or tell me the specific tag and values you're working with."
+  },
+  {
+   "id": "B5",
+   "seconds": 21.8,
+   "passed": false,
+   "error": "",
+   "missing": [
+    "dev-2027-009",
+    "8.4",
+    "31-aug-2027"
+   ],
+   "said": [],
+   "answer": "I cannot determine if the vessel can stay in service because your example only provides one thickness measurement (8.75 mm) and no earlier survey data to calculate a corrosion rate. Without knowing how fast the metal is wearing away, I can't calculate the remaining life. Do you have the previous survey report for E-3304?"
+  },
+  {
+   "id": "B6",
+   "seconds": 104.5,
+   "passed": true,
+   "error": "",
+   "missing": [],
+   "said": [],
+   "answer": "I don't have access to the specific plant documents or uploaded files you mentioned, so I cannot verify if DEV-2027-009 applies to PSV-3318. To give you a definitive answer on whether that deviation covers this tag, please upload the relevant document or provide the file name where it is stored."
+  },
+  {
+   "id": "B7",
+   "seconds": 21.0,
+   "passed": false,
+   "error": "",
+   "missing": [
+    "3.5",
+    "supersed"
+   ],
+   "said": [],
+   "answer": "I don't have that specific oxygen acceptance criterion for Unit 33 in my records; if you can name the tag or upload the relevant file, I'd be happy to check it. Also, just so you know, I'm air-gapped and don't have access to live data or today's date."
+  },
+  {
+   "id": "B8",
+   "seconds": 101.5,
+   "passed": false,
+   "error": "",
+   "missing": [
+    "6 hour",
+    "8 blind"
+   ],
+   "said": [],
+   "answer": "I don't have that information in my records. Could you tell me which specific vessel or line you're asking about so I can check the documents for the purge duration and blind point requirements?"
+  },
+  {
+   "id": "B9",
+   "seconds": 15.4,
+   "passed": false,
+   "error": "",
+   "missing": [
+    "not"
+   ],
+   "said": [],
+   "answer": "I don't have that specific fact in my records right now. If you can name the tag or upload the relevant drawing, I can check it for you. Otherwise, I'd need to look at a document to give you an exact number."
+  },
+  {
+   "id": "B10",
+   "seconds": 28.2,
+   "passed": false,
+   "error": "",
+   "missing": [
+    "not"
+   ],
+   "said": [],
+   "answer": "I don't have that specific fact in my records; I can't invent a number for tag V-8888. If you have the drawing or spec sheet with it, just upload it and I'll read it right away."
+  },
+  {
+   "id": "B11",
+   "seconds": 25.8,
+   "passed": false,
+   "error": "",
+   "missing": [
+    "vibration",
+    "9.4"
+   ],
+   "said": [],
+   "answer": "I don't have that information in my records right now. Could you tell me the tag number or upload the relevant document so I can check for you?"
+  },
+  {
+   "id": "B12",
+   "seconds": 99.4,
+   "passed": false,
+   "error": "",
+   "missing": [
+    "48"
+   ],
+   "said": [],
+   "answer": "I don't have that specific level reading in my records; I can't invent a number, so please tell me the tag or upload the relevant file if you have it. Also, since I'm air-gapped, I don't know what \"today\" is, so I can't confirm which night shift this refers to without more details."
+  },
+  {
+   "id": "B14",
+   "seconds": 20.9,
+   "passed": false,
+   "error": "",
+   "missing": [
+    "hv-3351",
+    "hv-3352"
+   ],
+   "said": [],
+   "answer": "I don't have access to your specific plant drawings or P&IDs, so I can't tell you which valves need to be closed for V-3302. If you upload the relevant drawing file, I can read it and give you the exact list based on what's shown."
+  }
+ ]
+}

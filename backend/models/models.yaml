@@ -100,103 +100,73 @@ profiles:
         dim: 768
 
   # ---------------------------------------------------------------------
-  # tier-L - the largest open-weight models that exist, per lane.
+  # tier-L - the strongest OPEN-WEIGHT models, reached over the network.
+  #
+  # Two ways to point this somewhere; the code does not care which:
+  #
+  #   hosted API    endpoint: https://api.deepseek.com   (set here)
+  #                 api_key_env: TIER_L_API_KEY
+  #   own GPU node  endpoint: http://192.168.1.50:8000      (LAN, vLLM)
+  #                 api_key_env: omit - a self-hosted pod needs no auth
+  #
+  # The models are OPEN WEIGHTS on purpose. A plant runs this profile on its
+  # own GPU node; a hosted endpoint is the same weights on someone else's
+  # hardware, so the demo can say "this is the model your node will run" and
+  # have it be true. Pointing it at a vendor's closed product makes that
+  # sentence false, and this product exists to keep plant documents off other
+  # people's models.
+  #
+  # api_key_env names an ENVIRONMENT VARIABLE. The key itself never goes in
+  # this file - the file is committed, and a key in git is a key that leaked:
+  #     export TIER_L_API_KEY=...
+  #
+  # NOT SOVEREIGN while the endpoint is public. airgap.py classifies it
+  # EXTERNAL, the seal refuses the call, and the header badge turns red and
+  # says so. On a LAN address the same profile stays green - that is the
+  # monitor working, not a snag to hide.
   #
   # NOTHING HERE HAS BEEN RUN. tier-S is measured; this is a configuration,
-  # and it is written down so that "addable without redesigning the system"
-  # is demonstrable rather than claimed - the lane names, the event stream,
-  # the prompts and every tool are identical. Only this block changes.
+  # written down so that "a new open-weight model is addable without
+  # redesigning the system" is demonstrable: lane names, prompts, tools and
+  # the event stream are identical between the two profiles, and only this
+  # block changes.
   #
-  # Hardware, from published self-hosting figures (Sept 2026):
-  #   glm-5.3          ~753B      FP8 ~755 GB -> 8x H200; INT4 ~370-390 GB
-  #                               fits 8x H100 or 4x H200
-  #   deepseek-v4-pro  1.6T MoE   MIT; 80.6% SWE-bench Verified
-  #   kimi-k3          2.8T MoE   largest open weight released; 8x B300+
-  #   qwen3-vl:235b    235B-A22B  Apache-2.0 flagship VLM
-  # This is a datacentre node, not a workstation. A 24 GB laptop runs the
-  # step-down column in the README, not this.
-  #
-  # WHY THE ROUTER STAYS SMALL. The router emits 32 tokens of JSON to pick a
-  # lane. Measured on tier-S, few-shot examples took a 0.8b model from 83% to
-  # 100% on a held-out set - the accuracy came from the examples, not the
-  # parameters. Putting a trillion-parameter model on a classification that a
-  # 2b model already gets right would add latency to every single request for
-  # nothing.
-  #
-  # WHY THIS LIST WILL BE WRONG. Open-weight leadership changed hands three
-  # times in 2026. That is the argument for the lane abstraction, not against
-  # it: when the next one lands, it is six lines here and no code anywhere.
+  # WHY THE ROUTER STAYS SMALL. It emits 32 tokens of JSON to pick a lane, and
+  # on tier-S few-shot examples took a 0.8b model from 83% to 100% on a
+  # held-out set - the accuracy came from the examples, not the parameters.
   # ---------------------------------------------------------------------
-  # ---------------------------------------------------------------------
-  # tier-R - a rented GPU, reachable over the public internet.
-  #
-  # Same open weights as tier-L, on hardware nobody here owns. It exists so the
-  # capability can be shown without a plant GPU node, and it is NOT sovereign:
-  # airgap.py classifies a public address as EXTERNAL, the seal refuses the
-  # call, and the header badge turns red and says "data leaves this machine".
-  #
-  # That is the point rather than a snag. A monitor that never changes colour
-  # proves nothing; one that refuses a call on stage proves it is the object
-  # doing the blocking. Put the rented endpoint below and switch in the header.
-  #
-  # A third-party model API (DeepSeek, OpenAI, Anthropic) is deliberately NOT
-  # offered here. Renting a GPU to run weights you chose is a hardware
-  # decision; posting plant documents to somebody else's model is the exact
-  # thing this product exists to make impossible.
-  # ---------------------------------------------------------------------
-  tier-R:
-    # Two ways to fill this in. Either is fine; both are EXTERNAL.
-    #
-    #   self-hosted vLLM pod   endpoint: https://<pod>-8000.proxy.runpod.net
-    #                          api_key_env: (omit - pods need no auth)
-    #   hosted open weights    endpoint: https://api.deepinfra.com/v1/openai
-    #                          api_key_env: TIER_R_API_KEY
-    #
-    # Pick a provider that serves OPEN WEIGHTS - the same models tier-L runs on
-    # a plant GPU node - rather than a vendor's own closed product. The demo
-    # then says "this is the model your node will run, reached over the network
-    # today", which is true, instead of "this is somebody else's model", which
-    # is the thing this product exists to avoid.
-    #
-    # api_key_env names the environment variable. The key itself never goes in
-    # this file: the file is committed, and a key in git is a key that leaked.
-    #   export TIER_R_API_KEY=...
-    endpoint: https://REPLACE-ME/v1/openai
-    # api_key_env: TIER_R_API_KEY
+  tier-L:
+    endpoint: https://api.deepseek.com
+    api_key_env: TIER_L_API_KEY
     max_loaded_models: 4
     keep_alive: 60m
-    fallback_profile: tier-S
+    fallback_profile: tier-S              # unreachable or refused -> local
     lanes:
       # Model names must match what the endpoint serves, exactly.
-      router:  { model: Qwen/Qwen3-32B,  think: false, max_tokens: 32 }
-      reason:  { model: Qwen/Qwen3-32B,  think: false, max_tokens: 2048 }
-      code:    { model: Qwen/Qwen3-32B,  think: false, max_tokens: 2048 }
-      vision:  { model: Qwen/Qwen3-32B,  think: false, max_tokens: 2048 }
-      # Embeddings stay LOCAL. Changing the embedding model invalidates the
-      # index, and re-embedding the corpus through a paid endpoint costs money
-      # to gain nothing - the comparison is about reasoning, not retrieval.
+      # Model IDs as of Sept 2026. deepseek-chat and deepseek-reasoner were
+      # RETIRED on 24-Jul-2026 and deepseek-v4-flash on 10-Sep-2026 - a config
+      # left on those names fails with a model-not-found that reads like an
+      # auth problem.
+      #
+      #   deepseek-v4-pro    1.6T MoE, 49B active, 1M context, thinking modes
+      #   deepseek-flash     V4.1 Flash, ~$0.30/$1.20 per M tokens at peak,
+      #                      half that off-peak. Use it for cheap dry runs.
+      #
+      # The router asks for 32 tokens of JSON, so it runs on Flash: a 1.6T
+      # model classifying "is this a document question" is money set alight.
+      router:  { model: deepseek-flash,  think: false, max_tokens: 32 }
+      reason:  { model: deepseek-v4-pro, think: false, max_tokens: 2048 }
+      code:    { model: deepseek-v4-pro, think: false, max_tokens: 2048 }
+      # DeepSeek's API is TEXT ONLY - there is no vision model behind it. A
+      # scanned page on this tier is answered from its OCR text rather than by
+      # looking at it, and the lane is pointed at the text model so the call
+      # does not simply fail. The P&ID path is unaffected: tools/pid_ocr.py
+      # reads the drawing, and no language model ever sees it.
+      vision:  { model: deepseek-v4-pro, think: false, max_tokens: 2048 }
+      # Embeddings stay LOCAL. Changing them invalidates the index, and
+      # re-embedding through a paid endpoint costs money to gain nothing -
+      # this comparison is about reasoning, not retrieval.
       embed:   { model: nomic-embed-text, dim: 768 }
-
-  tier-L:
-    endpoint: http://192.168.1.50:8000      # vLLM, OpenAI-compatible
-    max_loaded_models: 4                    # all of them can stay resident
-    keep_alive: 60m
-    fallback_profile: tier-S                # if the node does not answer in 2s, drop to tier-S
-    lanes:
-      # 32 tokens of JSON. Deliberately the one lane that is NOT maximised.
-      router:  { model: qwen3.5:2b,           think: false, max_tokens: 32 }
-      # Top open-weight entry on the Artificial Analysis intelligence index
-      # (45, Sept 2026), ahead of kimi-k3 on 44. MIT.
-      reason:  { model: glm-5.3,              think: true,  max_tokens: 8192 }
-      # 80.6% SWE-bench Verified, MIT. The code lane runs in a sandbox with no
-      # network, so a stronger coder is bounded by the sandbox, not trusted.
-      code:    { model: deepseek-v4-pro,      think: false, max_tokens: 4096 }
-      # Apache-2.0 flagship VLM, 256K context. Note it still does not COUNT
-      # symbols on a drawing - tools/pid_ocr.py does. See the P&ID section of
-      # the README for the measurement behind that split.
-      vision:  { model: qwen3-vl:235b-a22b,   think: false, max_tokens: 4096 }
-      # Largest in the Qwen3-Embedding family; MTEB ~70.6.
-      embed:   { model: qwen3-embedding:8b,   dim: 4096 }
 
 # ---------------------------------------------------------------------------
 # ROUTING - the router lane classifies input into these classes

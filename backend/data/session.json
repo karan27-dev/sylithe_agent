@@ -1,5 +1,5 @@
 {
- "saved": 1789564400.0502741,
+ "saved": 1789566651.7644548,
  "chats": {
   "388e430265c9": {
    "uploads": [],
@@ -566,16 +566,7 @@
    ]
   },
   "e01c62d28f75": {
-   "uploads": [
-    "B13_E-3304_bundle_quotations.csv",
-    "B12_equipment_register.xlsx",
-    "B11_V-3302_nameplate_photo.png",
-    "B10_shift_log_scanned.pdf",
-    "B09_ncr_register.csv",
-    "B08_E-3304_shell_survey.docx",
-    "B07_DEV-2027-009_deviation_approval.docx",
-    "B06_PSV-3318_test_certificate.pdf"
-   ],
+   "uploads": [],
    "drawings": [
     "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/B14_PID-U33-014.png"
    ],
@@ -683,6 +674,14 @@
     "B12_equipment_register.xlsx",
     "B13_E-3304_bundle_quotations.csv"
    ]
+  },
+  "0aa2d818d5e8": {
+   "uploads": [],
+   "drawings": [],
+   "images": [],
+   "briefs": [],
+   "folder": "/Users/karan/Downloads/PACK-B-Unit33-hard",
+   "corpus": []
   }
  }
 }
