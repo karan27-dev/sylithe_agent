@@ -19,6 +19,11 @@
     --line:#302e2b;--line2:#3d3a36;--accent:#d9794f;--ok:#7aa885;
     --warn:#d0a45a;--bad:#cf6a5b}
 }
+/* An author display rule beats the UA stylesheet's [hidden], so #gate{display:grid}
+   and #shell{display:flex} kept both panels on screen after a successful sign-in
+   and it read as "the button does nothing". Toggling .hidden in JS is only
+   reliable if this rule exists. */
+[hidden]{display:none !important}
 html,body{height:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 var(--sans);
   -webkit-font-smoothing:antialiased}
