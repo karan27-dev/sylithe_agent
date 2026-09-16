@@ -548,6 +548,10 @@ def api_deliverable_get(name: str):
                         media_type="application/octet-stream")
 
 
+from api.admin import router as _admin_router
+app.include_router(_admin_router)
+
+
 @app.get("/api/usage")
 def api_usage(days: int = 30) -> dict:
     """
@@ -624,6 +628,16 @@ def index() -> HTMLResponse:
     html = html.replace("/static/app.css", f"/static/app.css?v={v}")
     html = html.replace("/static/main.js", f"/static/main.js?v={v}")
     # index.html itself must never be cached, or the stamped URLs never arrive
+    return HTMLResponse(html, headers={"Cache-Control": "no-store"})
+
+
+@app.get("/admin", response_class=HTMLResponse)
+def admin_page() -> HTMLResponse:
+    """The fleet dashboard. Same asset stamping as the workbench page."""
+    html = (_STATIC / "admin.html").read_text()
+    v = _asset_version()
+    html = html.replace("/static/admin.css", f"/static/admin.css?v={v}")
+    html = html.replace("/static/admin.js", f"/static/admin.js?v={v}")
     return HTMLResponse(html, headers={"Cache-Control": "no-store"})
 
 

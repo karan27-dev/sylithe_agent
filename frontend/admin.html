@@ -1,0 +1,76 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sovereign Workbench · Fleet admin</title>
+<link rel="stylesheet" href="/static/admin.css">
+
+<!-- Sign in. One account, from the environment - see api/admin.py for why it
+     is deliberately this small. -->
+<div id="gate">
+  <form id="loginform" autocomplete="on">
+    <div class="mark">SW</div>
+    <h1>Fleet admin</h1>
+    <p class="lede">Usage, capacity and running cost across every workbench
+      on this site.</p>
+    <label>Email<input id="email" type="email" required
+      placeholder="admin@plant.local" autocomplete="username"></label>
+    <label>Password<input id="password" type="password" required
+      placeholder="••••••••" autocomplete="current-password"></label>
+    <button type="submit" id="signin">Sign in</button>
+    <div class="err" id="loginerr" hidden></div>
+    <p class="foot">Runs on this machine. Nothing is sent anywhere.</p>
+  </form>
+</div>
+
+<div id="shell" hidden>
+  <aside id="nav">
+    <div class="org">
+      <div class="mark sm">SW</div>
+      <div><b>Sovereign Workbench</b><span id="orgsub">fleet</span></div>
+    </div>
+
+    <div class="group">
+      <span class="ghead">Overview</span>
+      <button class="nav on" data-view="fleet">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"/>
+          <rect x="14" y="3" width="7" height="5" rx="1"/>
+          <rect x="14" y="12" width="7" height="9" rx="1"/>
+          <rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+        <span>Fleet</span></button>
+      <button class="nav" data-view="models">
+        <svg viewBox="0 0 24 24"><path d="M12 2 3 7l9 5 9-5-9-5Z"/>
+          <path d="m3 12 9 5 9-5M3 17l9 5 9-5"/></svg>
+        <span>Models</span></button>
+      <button class="nav" data-view="matrix">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/>
+          <path d="M3 10h18M9 4v16"/></svg>
+        <span>Token matrix</span></button>
+      <button class="nav" data-view="power">
+        <svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/></svg>
+        <span>Electricity</span></button>
+    </div>
+
+    <div class="group grow">
+      <span class="ghead">Engineers <i id="pcount"></i></span>
+      <div id="people"></div>
+    </div>
+
+    <div class="group bottom">
+      <div class="who"><span id="whoami"></span>
+        <button class="nav sm" id="signout">
+          <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <path d="m16 17 5-5-5-5M21 12H9"/></svg><span>Sign out</span></button>
+      </div>
+    </div>
+  </aside>
+
+  <main id="body">
+    <header id="bar">
+      <div class="crumb"><span id="crumb-a">Fleet</span></div>
+      <div class="range" id="range"></div>
+    </header>
+    <div id="view"></div>
+  </main>
+</div>
+
+<script type="module" src="/static/admin.js"></script>
