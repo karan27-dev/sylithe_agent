@@ -603,9 +603,79 @@ def search(query: str, k: int = 5, *, client=None,
     return hits[:k] if k else hits
 
 
+# When a document clearly wins the search, bring the rest of it along. See
+# _complete_document for the failure this exists to prevent.
+COMPLETE_TOP_SOURCES = 1
+COMPLETE_MAX_CHUNKS = 5
+
+
+def _complete_document(hits: list[Hit], budget: int) -> list[Hit]:
+    """
+    Pull in the sibling chunks of the document that won the search.
+
+    A report is one document; ranked retrieval treats it as unrelated
+    fragments. Measured on a real thickness survey: asked for the corrosion
+    rate of V-2405, the top hit was that report's EQUIPMENT PARTICULARS
+    section - correct document, and it carries t-min but no readings. The
+    ULTRASONIC THICKNESS READINGS table from the SAME report ranked 8th, so
+    at k=4 it never arrived. The model was asked to compute a rate with no
+    thicknesses in front of it and duly invented them.
+
+    Ranking cannot fix this on its own. A serialised table reads as
+    "CML-01, Survey A = 14.55. CML-01, Survey B = 13.10." - it contains
+    neither the phrase "corrosion rate" nor "remaining life", so it will
+    always lose to prose that does. The words are in the remarks; the numbers
+    are in the table; the question needs both.
+
+    So: whichever source scored highest, add its other chunks. Capped, because
+    a 381-page PDF must not empty its whole self into the prompt.
+    """
+    if not hits:
+        return hits
+    have = {h.chunk.chunk_id for h in hits}
+    top_sources: list[str] = []
+    for h in hits:
+        if h.chunk.source not in top_sources:
+            top_sources.append(h.chunk.source)
+        if len(top_sources) >= COMPLETE_TOP_SOURCES:
+            break
+
+    extra: list[Hit] = []
+    for src in top_sources:
+        try:
+            siblings = search_source(src)
+        except Exception:
+            continue
+        for c in siblings:
+            if len(extra) >= budget:
+                break
+            if c.chunk_id in have:
+                continue
+            have.add(c.chunk_id)
+            # Ordered after the ranked hits, and marked with the score of the
+            # hit that dragged them in, so nothing claims a relevance it did
+            # not earn.
+            extra.append(Hit(chunk=c, score=hits[0].score))
+    return hits + extra
+
+
+def search_source(source: str) -> list[Chunk]:
+    """Every chunk of one document, in the order it was written."""
+    db = _db()
+    if TABLE not in _tables(db):
+        return []
+    rows = (db.open_table(TABLE).search().where(f"source = '{source}'")
+            .limit(500).to_list())
+    out = [Chunk(chunk_id=r["chunk_id"], source=r["source"], path=r["path"],
+                 page=int(r["page"]), heading=r["heading"], kind=r["kind"],
+                 text=r["text"]) for r in rows]
+    out.sort(key=lambda c: (c.page, c.heading))
+    return out
+
+
 def context(query: str, k: int = 5, *, client=None,
             min_score: float | None = None, sources: list[str] | None = None,
-            per_source: int = 0) -> tuple[str, list[Hit]]:
+            per_source: int = 0, complete: bool = True) -> tuple[str, list[Hit]]:
     """
     A block ready for the reason lane, plus the hits.
     Each passage is numbered [1] [2] so the model can cite it.
@@ -616,6 +686,8 @@ def context(query: str, k: int = 5, *, client=None,
     """
     hits = search(query, k, client=client, min_score=min_score,
                   sources=sources, per_source=per_source)
+    if complete and not per_source:
+        hits = _complete_document(hits, COMPLETE_MAX_CHUNKS)
     blocks = [
         f"[{i}] {h.chunk.cite()}\n{h.chunk.text}"
         for i, h in enumerate(hits, 1)

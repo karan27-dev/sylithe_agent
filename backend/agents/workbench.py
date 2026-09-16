@@ -905,7 +905,34 @@ class Agent:
             turn = f"{head}{compare_ctx}\n\nQUESTION: {question}"
         else:
             system = GROUNDED_SYS if ctx else NO_CONTEXT_SYS
-            turn = (f"{head}PASSAGES:\n{ctx}\n\nQUESTION: {question}"
+            # A tolerance band is arithmetic, and arithmetic does not go
+            # through the model. Measured: with the set pressure, the +/-3%
+            # rule and the as-found value all in the passages, the reply was
+            # still "24.50 exceeds the nameplate requirement of 24.0,
+            # non-conforming" - a conforming relief valve condemned, which in
+            # a plant means a good valve pulled off a vessel. The band is
+            # computed in tools/tolerance.py and handed over already worked
+            # out. See also rule 6 of GROUNDED_SYS, which was not enough on
+            # its own because the model never mentioned the tolerance at all.
+            band_note = ""
+            if ctx and hits:
+                try:
+                    from tools import tolerance as tol
+                    band_note = tol.format_bands(
+                        tol.bands_in([h.chunk.text for h in hits]))
+                except Exception:
+                    band_note = ""
+            if band_note:
+                yield {"type": "step", "id": "band", "status": "done",
+                       "label": "Computing tolerance band",
+                       "detail": band_note.splitlines()[-1].strip()[:110]}
+            # Only when there IS a band. A first version interpolated the
+            # note unconditionally, so every question without one gained two
+            # blank lines - and the scores on unrelated questions moved. A
+            # prompt is an input; changing it for questions the change was not
+            # meant to touch makes every later comparison meaningless.
+            extra = f"\n\n{band_note}" if band_note else ""
+            turn = (f"{head}PASSAGES:\n{ctx}{extra}\n\nQUESTION: {question}"
                     if ctx else head + question)
         prompt = history + [{"role": "user", "content": turn}] if history else turn
 

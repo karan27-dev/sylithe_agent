@@ -244,7 +244,16 @@ routing:
 # ---------------------------------------------------------------------------
 retrieval:
   min_score: 0.50
-  k: 4
+  # 4 was too few for an engineering question, and the failure was silent.
+  # "Corrosion rate of V-2405" needs the equipment particulars (t-min), the
+  # thickness table (readings), the remarks (governing CML and interval) and
+  # the policy (the formula) - four chunks before anything unrelated is even
+  # considered. Measured on a real survey report: the readings table ranked
+  # 8th, so at k=4 the model was asked to compute a rate with no thicknesses
+  # in front of it. It invented them; verify.py caught it; the answer was
+  # still wrong. See _complete_document in ingest/pipeline.py, which brings
+  # the winning document's remaining sections along regardless of rank.
+  k: 8
 
 # ---------------------------------------------------------------------------
 # Candidates deliberately NOT taken, with reasons, so nobody re-researches them

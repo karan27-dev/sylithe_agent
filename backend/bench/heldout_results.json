@@ -1,0 +1,127 @@
+{
+ "passed": 10,
+ "total": 14,
+ "results": [
+  {
+   "id": "A1",
+   "question": "What is the corrosion rate of V-2405, and what is its remaining life?",
+   "passed": true,
+   "fails": [],
+   "seconds": 39.3,
+   "answer": "The report states that corrosion rate and remaining life have NOT been calculated in this document [7]. The governing thickness loss is 1.50 mm over a 3-year interval, which implies an estimated rate of 0.50 mm/yr. Using the minimum required thickness of 9.50 mm [1] and current measured thickness of 12.70 mm [6], the remaining life would be approximately 6.4 years if this rate continues.\n\n**\u26a0\ufe0f Needs review** (automatic check found possible issues with the claims above):\n- \"Using the minimum required thickness of 9.50 mm [1] and current measured thickness of 12.70 mm [6], the remaining life would be approximately 6.4 years if this rate continues.\" \u2014 number(s) 6.4 do not appear verbatim in any retrieved passage"
+  },
+  {
+   "id": "A2",
+   "question": "When is the next inspection of V-2405 due?",
+   "passed": false,
+   "fails": [
+    "missing ['3.2']"
+   ],
+   "seconds": 38.3,
+   "answer": "The report does not state when the next inspection is due; it only notes that no repairs or re-rating have occurred since the last survey on 10-Mar-2026 [7]. Under API 510, the interval depends on the corrosion rate and remaining life, which this document explicitly says has NOT been calculated yet [7]. You will need to engage the Inspection Engineer to determine the next due date based on the actual remaining thickness at CML-02 (currently 12.70 mm) versus the minimum required thickness of 9.50 mm [6][2]."
+  },
+  {
+   "id": "B1",
+   "question": "Is PSV-2418 acceptable to return to service?",
+   "passed": true,
+   "fails": [],
+   "seconds": 33.6,
+   "answer": "Yes, PSV-2418 is acceptable because its governing as-found pressure of 24.50 barg [4] falls within the calculated acceptance band of 23.28 to 24.72 barg for a 24.0 barg set point with +/- 3% tolerance [1]. The nameplate set pressure remains 24.0 barg [1], and the valve is sealed in serviceable condition per the remarks [5]. It must never be closed or isolated as it protects V-2405 [2].\n\n**\u26a0\ufe0f Needs review** (automatic check found possible issues with the claims above):\n- \"Yes, PSV-2418 is acceptable because its governing as-found pressure of 24.50 barg [4] falls within the calculated acceptance band of 23.28 to 24.72 barg for a 24.0 barg set point with +/- 3% tolerance [1].\" \u2014 number(s) 23.28, 24.72 do not appear verbatim in any retrieved passage"
+  },
+  {
+   "id": "B2",
+   "question": "Is PSV-2422 acceptable to return to service?",
+   "passed": false,
+   "fails": [
+    "missing ['ncr-2026-044']",
+    "SAID ['dev-2026-017']"
+   ],
+   "seconds": 34.7,
+   "answer": "No, PSV-2422 is not acceptable because its as-found pressure of 12.60 barg [4] exceeds the acceptance band of 11.64 to 12.36 barg [4]. The nameplate set pressure is 12.0 barg with a tolerance of +/- 3% [2], and the deviation approval DEV-2026-017 only covers E-2404 shell thickness, not this valve [1]. Since no deviation exists for PSV-2422, it must be re-tested after cleaning and lapping before return to service [1].\n\n**\u26a0\ufe0f Needs review** (automatic check found possible issues with the claims above):\n- \"No, PSV-2422 is not acceptable because its as-found pressure of 12.60 barg [4] exceeds the acceptance band of 11.64 to 12.36 barg [4].\" \u2014 number(s) 11.64, 12.36 do not appear verbatim in any retrieved passage"
+  },
+  {
+   "id": "C1",
+   "question": "E-2404 shell measured 8.20 mm against a t-min of 8.50 mm. Can it stay in service?",
+   "passed": true,
+   "fails": [],
+   "seconds": 38.6,
+   "answer": "Yes, E-2404 can stay in service temporarily under the approved deviation DEV-2026-017 [5]. The measured thickness of 8.20 mm is below the original t-min of 8.50 mm but above the approved temporary minimum of 7.80 mm [1]. This approval allows operation until 30-Nov-2026, with mandatory replacement or repair by the next shutdown [4]."
+  },
+  {
+   "id": "C2",
+   "question": "Does DEV-2026-017 apply to PSV-2422?",
+   "passed": true,
+   "fails": [],
+   "seconds": 35.1,
+   "answer": "No, DEV-2026-017 does not apply to PSV-2422; it covers only E-2404 shell side [2]. The NCR explicitly states no deviation approval exists for this valve [3], and the certificate shows a non-conforming set pressure of 12.60 barg outside the 11.64\u201312.36 barg band [5].\n\n**\u26a0\ufe0f Needs review** (automatic check found possible issues with the claims above):\n- \"The NCR explicitly states no deviation approval exists for this valve [3], and the certificate shows a non-conforming set pressure of 12.60 barg outside the 11.64\u201312.36 barg band [5].\" \u2014 number(s) 11.64, 12.36 do not appear verbatim in any retrieved passage"
+  },
+  {
+   "id": "D1",
+   "question": "What is the oxygen acceptance criterion for nitrogen purging on the NHT reactor loop?",
+   "passed": false,
+   "fails": [
+    "missing ['supersed']"
+   ],
+   "seconds": 30.0,
+   "answer": "The current oxygen acceptance criterion for nitrogen purging on the NHT reactor loop is less than 5.0 vol% [1]. This requirement was tightened from the previous Rev 2 standard of less than 8.0 vol% to ensure safer entry conditions [5]. The active procedure document is NHT-SOP-114 Rev 3, approved for field use on 15-Jan-2026 [3]."
+  },
+  {
+   "id": "D2",
+   "question": "How long must the nitrogen purge run, and how many blind points are required?",
+   "passed": true,
+   "fails": [],
+   "seconds": 27.3,
+   "answer": "The nitrogen purge must run for **4 hours** with oxygen below **5.0 vol%**, per Rev 3 [1]. You need **6 blind points**: BL-01 to BL-06 [5], including the new recycle and wash water lines added in Rev 3 [4]. This supersedes the old 2-hour/4-point rule from Rev 2 [2]."
+  },
+  {
+   "id": "E1",
+   "question": "What is the shell thickness of TK-2410?",
+   "passed": true,
+   "fails": [],
+   "seconds": 31.7,
+   "answer": "The shell thickness of TK-2410 is not in the record because it has never been surveyed [1]. Unlike V-2405 which had a last survey on 10-Mar-2026, TK-2410 shows \"NOT SURVEYED\" with no UT data available [1][4]. Without thickness measurements, we cannot confirm if the tank meets code minimums or any operational limits."
+  },
+  {
+   "id": "E2",
+   "question": "What is the design pressure of V-9999?",
+   "passed": true,
+   "fails": [],
+   "seconds": 24.4,
+   "answer": "V-9999 is not in the record. The passages only contain data for PSV-2422 and PSV-7301 series; no document mentions tag V-9999, so its design pressure cannot be determined from these sources."
+  },
+  {
+   "id": "F1",
+   "question": "Why is P-2402B out of service?",
+   "passed": true,
+   "fails": [],
+   "seconds": 37.8,
+   "answer": "P-2402B is out of service because it tripped on HIGHVIBRATION at 02:15, recording 7.8 mm/s RMS against a setpoint of 7.1 mm/s RMS [1]. This high vibration indicates mechanical imbalance or bearing wear, which generally requires shutdown to prevent catastrophic failure like seal blowout or shaft fracture. The pump remains out of service pending a vibration investigation by Mechanical Maintenance [1]."
+  },
+  {
+   "id": "F2",
+   "question": "What was the TK-2410 level on the night of 9 March?",
+   "passed": true,
+   "fails": [],
+   "seconds": 34.9,
+   "answer": "The TK-2410 slop tank level was **62%** at 03:40 on 9 March, during a routine transfer to slop recovery [2]. This reading is from the shift log; no other levels were recorded for that night."
+  },
+  {
+   "id": "G2",
+   "question": "Does the nameplate design pressure match the inspection report?",
+   "passed": false,
+   "fails": [
+    "missing ['18.5']"
+   ],
+   "seconds": 39.4,
+   "answer": "No, the nameplate set pressure of **12.0 barg** does not match the governing as-found popping pressure of **12.60 barg** recorded in the test certificate [5]. The inspection report explicitly states that the valve's as-found value is elevated relative to its nameplate setting due to heavy deposits on the disc and seat [1]. While a general spring-loaded relief valve should pop at its nameplate pressure, this specific unit failed to meet the API 527 acceptance band of **11.64 to 12.36 barg** [2], making it non-conforming per the NCR [3].\n\n**\u26a0\ufe0f Needs review** (automatic check found possible issues with the claims above):\n- \"While a general spring-loaded relief valve should pop at its nameplate pressure, this specific unit failed to meet the API 527 acceptance band of **11.64 to 12.36 barg** [2], making it non-conforming per the NCR [3].\" \u2014 number(s) 11.64, 12.36 do not appear verbatim in any retrieved passage"
+  },
+  {
+   "id": "H1",
+   "question": "What must be closed to isolate V-2405 for entry?",
+   "passed": true,
+   "fails": [],
+   "seconds": 58.4,
+   "answer": "To isolate V-2405 for entry, you must close the two hand valves HV-2431 (inlet) and HV-2432 (outlet), followed by inserting blinds BL-01 and BL-02 [1]. The relief valve PSV-2418 must NOT be closed as it protects the vessel [1]. Instruments like LT or PT cannot isolate anything."
+  }
+ ]
+}
