@@ -11,13 +11,22 @@ let chatId = null, busy = false;
    a file dropped here never surfaces in a different conversation. Uploading
    before the first message is normal, so a chat is created on demand rather
    than only when a question is sent. */
+let chatPending = null;
 async function needChat(){
-  if(!chatId){
-    const r = await (await fetch("/api/chats", {method:"POST"})).json();
-    chatId = r.id;
-    await loadChats();
+  if(chatId) return chatId;
+  // Dropping three files at once fired three of these in parallel, and each
+  // one saw chatId still null - three chats created, the uploads split
+  // between them, and the question asked in whichever won. One in-flight
+  // request, awaited by everyone.
+  if(!chatPending){
+    chatPending = (async () => {
+      const r = await (await fetch("/api/chats", {method:"POST"})).json();
+      chatId = r.id;
+      await loadChats();
+      return chatId;
+    })().finally(() => { chatPending = null; });
   }
-  return chatId;
+  return chatPending;
 }
 
 /* ---------- theme ---------- */

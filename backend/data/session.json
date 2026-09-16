@@ -1,7 +1,125 @@
 {
- "saved": 1789552945.313371,
+ "saved": 1789553391.60957,
  "chats": {
   "388e430265c9": {
+   "uploads": [],
+   "drawings": [
+    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-CDU2-004.png"
+   ],
+   "images": [
+    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-CDU2-004.png"
+   ],
+   "briefs": [
+    {
+     "name": "PID-CDU2-004.png",
+     "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-CDU2-004.png",
+     "kind": "drawing",
+     "chunks": 0,
+     "tags": [
+      "PSV-2041",
+      "LT-4102",
+      "TK-4102",
+      "HV-4021",
+      "FV-4033",
+      "P-4110A"
+     ],
+     "preview": "",
+     "detail": "engineering drawing, 2 symbols detected, 6 tags read"
+    }
+   ],
+   "folder": null
+  },
+  "neverseen123": {
+   "uploads": [],
+   "drawings": [],
+   "images": [],
+   "briefs": [],
+   "folder": null
+  },
+  "f2db8a977f47": {
+   "uploads": [],
+   "drawings": [],
+   "images": [],
+   "briefs": [],
+   "folder": null
+  },
+  "": {
+   "uploads": [],
+   "drawings": [
+    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/gate-valve-symbols_14_png_jpg.rf.e3da93e3db463a583325bdebc8b0a350.jpg"
+   ],
+   "images": [
+    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/gate-valve-symbols_14_png_jpg.rf.e3da93e3db463a583325bdebc8b0a350.jpg",
+    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/basic-simple-p-id-diagram_31_png_jpg.rf.7eb369ba80de62e8d0ca56dfb8efaafc.jpg"
+   ],
+   "briefs": [
+    {
+     "name": "gate-valve-symbols_14_png_jpg.rf.e3da93e3db463a583325bdebc8b0a350.jpg",
+     "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/gate-valve-symbols_14_png_jpg.rf.e3da93e3db463a583325bdebc8b0a350.jpg",
+     "kind": "drawing",
+     "chunks": 0,
+     "tags": [],
+     "preview": "",
+     "detail": "engineering drawing, 1 symbols detected, 0 tags read"
+    },
+    {
+     "name": "basic-simple-p-id-diagram_31_png_jpg.rf.7eb369ba80de62e8d0ca56dfb8efaafc.jpg",
+     "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/basic-simple-p-id-diagram_31_png_jpg.rf.7eb369ba80de62e8d0ca56dfb8efaafc.jpg",
+     "kind": "scan",
+     "chunks": 1,
+     "tags": [
+      "IEI-10",
+      "IE-11",
+      "BALL-14",
+      "BALL-15",
+      "BALL-16",
+      "BALL-17",
+      "BALL-18",
+      "BALL-20",
+      "E-10"
+     ],
+     "preview": "IE6\n4-100-24\nIEI\n10-100-42A\nE5\nCATALYST\n1E7\n1E9 1E2 1E8\nIE11\nE3\n1E5\nPos. Name Descipton Tipe INSTRUMENT\nDISCRETE FIELD\n2\nINSTRUMENT\nDISCRETE, FIELD\n3\nCONNECTOR\nOFFSHEET CONNECT\n4\n50\nINSTRUMENT\nDISCRETE, FIELD\nE1\nVESSEL\nSPHERICAL, ON LE\n6\nE2\nVESSEL\nSPHERICAL, ONLE\n7\nE3\nVESSEL\nVESSEL WITHDISH\n8\nE4\nPUMP\nCENTRIFUGAL\n6\nE5\nPUMP\nCENTRIFUGAL\n10\nE6\nPUMP\nCENTRIFUGAL\n11\nE7\nPUMP\nCENTRIFUGAL\n12\nE8\nPUMP\nCENTRIF",
+     "detail": "1 indexed passages over 1 page(s)"
+    }
+   ],
+   "folder": null
+  },
+  "aa7901305115": {
+   "uploads": [],
+   "drawings": [],
+   "images": [],
+   "briefs": [],
+   "folder": null
+  },
+  "2891c3189591": {
+   "uploads": [],
+   "drawings": [
+    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-CDU2-004.png"
+   ],
+   "images": [
+    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-CDU2-004.png"
+   ],
+   "briefs": [
+    {
+     "name": "PID-CDU2-004.png",
+     "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-CDU2-004.png",
+     "kind": "drawing",
+     "chunks": 0,
+     "tags": [
+      "PSV-2041",
+      "LT-4102",
+      "TK-4102",
+      "HV-4021",
+      "FV-4033",
+      "P-4110A"
+     ],
+     "preview": "",
+     "detail": "engineering drawing, 2 symbols detected, 6 tags read"
+    }
+   ],
+   "folder": null
+  },
+  "f6bf97f813eb": {
    "uploads": [],
    "drawings": [
     "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-CDU2-004.png"
