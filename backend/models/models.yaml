@@ -230,15 +230,26 @@ profiles:
 # Hosted rates are list prices and change. They are here rather than in code
 # so a finance correction is a YAML edit, and the dashboard says which rates
 # it used.
+# WHEN THE PLANT OWNS THE HARDWARE there is no invoice, so cost is derived
+# from what the node cost and what it draws. Stated as three numbers the person
+# who signed for the GPU can argue with, rather than a rate pulled from the air.
+# Currency is whatever these are entered in - the dashboard does not convert.
+onprem:
+  node_cost:     800000     # purchase price of the GPU node
+  life_years:    4          # written off over
+  draw_watts:    700        # under load
+  power_per_kwh: 8.5        # tariff
+# -> about 28.80 per engine-hour on those numbers. Every local model is billed
+#    at that rate for the seconds it occupied the node: free at the invoice,
+#    not free at the wall.
+
 pricing:
   deepseek-v4-pro:  { input: 0.60, output: 2.40 }
   deepseek-flash:   { input: 0.30, output: 1.20 }   # half these off-peak
   gemini-3.5-flash: { input: 0.30, output: 2.50 }
-  # local - free per token, and that is the headline rather than a footnote
-  qwen3.5:0.8b:     { input: 0.0, output: 0.0 }
-  qwen3.5:2b:       { input: 0.0, output: 0.0 }
-  qwen3.5:4b:       { input: 0.0, output: 0.0 }
-  nomic-embed-text: { input: 0.0, output: 0.0 }
+  # Local models are deliberately ABSENT rather than listed at zero. A model
+  # with no per-token price is charged for engine time under onprem: above,
+  # which is what running it actually costs the plant.
 
 # ---------------------------------------------------------------------------
 # ROUTING - the router lane classifies input into these classes

@@ -236,41 +236,57 @@ async function showUsage(){
     d = await (await fetch("/api/usage?days=" + USAGE_DAYS)).json();
   }catch(e){ view.innerHTML = `<div class="uv-empty">Could not read usage.</div>`; return; }
 
-  const t = d.total, tok = t.tokens || 0;
+  const t = d.total, tok = t.tokens || 0, cap = d.capacity || {};
   const peak = Math.max(1, ...d.daily.map(x => x.prompt_tokens + x.output_tokens));
-  const hosted = d.tiers.filter(x => x.cost_usd > 0)
+  const hourPeak = Math.max(1, ...(cap.by_hour || []).map(h => h.seconds));
+  const util = Math.round((cap.utilisation || 0) * 100);
+  const hosted = d.tiers.filter(x => x.key !== "tier-S")
                         .reduce((a, x) => a + x.cost_usd, 0);
-  const localTok = d.models.filter(m => !(d.pricing[m.key]?.output))
-                           .reduce((a, m) => a + m.prompt_tokens + m.output_tokens, 0);
+  const cur = n => n >= 1 ? n.toFixed(2) : n > 0 ? n.toFixed(4) : "0.00";
 
   view.innerHTML = `
-    <div class="uv-head"><h2>Usage and cost</h2>
+    <div class="uv-head"><h2>Fleet usage and capacity</h2>
       <div class="uv-range">
         ${[1, 7, 30, 90].map(n =>
           `<button data-d="${n}" class="${n === USAGE_DAYS ? "on" : ""}">${
             n === 1 ? "today" : n + "d"}</button>`).join("")}
       </div>
     </div>
-    <div class="uv-sub">This machine: <b>${esc(d.this_machine)}</b>
-      \u00b7 signed in as <b>${esc(d.this_user)}</b>
+    <div class="uv-sub">${fmtInt(cap.machines_seen || 0)} PC(s) reporting
+      \u00b7 reading <b>${esc(d.usage_dir || "this machine only")}</b>
       \u00b7 last ${d.days} day${d.days === 1 ? "" : "s"}</div>
 
     <div class="uv-cards">
+      <div class="uv-card"><div class="k">node utilisation</div>
+        <div class="v">${util}%</div>
+        <div class="n">${(cap.engine_seconds / 3600).toFixed(1)}h of engine time
+          over ${(cap.window_hours || 0).toFixed(1)}h</div></div>
+      <div class="uv-card"><div class="k">busiest hour</div>
+        <div class="v">${cap.busiest_hour == null ? "\u2014"
+          : String(cap.busiest_hour).padStart(2, "0") + ":00"}</div>
+        <div class="n">${(cap.busiest_hour_seconds / 60).toFixed(0)} engine-minutes</div></div>
       <div class="uv-card"><div class="k">requests</div>
         <div class="v">${fmtInt(t.calls)}</div>
         <div class="n">${fmtInt(t.tokens_per_call)} tokens each on average</div></div>
       <div class="uv-card"><div class="k">tokens</div>
         <div class="v">${fmtTok(tok)}</div>
         <div class="n">${fmtTok(t.prompt_tokens)} in \u00b7 ${fmtTok(t.output_tokens)} out</div></div>
-      <div class="uv-card"><div class="k">billed</div>
-        <div class="v">${fmtUsd(t.cost_usd)}</div>
-        <div class="n">${hosted > 0 ? "hosted tiers only" : "nothing billable yet"}</div></div>
-      <div class="uv-card free"><div class="k">ran free on-premise</div>
-        <div class="v">${fmtTok(localTok)}</div>
-        <div class="n">tokens that cost nothing per call</div></div>
-      <div class="uv-card"><div class="k">engine time</div>
-        <div class="v">${(t.seconds / 60).toFixed(1)}m</div>
-        <div class="n">${t.fell_back} fell back to local</div></div>
+      <div class="uv-card"><div class="k">cost to run</div>
+        <div class="v">${cur(t.cost_usd)}</div>
+        <div class="n">${hosted > 0
+          ? cur(hosted) + " of it billed by a vendor"
+          : "all on plant hardware"}</div></div>
+    </div>
+
+    <div class="uv-sec"><h3>When the node is busy</h3>
+      <p class="why">Engine-seconds by hour of day. This is the number that
+        decides whether one GPU node is enough - a flat day means headroom, a
+        wall at 10:00 means people are queueing behind each other.</p>
+      <div class="uv-spark">${(cap.by_hour || []).map(h =>
+        `<i style="height:${Math.max(2, h.seconds / hourPeak * 100)}%"
+           title="${String(h.hour).padStart(2, "0")}:00 \u00b7 ${
+             (h.seconds / 60).toFixed(1)} engine-min \u00b7 ${h.calls} calls"></i>`
+        ).join("") || '<span class="uv-empty">No traffic recorded yet.</span>'}</div>
     </div>
 
     <div class="uv-sec"><h3>Daily</h3>
@@ -279,28 +295,42 @@ async function showUsage(){
       <div class="uv-spark">${d.daily.map(x => {
         const v = x.prompt_tokens + x.output_tokens;
         return `<i style="height:${Math.max(2, v / peak * 100)}%"
-          title="${esc(x.key)} \u00b7 ${fmtTok(v)} tokens \u00b7 ${fmtUsd(x.cost_usd)}"></i>`;
+          title="${esc(x.key)} \u00b7 ${fmtTok(v)} tokens \u00b7 ${cur(x.cost_usd)}"></i>`;
       }).join("") || '<span class="uv-empty">No days recorded yet.</span>'}</div>
     </div>
 
-    ${uvTable("By machine",
-      "One workbench per PC, so a machine is a person's usage. The lightest "
-      + "rows matter as much as the heaviest: a machine at zero is a licence "
-      + "nobody is using.", d.machines, tok, d.this_machine, "machine")}
+    ${uvTable("By PC",
+      "One workbench per engineer's machine, so a row is a person's load on "
+      + "the shared node. The lightest rows matter as much as the heaviest: a "
+      + "PC at the bottom is a deployment nobody is using."
+      + ((cap.machines_idle || []).length
+          ? " Idle right now: " + cap.machines_idle.map(esc).join(", ") + "."
+          : ""),
+      d.machines, tok, d.this_machine, "machine")}
 
-    ${uvTable("By person", "Who the OS says was signed in. Taken from the "
-      + "login rather than asked for, so it cannot be typed wrong or borrowed.",
+    ${uvTable("By person", "Who the OS says was signed in. Taken from the login "
+      + "rather than asked for, so it cannot be typed wrong or borrowed.",
       d.users, tok, d.this_user, "user")}
 
-    ${uvTable("By model", "What each model is costing. Local models are billed "
-      + "at zero because they are - that is the product, not a rounding.",
-      d.models, tok, null, "model")}
+    ${uvTable("By model", "What each model is doing to the node. Models with no "
+      + "per-token price are charged for the seconds they occupied it - free at "
+      + "the invoice, not free at the wall.", d.models, tok, null, "model")}
 
-    ${uvTable("By lane", "Which job spends the budget. A router burning tokens "
-      + "means a big model is doing a small model's work.",
+    ${uvTable("By lane", "Which job is eating the node. A router burning engine "
+      + "time means a large model is doing a small model's work.",
       d.lanes, tok, null, "lane")}
 
-    ${uvTable("By tier", "Local against hosted, in money.", d.tiers, tok, null, "tier")}
+    ${uvTable("On-premise against hosted", "The whole argument, in one table.",
+      d.tiers, tok, null, "tier")}
+
+    <div class="uv-sec"><h3>How cost is worked out</h3>
+      <p class="why">There is no vendor invoice for a model the plant hosts, so
+        cost is derived: a node costing ${fmtInt(d.onprem?.node_cost || 0)} over
+        ${d.onprem?.life_years || 0} years, drawing ${d.onprem?.draw_watts || 0} W
+        at ${d.onprem?.power_per_kwh || 0} per kWh, is about
+        <b>${cur((d.onprem_rate || 0) * 3600)} per engine-hour</b>. Change those
+        four numbers in models.yaml and every figure above moves with them.</p>
+    </div>
   `;
 
   view.querySelectorAll(".uv-range button").forEach(b => {

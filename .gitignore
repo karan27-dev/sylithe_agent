@@ -58,4 +58,4 @@ backend/data/bench_pid_real/*.png
 
 # Per-machine usage accounting. Local to the PC that produced it, and a fleet
 # view is these files gathered on a share rather than a service every PC calls.
-backend/data/usage.jsonl
+backend/data/usage/

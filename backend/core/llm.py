@@ -222,6 +222,8 @@ class Registry:
     # USD per million tokens, per model. Read by the usage dashboard; a model
     # that is absent prices at zero, which is correct for anything local.
     pricing: dict = field(default_factory=dict)
+    # What an engine-second costs on hardware the plant owns.
+    onprem: dict = field(default_factory=dict)
 
     @classmethod
     def load(cls, path: Path | str = _YAML_PATH) -> "Registry":
@@ -250,6 +252,7 @@ class Registry:
         return cls(
             active_profile=active,
             pricing=raw.get("pricing") or {},
+            onprem=raw.get("onprem") or {},
             defaults=defaults,
             profiles=profiles,
             classes=classes,
@@ -395,7 +398,7 @@ class Client:
                          prompt_tokens=reply.prompt_tokens,
                          output_tokens=reply.output_tokens,
                          latency_s=dt, fell_back=_fell_back,
-                         rates=self.reg.pricing)
+                         rates=self.reg.pricing, onprem=self.reg.onprem)
         except Exception:
             pass
         return reply

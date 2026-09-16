@@ -1,28 +1,37 @@
 """
-Who ran what, on which machine, and what it cost.
+Who ran what, on which PC, and what it cost the plant to run it.
 
-The deployment this is written for is one workbench per engineer's PC, all of
-them on plant hardware. That answers "is our data safe" and immediately raises
-the next question a plant IT manager asks: which machines are actually using
-this, how much, and what is the bill.
+THE DEPLOYMENT THIS IS FOR. The plant hosts the models on its own GPU server.
+Engineers' PCs run the workbench and call that server over the LAN. Nothing
+leaves the site, so there is no vendor bill - and "cost" therefore is not
+dollars per token. It is GPU TIME on hardware the plant already bought, plus
+the power to run it. A dashboard built around an API invoice answers a
+question this deployment never asks.
 
-Recorded per LLM call, appended to data/usage.jsonl and never rewritten:
+So the unit of account is engine seconds. Money is derived from them, at a
+rate the plant sets in models.yaml from its own capex and tariff, and the
+dashboard says which rate it used rather than implying a market price.
+
+WHAT A PLANT IT MANAGER ACTUALLY ASKS
+  * is one GPU node enough, and when will it stop being enough
+  * which PCs are actually using this, and which are not using it at all
+  * who is waiting, and at what time of day
+  * which job is eating the node - because a router burning GPU time means a
+    large model is doing a small model's work
+
+FLEET WITHOUT A SERVER. Every PC appends to its OWN file. Point
+WORKBENCH_USAGE_DIR at a share and the dashboard reads every file in it, so a
+fleet view needs a folder rather than a service each PC phones home to - which
+would be a network dependency in a product whose claim is that there is none.
+
+Recorded per call, appended and never rewritten:
 
     ts  machine  user  tier  lane  model  prompt_tokens  output_tokens
     latency_s  fell_back  cost_usd
 
-machine and user come from the OS, not from anything the user types, because
-an attribution scheme people can edit is not an attribution scheme. Nothing
-leaves the box: this file is read by the dashboard on the same machine.
-
 WHAT IS DELIBERATELY NOT STORED. Not the question, not the answer, not the
-documents. A usage log that carries plant content becomes the thing the air
-gap exists to prevent, and a token count is enough to answer every question
-the dashboard asks.
-
-Local models cost nothing per token, and the log says 0.0 rather than
-inventing an electricity figure. That zero is the point of the product, so it
-should be visible rather than fudged into looking like a saving.
+documents. A usage log carrying plant content becomes the thing the air gap
+exists to prevent, and a token count answers every question asked here.
 """
 
 from __future__ import annotations
@@ -37,7 +46,12 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parent.parent
-STORE = _ROOT / "data" / "usage.jsonl"
+
+# One file per PC. A shared directory makes the fleet view work with no
+# service and no inbound port - each machine only ever appends to its own file,
+# so two PCs writing at once cannot corrupt each other.
+USAGE_DIR = Path(os.environ.get("WORKBENCH_USAGE_DIR")
+                 or (_ROOT / "data" / "usage"))
 _lock = threading.Lock()
 
 # Kept small and boring on purpose: hostname identifies the PC, the OS login
@@ -65,6 +79,25 @@ class Call:
     cost_usd: float
 
 
+def gpu_rate(onprem: dict) -> float:
+    """
+    Cost of one engine-second on hardware the plant owns.
+
+    Derived, not quoted. A GPU node has a purchase price, a life, and a power
+    draw; per-second cost is those three divided out. Stated this way the
+    number can be argued with by the person who signs for the hardware, which
+    is the only way a cost figure survives a review.
+    """
+    o = onprem or {}
+    capex = float(o.get("node_cost", 0))          # what the node cost
+    years = float(o.get("life_years", 4) or 4)    # over how long it is written off
+    watts = float(o.get("draw_watts", 0))         # under load
+    tariff = float(o.get("power_per_kwh", 0))     # currency per kWh
+    hours = years * 365 * 24
+    per_hour = (capex / hours if hours else 0) + (watts / 1000.0) * tariff
+    return per_hour / 3600.0
+
+
 def price(rates: dict, model: str) -> tuple[float, float]:
     """(input, output) USD per MILLION tokens. Unknown model prices at 0."""
     r = (rates or {}).get(model)
@@ -75,9 +108,14 @@ def price(rates: dict, model: str) -> tuple[float, float]:
 
 def record(*, tier: str, lane: str, model: str, prompt_tokens: int,
            output_tokens: int, latency_s: float, fell_back: bool,
-           rates: dict | None = None) -> None:
+           rates: dict | None = None, onprem: dict | None = None) -> None:
     pin, pout = price(rates or {}, model)
     cost = (prompt_tokens / 1e6) * pin + (output_tokens / 1e6) * pout
+    # A model with no per-token price is running on the plant's own hardware,
+    # so it is charged for the seconds it occupied the node instead. Free at
+    # the invoice, not free at the wall.
+    if pin == 0 and pout == 0:
+        cost = float(latency_s or 0) * gpu_rate(onprem or {})
     call = Call(ts=time.time(), machine=MACHINE, user=USER, tier=tier,
                 lane=lane, model=model, prompt_tokens=int(prompt_tokens or 0),
                 output_tokens=int(output_tokens or 0),
@@ -85,26 +123,36 @@ def record(*, tier: str, lane: str, model: str, prompt_tokens: int,
                 fell_back=bool(fell_back), cost_usd=round(cost, 6))
     try:
         with _lock:
-            STORE.parent.mkdir(parents=True, exist_ok=True)
-            with STORE.open("a") as fh:
+            USAGE_DIR.mkdir(parents=True, exist_ok=True)
+            with _my_file().open("a") as fh:
                 fh.write(json.dumps(asdict(call)) + "\n")
     except Exception:
         # Usage accounting must never break a working answer.
         pass
 
 
+def _my_file() -> Path:
+    safe = "".join(c if c.isalnum() or c in "-_." else "-" for c in MACHINE)
+    return USAGE_DIR / f"usage-{safe}.jsonl"
+
+
 def read(since: float | None = None) -> list[dict]:
-    if not STORE.exists():
-        return []
+    """Every machine's file in the usage directory, not just this one."""
     out = []
-    with STORE.open() as fh:
-        for line in fh:
-            try:
-                d = json.loads(line)
-            except json.JSONDecodeError:
-                continue
-            if since is None or d.get("ts", 0) >= since:
-                out.append(d)
+    if not USAGE_DIR.exists():
+        return out
+    for f in sorted(USAGE_DIR.glob("usage-*.jsonl")):
+        try:
+            with f.open() as fh:
+                for line in fh:
+                    try:
+                        d = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
+                    if since is None or d.get("ts", 0) >= since:
+                        out.append(d)
+        except Exception:
+            continue
     return out
 
 
@@ -152,8 +200,36 @@ def summary(days: int = 30) -> dict:
         out.sort(key=lambda r: -(r["prompt_tokens"] + r["output_tokens"]))
         return out
 
+    # Capacity, which is the question an owned node actually raises: not
+    # "what is the bill" but "is one node enough, and when will it stop being".
+    by_hour: dict[int, dict] = {}
+    for d in rows:
+        _add(by_hour.setdefault(
+            int(time.strftime("%H", time.localtime(d.get("ts", 0)))), _empty()), d)
+
+    busiest = max(by_hour.items(), key=lambda kv: kv[1]["seconds"], default=None)
+    span_h = max(1e-9, (max((d["ts"] for d in rows), default=0)
+                        - min((d["ts"] for d in rows), default=0)) / 3600)
+    # Engine-seconds used against wall-clock seconds in the window. Above ~1.0
+    # the node is saturated and people are queueing behind each other.
+    busy_frac = total["seconds"] / (span_h * 3600) if rows else 0.0
+
+    idle = [m for m in by_machine if by_machine[m]["calls"] == 0]
+
     tokens = total["prompt_tokens"] + total["output_tokens"]
     return {
+        "capacity": {
+            "engine_seconds": round(total["seconds"], 1),
+            "window_hours": round(span_h, 2),
+            "utilisation": round(busy_frac, 4),
+            "busiest_hour": busiest[0] if busiest else None,
+            "busiest_hour_seconds": round(busiest[1]["seconds"], 1) if busiest else 0,
+            "by_hour": [{"hour": h, "seconds": round(v["seconds"], 1),
+                         "calls": v["calls"]}
+                        for h, v in sorted(by_hour.items())],
+            "machines_seen": len(by_machine),
+            "machines_idle": idle,
+        },
         "days": days,
         "since": since,
         "total": {**total, "tokens": tokens,

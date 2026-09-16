@@ -562,6 +562,9 @@ def api_usage(days: int = 30) -> dict:
     from core import usage
     out = usage.summary(days=days)
     out["pricing"] = CLIENT.reg.pricing
+    out["onprem"] = CLIENT.reg.onprem
+    out["onprem_rate"] = usage.gpu_rate(CLIENT.reg.onprem)
+    out["usage_dir"] = str(usage.USAGE_DIR)
     return out
 
 
