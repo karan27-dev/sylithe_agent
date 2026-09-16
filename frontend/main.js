@@ -6,6 +6,20 @@ const $ = s => document.querySelector(s);
 const feed = $("#feed"), qEl = $("#q"), sendEl = $("#send"), scroll = $("#scroll");
 let chatId = null, busy = false;
 
+/* Working context - uploads, the drawing in play, the chosen folder - is kept
+   per chat on the server. Anything that adds to it has to say WHICH chat, so
+   a file dropped here never surfaces in a different conversation. Uploading
+   before the first message is normal, so a chat is created on demand rather
+   than only when a question is sent. */
+async function needChat(){
+  if(!chatId){
+    const r = await (await fetch("/api/chats", {method:"POST"})).json();
+    chatId = r.id;
+    await loadChats();
+  }
+  return chatId;
+}
+
 /* ---------- theme ---------- */
 const root = document.documentElement;
 try{ root.dataset.theme = localStorage.getItem("sw-theme") || "light"; }catch(e){}
@@ -31,7 +45,8 @@ function toast(msg, ms = 2800){
 /* ---------- boot ---------- */
 async function boot(){
   try{
-    const b = await (await fetch("/api/boot")).json();
+    const b = await (await fetch("/api/boot?chat_id="
+      + encodeURIComponent(chatId || ""))).json();
     $("#pill-model").innerHTML = b.health.up
       ? `<b>${b.health.lanes.reason}</b>`
       : `<b style="color:var(--bad)">engine offline</b>`;
@@ -307,8 +322,7 @@ function fileCard(f){
 async function ask(){
   const text = qEl.value.trim();
   if(!text || busy) return;
-  if(!chatId){ const r = await (await fetch("/api/chats",{method:"POST"})).json();
-               chatId = r.id; }
+  await needChat();
   if(feed.querySelector(".hero")) feed.innerHTML = "";
 
   busy = true; sendEl.disabled = true;
@@ -505,7 +519,9 @@ async function upload(files){
     filesEl.appendChild(chip);
     const fd = new FormData(); fd.append("file", f);
     try{
-      const r = await (await fetch("/api/upload", { method:"POST", body: fd })).json();
+      const r = await (await fetch("/api/upload?chat_id="
+        + encodeURIComponent(await needChat()),
+        { method:"POST", body: fd })).json();
       if(!r.ok){ toast(r.error || "Ingest failed", 5000); chip.remove(); continue; }
       chip.classList.remove("busy");
       const okIngest = r.indexed !== false && r.stats.chunks > 0;
@@ -566,7 +582,8 @@ folderBtn.onclick = async () => {
   folderBtn.disabled = true;
   folderBtn.classList.add("on");
   try{
-    const r = await (await fetch("/api/folder/choose", {method:"POST"})).json();
+    await needChat();
+      const r = await (await fetch("/api/folder/choose", {method:"POST"})).json();
     if(r.path){ analyseFolder(r.path); return; }
     if(r.cancelled) return;                 // said no - do nothing at all
     toast((r.error || "Could not open the folder chooser")
@@ -642,7 +659,8 @@ function analyseFolder(path){
     stackIcons(head, body);
   }
 
-  const es = new EventSource("/api/folder/analyse?path=" + encodeURIComponent(path));
+  const es = new EventSource("/api/folder/analyse?path="
+    + encodeURIComponent(path) + "&chat_id=" + encodeURIComponent(chatId || ""));
   es.addEventListener("step", e => putStep(JSON.parse(e.data)));
 
   es.addEventListener("folder_scan", e => {

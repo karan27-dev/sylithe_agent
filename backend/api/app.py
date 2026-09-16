@@ -52,42 +52,49 @@ app = FastAPI(title="Sovereign Workbench")
 CLIENT = Client()
 AGENT = Agent(CLIENT)
 
-# Files uploaded in this session, newest first. When someone asks "what is in
-# this file" right after dropping one in, retrieval must look THERE rather
-# than run a vague search across the whole corpus and come back empty.
-RECENT_UPLOADS: list[str] = []
+# ---------------------------------------------------------------------------
+# working context, PER CHAT
+# ---------------------------------------------------------------------------
+# What is currently being worked on: which files were uploaded, which drawing
+# is on the table, the brief describing each one, which folder was picked.
+#
+# This used to be five module-level lists - one set for the whole server. Open
+# a new chat and the assistant still answered about the previous chat's file,
+# because the process only ever had one "current file". A chat that looks clean
+# must be clean underneath. So every entry below is keyed by chat id, and the
+# same keying is what lets a chat you come back to still know its own context.
+#
+# Why each list exists:
+#   uploads  - "what is in this file" right after a drop must look THERE, not
+#              run a vague search over the whole corpus and come back empty
+#   drawings - a P&ID yields zero chunks (its content is geometry, not text) so
+#              it never reaches the index; the agent needs the FILE
+#   images   - a handwritten note DOES index, so it is not a "drawing", but the
+#              vision lane still reads it better than OCR does
+#   briefs   - what each upload actually IS, worked out once at upload time;
+#              without it the agent held a path and no idea what was in it
 RECENT_MAX = 8
-
-# Drawings are tracked separately. A P&ID yields zero chunks - its content is
-# geometry, not text - so it never reaches the index and the ordinary
-# "recent uploads" path cannot help. The agent needs the FILE.
-RECENT_DRAWINGS: list[str] = []
+BRIEFS_MAX = 5
 DRAWING_EXT = {".png", ".jpg", ".jpeg", ".tiff", ".bmp", ".webp", ".pdf"}
-
-# Every uploaded image, whether or not OCR found text in it. A handwritten note
-# DOES index (OCR recovers most of it), so it never lands in RECENT_DRAWINGS -
-# but the vision lane still reads it better than OCR does, so the file has to
-# be kept either way.
-RECENT_IMAGES: list[str] = []
 IMAGE_EXT = {".png", ".jpg", ".jpeg", ".tiff", ".bmp", ".webp"}
 
-# What each upload actually IS, worked out once at upload time and then carried
-# into every question. Without this the agent held a file path and no idea what
-# was in it, and answered "what is this" with "I cannot see any files you have
-# uploaded" while the file sat in front of it.
-BRIEFS: list = []
-BRIEFS_MAX = 5
+# chat_id -> working context. "" is the scratch context used by callers that
+# genuinely have no chat (the CLI benchmarks, a bare curl); it is never shown
+# to a real chat.
+SESSIONS: dict[str, dict] = {}
 
-# Bring the last session back. The index and chats were always on disk; this is
-# the working context - what was uploaded, which drawing is in play - which
-# used to vanish with the process.
+
+def sess(chat_id: str | None) -> dict:
+    return SESSIONS.setdefault(chat_id or "", {
+        "uploads": [], "drawings": [], "images": [], "briefs": [],
+        "folder": None,
+    })
+
+
 try:
     from api import memory as _mem
-    _saved = _mem.load()
-    RECENT_UPLOADS[:] = _saved.get("uploads", [])
-    RECENT_DRAWINGS[:] = _saved.get("drawings", [])
-    RECENT_IMAGES[:] = _saved.get("images", [])
-    BRIEFS[:] = _mem.restore_briefs(_saved.get("briefs", []))
+    for _cid, _v in _mem.load().items():
+        SESSIONS[_cid] = {**_v, "briefs": _mem.restore_briefs(_v.get("briefs", []))}
 except Exception:
     pass
 
@@ -95,36 +102,40 @@ except Exception:
 def _remember() -> None:
     try:
         from api import memory as _m
-        _m.save(RECENT_UPLOADS, RECENT_DRAWINGS, RECENT_IMAGES, BRIEFS,
-                folder=SELECTED_FOLDER[0] if SELECTED_FOLDER else None)
+        _m.save(SESSIONS)
     except Exception:
         pass
 
 
-def _remember_image(path: Path) -> None:
-    p = str(path)
-    if p in RECENT_IMAGES:
-        RECENT_IMAGES.remove(p)
-    RECENT_IMAGES.insert(0, p)
-    del RECENT_IMAGES[4:]
+def _push(seq: list, value, cap: int) -> None:
+    if value in seq:
+        seq.remove(value)
+    seq.insert(0, value)
+    del seq[cap:]
+
+
+def _remember_image(chat_id: str | None, path: Path) -> None:
+    _push(sess(chat_id)["images"], str(path), 4)
     _remember()
 
 
-def _remember_drawing(path: Path) -> None:
-    p = str(path)
-    if p in RECENT_DRAWINGS:
-        RECENT_DRAWINGS.remove(p)
-    RECENT_DRAWINGS.insert(0, p)
-    del RECENT_DRAWINGS[4:]
+def _remember_drawing(chat_id: str | None, path: Path) -> None:
+    _push(sess(chat_id)["drawings"], str(path), 4)
     _remember()
 
 
-def _remember_upload(name: str) -> None:
-    if name in RECENT_UPLOADS:
-        RECENT_UPLOADS.remove(name)
-    RECENT_UPLOADS.insert(0, name)
-    del RECENT_UPLOADS[RECENT_MAX:]
+def _remember_upload(chat_id: str | None, name: str) -> None:
+    _push(sess(chat_id)["uploads"], name, RECENT_MAX)
     _remember()
+
+
+def _remember_brief(chat_id: str | None, b) -> None:
+    briefs = sess(chat_id)["briefs"]
+    briefs[:] = [x for x in briefs if x.name != b.name]
+    briefs.insert(0, b)
+    del briefs[BRIEFS_MAX:]
+    _remember()
+
 
 def _sse(event: str, data: dict) -> str:
     return f"event: {event}\ndata: {json.dumps(data, default=str)}\n\n"
@@ -136,15 +147,20 @@ def _sse(event: str, data: dict) -> str:
 
 
 @app.get("/api/boot")
-def boot() -> dict:
-    """On page load: what is running, what is indexed, how the seal looks."""
+def boot(chat_id: str = "") -> dict:
+    """On page load: what is running, what is indexed, how the seal looks.
+
+    `remembered` is this CHAT's context. A chat id that has never uploaded
+    anything gets an empty list - which is the whole point: a new chat used to
+    boot showing the previous chat's file.
+    """
     health = CLIENT.health()
     try:
         idx = pipeline.status()
     except Exception as exc:
         idx = {"indexed": False, "chunks": 0, "sources": [], "error": str(exc)}
     return {
-        "remembered": [b.line() for b in BRIEFS[:3]],
+        "remembered": [b.line() for b in sess(chat_id)["briefs"][:3]],
         "health": health,
         "index": idx,
         "sovereignty": MONITOR.summary(),
@@ -189,12 +205,13 @@ async def _ask_stream(q: str, k: int, chat_id: str | None = None) -> AsyncIterat
 
     def produce() -> None:
         try:
+            ctx = sess(chat_id)
             for ev in AGENT.run(q, history=past, k=k,
-                                recent_files=list(RECENT_UPLOADS),
-                                drawing=RECENT_DRAWINGS[0] if RECENT_DRAWINGS else None,
-                                image=RECENT_IMAGES[0] if RECENT_IMAGES else None,
-                                briefs=list(BRIEFS),
-                                folder=SELECTED_FOLDER[0] if SELECTED_FOLDER else None):
+                                recent_files=list(ctx["uploads"]),
+                                drawing=ctx["drawings"][0] if ctx["drawings"] else None,
+                                image=ctx["images"][0] if ctx["images"] else None,
+                                briefs=list(ctx["briefs"]),
+                                folder=ctx["folder"]):
                 if ev["type"] == "token":
                     state["answer"] += ev["text"]
                 elif ev["type"] == "sources":
@@ -271,7 +288,8 @@ def api_chat_del(cid: str) -> dict:
 
 
 @app.post("/api/upload")
-async def upload(file: UploadFile = File(...)) -> JSONResponse:
+async def upload(file: UploadFile = File(...),
+                 chat_id: str = "") -> JSONResponse:
     """Drag-drop -> data/corpus -> indexed immediately. Nothing leaves the box."""
     name = Path(file.filename or "upload").name
     if Path(name).suffix.lower() not in pipeline.SUPPORTED:
@@ -292,22 +310,19 @@ async def upload(file: UploadFile = File(...)) -> JSONResponse:
     try:
         from tools.brief import describe
         b = await loop.run_in_executor(None, lambda: describe(dest, chunks))
-        BRIEFS[:] = [x for x in BRIEFS if x.name != b.name]
-        BRIEFS.insert(0, b)
-        del BRIEFS[BRIEFS_MAX:]
-        _remember()
+        _remember_brief(chat_id, b)
     except Exception:
         b = None
 
     indexed = stats.get("chunks", 0) > 0
     if dest.suffix.lower() in IMAGE_EXT:
-        _remember_image(dest)
+        _remember_image(chat_id, dest)
     if indexed:
-        _remember_upload(name)
+        _remember_upload(chat_id, name)
     elif dest.suffix.lower() in DRAWING_EXT:
         # Zero chunks from an image is the signature of a drawing, so keep the
         # path for analyze_pid instead of treating it as a failed upload.
-        _remember_drawing(dest)
+        _remember_drawing(chat_id, dest)
     return JSONResponse({"ok": True, "file": name, "stats": stats,
                          "indexed": indexed,
                          "brief": b.as_dict() if b else None,
@@ -353,23 +368,15 @@ def api_folder_choose() -> dict:
     return folder.choose()
 
 
-# The folder the user last chose. "Analyse my folder" should not require
-# retyping a path that was just picked from a dialog.
-SELECTED_FOLDER: list[str] = []
-try:
-    _sf = _mem.load().get("folder")
-    if _sf and Path(_sf).is_dir():
-        SELECTED_FOLDER.append(_sf)
-except Exception:
-    pass
-
-
+# The folder the user last chose, per chat. "Analyse my folder" should not
+# require retyping a path that was just picked from a dialog - but the folder
+# picked in one chat is not the folder a different chat is working on.
 @app.post("/api/folder/select")
-def api_folder_select(path: str) -> dict:
+def api_folder_select(path: str, chat_id: str = "") -> dict:
     p = Path(path).expanduser()
     if not p.is_dir():
         return {"ok": False, "error": f"Not a folder: {p}"}
-    SELECTED_FOLDER[:] = [str(p)]
+    sess(chat_id)["folder"] = str(p)
     _remember()
     return {"ok": True, "path": str(p)}
 
@@ -402,11 +409,11 @@ async def _folder_stream(path: str) -> AsyncIterator[str]:
 
 
 @app.get("/api/folder/analyse")
-async def api_folder_analyse(path: str) -> StreamingResponse:
+async def api_folder_analyse(path: str, chat_id: str = "") -> StreamingResponse:
     """Chosen a folder? Then say what is in it, without being asked."""
     p = Path(path).expanduser()
     if p.is_dir():
-        SELECTED_FOLDER[:] = [str(p)]
+        sess(chat_id)["folder"] = str(p)
         _remember()
     return StreamingResponse(
         _folder_stream(str(p)), media_type="text/event-stream",
@@ -421,7 +428,7 @@ def api_folder_preview(path: str) -> dict:
 
 
 @app.post("/api/folder/ingest")
-async def api_folder_ingest(path: str) -> dict:
+async def api_folder_ingest(path: str, chat_id: str = "") -> dict:
     """Index a local folder in place. Nothing is copied, nothing leaves."""
     from tools import folder
     loop = asyncio.get_running_loop()
@@ -431,10 +438,7 @@ async def api_folder_ingest(path: str) -> dict:
         try:
             from tools.brief import describe
             for f in scan.files[:3]:
-                b = describe(Path(f), 1)
-                BRIEFS[:] = [x for x in BRIEFS if x.name != b.name]
-                BRIEFS.insert(0, b)
-            del BRIEFS[BRIEFS_MAX:]
+                _remember_brief(chat_id, describe(Path(f), 1))
         except Exception:
             pass
     return {**scan.as_dict(), "index": pipeline.status()}
