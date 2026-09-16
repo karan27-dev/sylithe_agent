@@ -158,8 +158,23 @@ profiles:
       #
       # The router asks for 32 tokens of JSON, so it runs on Flash: a 1.6T
       # model classifying "is this a document question" is money set alight.
+      # One model per job, not one model for everything.
+      #
+      # router  32 tokens of JSON to pick a lane. Flash, because a 1.6T model
+      #         answering "is this a document question" is money set alight,
+      #         and tier-S measured the accuracy as coming from the few-shot
+      #         examples rather than from parameters.
+      # reason  V4 Pro with thinking at max. This is the lane that decides
+      #         whether a relief device may go back into service, and every
+      #         wrong answer this project has recorded came from a model
+      #         asserting a verdict it had not worked through.
+      # code    V4 Pro, no thinking. The code lane writes a short script that
+      #         is then EXECUTED in a sandbox, so its output is checked by
+      #         running it - deliberation buys less here than it costs.
+      # vision  Flash, the only one of the two that accepts an image.
       router:  { model: deepseek-flash,  think: false, max_tokens: 32 }
-      reason:  { model: deepseek-v4-pro, think: false, max_tokens: 2048 }
+      reason:  { model: deepseek-v4-pro, think: true,  max_tokens: 4096,
+                 reasoning_effort: max, timeout_s: 240 }
       code:    { model: deepseek-v4-pro, think: false, max_tokens: 2048 }
       # Flash, not Pro: Pro is the stronger reasoner but Flash is the one that
       # takes an image. core/llm.py already sends uploads as OpenAI image_url
@@ -171,10 +186,17 @@ profiles:
       # the right split - a VLM asked to enumerate symbols invents categories
       # that are not on the sheet.
       vision:  { model: deepseek-flash,  think: false, max_tokens: 2048 }
-      # Embeddings stay LOCAL. Changing them invalidates the index, and
-      # re-embedding through a paid endpoint costs money to gain nothing -
-      # this comparison is about reasoning, not retrieval.
-      embed:   { model: nomic-embed-text, dim: 768 }
+      # Embeddings stay LOCAL, and the endpoint has to say so.
+      #
+      # Naming the model alone was not enough: the endpoint comes from the
+      # profile, so this lane posted to https://api.deepseek.com/v1/embeddings
+      # and returned 401 on every folder scan. Switching tiers must also never
+      # change the embedding model, because that invalidates every vector
+      # already in the index.
+      embed:
+        model: nomic-embed-text
+        dim: 768
+        endpoint: http://localhost:11434
 
 # ---------------------------------------------------------------------------
 # ROUTING - the router lane classifies input into these classes

@@ -58,6 +58,23 @@ class Lane:
     max_tokens: int | None = None
     timeout_s: float = 120.0
     dim: int | None = None            # embed lane only
+    # DeepSeek V4 Pro exposes thinking depth as reasoning_effort ("high" is
+    # its default, "max" is the ceiling) rather than through the chat template.
+    # Left unset the parameter is not sent at all, so an endpoint that has
+    # never heard of it is unaffected.
+    reasoning_effort: str | None = None
+
+    # A lane may pin its own engine instead of using the profile's.
+    #
+    # Needed because the embed lane is not like the others. models.yaml said
+    # "embed: nomic-embed-text" under tier-L and read as local, but only the
+    # MODEL NAME is per-lane - the endpoint came from the profile, so the call
+    # went to https://api.deepseek.com/v1/embeddings and came back 401. The
+    # comment claiming embeddings stayed local was simply wrong.
+    #
+    # It matters beyond the error: switching tiers must not silently change
+    # the embedding model, because that invalidates every vector in the index.
+    endpoint: str | None = None
 
     @classmethod
     def from_yaml(cls, name: str, raw: dict, defaults: dict) -> "Lane":
@@ -70,6 +87,9 @@ class Lane:
             max_tokens=merged.get("max_tokens"),
             timeout_s=float(merged.get("timeout_s", 120)),
             dim=merged.get("dim"),
+            endpoint=(str(merged["endpoint"]).rstrip("/")
+                      if merged.get("endpoint") else None),
+            reasoning_effort=merged.get("reasoning_effort"),
         )
 
 
@@ -477,10 +497,15 @@ class Client:
         if not items:
             return []
 
+        # A lane with its own endpoint runs there, on the backend that endpoint
+        # implies, whatever the profile is set to.
+        endpoint = ln.endpoint or prof.endpoint
+        backend = _infer_backend(endpoint) if ln.endpoint else prof.backend
+
         self._ensure_room(prof, ln.model)
-        if prof.backend == "ollama":
+        if backend == "ollama":
             r = self._http.post(
-                f"{prof.endpoint}/api/embed",
+                f"{endpoint}/api/embed",
                 json={"model": ln.model, "input": items,
                       "keep_alive": prof.keep_alive},
                 timeout=ln.timeout_s,
@@ -489,7 +514,7 @@ class Client:
             vecs = r.json()["embeddings"]
         else:
             r = self._http.post(
-                f"{prof.endpoint}/v1/embeddings",
+                f"{endpoint}/v1/embeddings",
                 json={"model": ln.model, "input": items},
                 timeout=ln.timeout_s,
             )
@@ -598,7 +623,10 @@ class Client:
         }
         if opts["max_tokens"]:
             payload["max_tokens"] = int(opts["max_tokens"])
-        if not opts["think"]:
+        if ln.reasoning_effort:
+            # DeepSeek's own switch. Sent only when a lane asks for it.
+            payload["reasoning_effort"] = ln.reasoning_effort
+        elif not opts["think"]:
             # Qwen chat-template switch; ignored by servers that do not know it
             payload["chat_template_kwargs"] = {"enable_thinking": False}
 

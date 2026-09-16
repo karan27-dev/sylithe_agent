@@ -2,7 +2,7 @@
  "tier-S": [
   {
    "id": "B1",
-   "seconds": 38.4,
+   "seconds": 43.0,
    "passed": true,
    "error": "",
    "missing": [],
@@ -11,7 +11,7 @@
   },
   {
    "id": "B2",
-   "seconds": 39.6,
+   "seconds": 59.3,
    "passed": true,
    "error": "",
    "missing": [],
@@ -20,7 +20,7 @@
   },
   {
    "id": "B3",
-   "seconds": 33.8,
+   "seconds": 53.0,
    "passed": true,
    "error": "",
    "missing": [],
@@ -29,7 +29,7 @@
   },
   {
    "id": "B4",
-   "seconds": 31.9,
+   "seconds": 45.3,
    "passed": true,
    "error": "",
    "missing": [],
@@ -38,7 +38,7 @@
   },
   {
    "id": "B5",
-   "seconds": 31.7,
+   "seconds": 41.0,
    "passed": true,
    "error": "",
    "missing": [],
@@ -47,7 +47,7 @@
   },
   {
    "id": "B6",
-   "seconds": 36.9,
+   "seconds": 55.1,
    "passed": true,
    "error": "",
    "missing": [],
@@ -56,7 +56,7 @@
   },
   {
    "id": "B7",
-   "seconds": 25.1,
+   "seconds": 43.3,
    "passed": false,
    "error": "",
    "missing": [
@@ -68,7 +68,7 @@
   },
   {
    "id": "B8",
-   "seconds": 26.6,
+   "seconds": 99.9,
    "passed": true,
    "error": "",
    "missing": [],
@@ -77,7 +77,7 @@
   },
   {
    "id": "B9",
-   "seconds": 25.4,
+   "seconds": 36.2,
    "passed": true,
    "error": "",
    "missing": [],
@@ -86,7 +86,7 @@
   },
   {
    "id": "B10",
-   "seconds": 40.7,
+   "seconds": 23.9,
    "passed": true,
    "error": "",
    "missing": [],
@@ -95,7 +95,7 @@
   },
   {
    "id": "B11",
-   "seconds": 49.6,
+   "seconds": 41.3,
    "passed": true,
    "error": "",
    "missing": [],
@@ -104,7 +104,7 @@
   },
   {
    "id": "B12",
-   "seconds": 32.7,
+   "seconds": 38.4,
    "passed": true,
    "error": "",
    "missing": [],
@@ -113,7 +113,7 @@
   },
   {
    "id": "B14",
-   "seconds": 30.2,
+   "seconds": 37.9,
    "passed": false,
    "error": "",
    "missing": [],
@@ -126,7 +126,7 @@
  "tier-L": [
   {
    "id": "B1",
-   "seconds": 20.2,
+   "seconds": 7.3,
    "passed": false,
    "error": "",
    "missing": [
@@ -134,22 +134,22 @@
     "2.2"
    ],
    "said": [],
-   "answer": "I don't have any indexed documents for tag V-3302, so I can't calculate its corrosion rate or remaining life. Please upload the relevant survey data or specify which file contains this information."
+   "answer": "I don\u2019t have V-3302\u2019s thickness survey data in the record, so I can\u2019t calculate a corrosion rate or remaining life for it.\n\nIf you can provide the two survey readings for the thinnest CML (with dates) and the minimum required thickness, I\u2019ll work the calculation."
   },
   {
    "id": "B2",
-   "seconds": 99.8,
+   "seconds": 6.9,
    "passed": false,
    "error": "",
    "missing": [
     "1.1"
    ],
    "said": [],
-   "answer": "I don't have the remaining life or policy ceiling for tag V-3302 in my records, so I can't calculate the interval. Could you provide the relevant file or specify the governing policy?"
+   "answer": "I don\u2019t have V-3302\u2019s inspection record in the available documents, so I can\u2019t calculate its next due date. If you provide the most recent survey date, remaining life (or corrosion rate), and the policy ceiling, I can work it out."
   },
   {
    "id": "B3",
-   "seconds": 21.5,
+   "seconds": 9.8,
    "passed": false,
    "error": "",
    "missing": [
@@ -157,11 +157,11 @@
     "65.92"
    ],
    "said": [],
-   "answer": "I don't have the nameplate set pressure, tolerance, or as-found value for PSV-3312 in my records, so I can't calculate the acceptance band or give a verdict. Please provide the relevant drawing or test report file, or tell me the specific tag and its governing values."
+   "answer": "Not in the record, so I can\u2019t give a verdict. I\u2019d need PSV-3312\u2019s nameplate set pressure, the stated tolerance, and the governing as-found value\u2014plus whether an as-left test exists."
   },
   {
    "id": "B4",
-   "seconds": 98.0,
+   "seconds": 7.1,
    "passed": false,
    "error": "",
    "missing": [
@@ -170,11 +170,11 @@
     "ncr-2027-066"
    ],
    "said": [],
-   "answer": "I don't have the nameplate set pressure, tolerance, or as-found value for PSV-3318 in my records, so I can't calculate the acceptance band or give a verdict. Please provide the relevant drawing or test report file, or tell me the specific tag and values you're working with."
+   "answer": "I can\u2019t determine PSV-3318 acceptance without its data. I need the nameplate set pressure, the stated tolerance, and the as-found/as-left test value. Provide those and I\u2019ll calculate the band and verdict."
   },
   {
    "id": "B5",
-   "seconds": 21.8,
+   "seconds": 10.9,
    "passed": false,
    "error": "",
    "missing": [
@@ -183,20 +183,20 @@
     "31-aug-2027"
    ],
    "said": [],
-   "answer": "I cannot determine if the vessel can stay in service because your example only provides one thickness measurement (8.75 mm) and no earlier survey data to calculate a corrosion rate. Without knowing how fast the metal is wearing away, I can't calculate the remaining life. Do you have the previous survey report for E-3304?"
+   "answer": "No. At 8.75 mm the shell is already below the 9.20 mm minimum required thickness, so it does not meet the thickness criterion.\n\nRemaining life is zero/negative at that condition: `(8.75 - 9.20) / rate < 0`. It would need de-rating, repair, replacement, or a fitness-for-service assessment before staying in service."
   },
   {
    "id": "B6",
-   "seconds": 104.5,
+   "seconds": 7.2,
    "passed": true,
    "error": "",
    "missing": [],
    "said": [],
-   "answer": "I don't have access to the specific plant documents or uploaded files you mentioned, so I cannot verify if DEV-2027-009 applies to PSV-3318. To give you a definitive answer on whether that deviation covers this tag, please upload the relevant document or provide the file name where it is stored."
+   "answer": "No\u2014in the available record, DEV-2027-009 is not shown as covering PSV-3318, so it does not apply to that tag."
   },
   {
    "id": "B7",
-   "seconds": 21.0,
+   "seconds": 4.9,
    "passed": false,
    "error": "",
    "missing": [
@@ -204,11 +204,11 @@
     "supersed"
    ],
    "said": [],
-   "answer": "I don't have that specific oxygen acceptance criterion for Unit 33 in my records; if you can name the tag or upload the relevant file, I'd be happy to check it. Also, just so you know, I'm air-gapped and don't have access to live data or today's date."
+   "answer": "That acceptance criterion is not in the document record I have. If you can name the equipment tag or upload the relevant purging procedure/spec, I can check it for you."
   },
   {
    "id": "B8",
-   "seconds": 101.5,
+   "seconds": 10.2,
    "passed": false,
    "error": "",
    "missing": [
@@ -216,33 +216,29 @@
     "8 blind"
    ],
    "said": [],
-   "answer": "I don't have that information in my records. Could you tell me which specific vessel or line you're asking about so I can check the documents for the purge duration and blind point requirements?"
+   "answer": "That\u2019s not in the record I have. If you name the equipment/tag or upload the nitrogen purge/isolation procedure, I can pull the required purge duration and blind-point count from it."
   },
   {
    "id": "B9",
-   "seconds": 15.4,
-   "passed": false,
+   "seconds": 4.7,
+   "passed": true,
    "error": "",
-   "missing": [
-    "not"
-   ],
+   "missing": [],
    "said": [],
-   "answer": "I don't have that specific fact in my records right now. If you can name the tag or upload the relevant drawing, I can check it for you. Otherwise, I'd need to look at a document to give you an exact number."
+   "answer": "That shell thickness is not in the record I have access to. If you can confirm the tag number or add the relevant drawing/datasheet, I can look again."
   },
   {
    "id": "B10",
-   "seconds": 28.2,
-   "passed": false,
+   "seconds": 4.7,
+   "passed": true,
    "error": "",
-   "missing": [
-    "not"
-   ],
+   "missing": [],
    "said": [],
-   "answer": "I don't have that specific fact in my records; I can't invent a number for tag V-8888. If you have the drawing or spec sheet with it, just upload it and I'll read it right away."
+   "answer": "The design pressure of V-8888 is not in the indexed record. If you can confirm the tag number or add the relevant datasheet/file, I can look again."
   },
   {
    "id": "B11",
-   "seconds": 25.8,
+   "seconds": 6.5,
    "passed": false,
    "error": "",
    "missing": [
@@ -250,22 +246,22 @@
     "9.4"
    ],
    "said": [],
-   "answer": "I don't have that information in my records right now. Could you tell me the tag number or upload the relevant document so I can check for you?"
+   "answer": "That isn\u2019t in the indexed record, so I can\u2019t say why P-3320B is out of service. If you upload the work order or maintenance file for that tag, I can check it."
   },
   {
    "id": "B12",
-   "seconds": 99.4,
+   "seconds": 3.8,
    "passed": false,
    "error": "",
    "missing": [
     "48"
    ],
    "said": [],
-   "answer": "I don't have that specific level reading in my records; I can't invent a number, so please tell me the tag or upload the relevant file if you have it. Also, since I'm air-gapped, I don't know what \"today\" is, so I can't confirm which night shift this refers to without more details."
+   "answer": "That specific level isn\u2019t in the record I have access to. If you can confirm the tag is TK-3340 and/or upload the night-shift log or historian export, I can look at it for you."
   },
   {
    "id": "B14",
-   "seconds": 20.9,
+   "seconds": 12.9,
    "passed": false,
    "error": "",
    "missing": [
@@ -273,7 +269,7 @@
     "hv-3352"
    ],
    "said": [],
-   "answer": "I don't have access to your specific plant drawings or P&IDs, so I can't tell you which valves need to be closed for V-3302. If you upload the relevant drawing file, I can read it and give you the exact list based on what's shown."
+   "answer": "I don\u2019t have the TO ISOLATE line or P&ID for V-3302, so I can\u2019t name the valves to close. Share that line or the drawing and I\u2019ll list exactly the valves it names\u2014excluding any PSV/PRV."
   }
  ]
 }

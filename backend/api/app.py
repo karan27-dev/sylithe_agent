@@ -25,6 +25,7 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
+import os
 import shutil
 import time
 from pathlib import Path
@@ -32,7 +33,15 @@ from typing import AsyncIterator
 
 from core import airgap
 
-MONITOR = airgap.seal()          # <- before anything else. Everything is sealed now.
+# <- before anything else. Sealed by default: an EXTERNAL attempt raises.
+#
+# SOVEREIGN_MODE=audit logs and permits instead of refusing. It exists because
+# tier-L points at a hosted endpoint, and under seal that call is blocked at
+# the DNS lookup - correct behaviour, and it makes the tier impossible to
+# demonstrate. Audit is opt-in, never the default, and the header badge says
+# which mode is running so the counter cannot imply a seal that is not there.
+MONITOR = (airgap.audit() if os.environ.get("SOVEREIGN_MODE", "").lower() == "audit"
+           else airgap.seal())
 
 from fastapi import FastAPI, UploadFile, File
 from fastapi.responses import HTMLResponse, StreamingResponse, JSONResponse
