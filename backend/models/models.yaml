@@ -100,26 +100,53 @@ profiles:
         dim: 768
 
   # ---------------------------------------------------------------------
-  # tier-L - the strongest open-weight models available, on hardware that can
-  # hold them. Same code, same lanes; only active_profile changes.
+  # tier-L - the largest open-weight models that exist, per lane.
   #
-  # Sized for a GPU node on the LAN. A 24 GB laptop runs most of this: the
-  # 8b vision and 8b embedding models fit alongside a 9b reason model, but a
-  # 27b reason model does not - keep reason at 9b there and raise
-  # max_loaded_models to 2. That sizing is arithmetic on the weights, NOT a
-  # measurement; nothing in this repo has been benchmarked on 24 GB.
+  # NOTHING HERE HAS BEEN RUN. tier-S is measured; this is a configuration,
+  # and it is written down so that "addable without redesigning the system"
+  # is demonstrable rather than claimed - the lane names, the event stream,
+  # the prompts and every tool are identical. Only this block changes.
+  #
+  # Hardware, from published self-hosting figures (Sept 2026):
+  #   glm-5.3          ~753B      FP8 ~755 GB -> 8x H200; INT4 ~370-390 GB
+  #                               fits 8x H100 or 4x H200
+  #   deepseek-v4-pro  1.6T MoE   MIT; 80.6% SWE-bench Verified
+  #   kimi-k3          2.8T MoE   largest open weight released; 8x B300+
+  #   qwen3-vl:235b    235B-A22B  Apache-2.0 flagship VLM
+  # This is a datacentre node, not a workstation. A 24 GB laptop runs the
+  # step-down column in the README, not this.
+  #
+  # WHY THE ROUTER STAYS SMALL. The router emits 32 tokens of JSON to pick a
+  # lane. Measured on tier-S, few-shot examples took a 0.8b model from 83% to
+  # 100% on a held-out set - the accuracy came from the examples, not the
+  # parameters. Putting a trillion-parameter model on a classification that a
+  # 2b model already gets right would add latency to every single request for
+  # nothing.
+  #
+  # WHY THIS LIST WILL BE WRONG. Open-weight leadership changed hands three
+  # times in 2026. That is the argument for the lane abstraction, not against
+  # it: when the next one lands, it is six lines here and no code anywhere.
   # ---------------------------------------------------------------------
   tier-L:
     endpoint: http://192.168.1.50:8000      # vLLM, OpenAI-compatible
     max_loaded_models: 4                    # all of them can stay resident
     keep_alive: 60m
-    fallback_profile: tier-S                # if the GPU does not answer in 2s, drop to tier-S
+    fallback_profile: tier-S                # if the node does not answer in 2s, drop to tier-S
     lanes:
-      router:  { model: qwen3.5:2b,          think: false, max_tokens: 32 }
-      reason:  { model: qwen3.5:27b,         think: true,  max_tokens: 4096 }
-      code:    { model: qwen3.5:9b,          think: false, max_tokens: 2048 }
-      vision:  { model: qwen3-vl:8b,         think: false, max_tokens: 2048 }
-      embed:   { model: qwen3-embedding:8b,  dim: 4096 }   # MTEB 70.58, ~5 GB
+      # 32 tokens of JSON. Deliberately the one lane that is NOT maximised.
+      router:  { model: qwen3.5:2b,           think: false, max_tokens: 32 }
+      # Top open-weight entry on the Artificial Analysis intelligence index
+      # (45, Sept 2026), ahead of kimi-k3 on 44. MIT.
+      reason:  { model: glm-5.3,              think: true,  max_tokens: 8192 }
+      # 80.6% SWE-bench Verified, MIT. The code lane runs in a sandbox with no
+      # network, so a stronger coder is bounded by the sandbox, not trusted.
+      code:    { model: deepseek-v4-pro,      think: false, max_tokens: 4096 }
+      # Apache-2.0 flagship VLM, 256K context. Note it still does not COUNT
+      # symbols on a drawing - tools/pid_ocr.py does. See the P&ID section of
+      # the README for the measurement behind that split.
+      vision:  { model: qwen3-vl:235b-a22b,   think: false, max_tokens: 4096 }
+      # Largest in the Qwen3-Embedding family; MTEB ~70.6.
+      embed:   { model: qwen3-embedding:8b,   dim: 4096 }
 
 # ---------------------------------------------------------------------------
 # ROUTING - the router lane classifies input into these classes

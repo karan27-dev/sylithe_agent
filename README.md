@@ -226,13 +226,13 @@ There are exactly two. The same code runs on both — `active_profile:` in
 ```
   TIER-S — the low-end target                TIER-L — the strongest open weights
   ┌───────────────────────────────┐          ┌───────────────────────────────┐
-  │ 8 GB laptop · no GPU          │          │ GPU node on the LAN           │
+  │ 8 GB laptop · no GPU          │          │ 8x H200 class node            │
   │ MacBook Air M1 · no internet  │          │ vLLM, OpenAI-compatible       │
   ├───────────────────────────────┤          ├───────────────────────────────┤
   │ router  qwen3.5:0.8b          │          │ router  qwen3.5:2b            │
-  │ reason  qwen3.5:4b            │ ───────► │ reason  qwen3.5:27b   think   │
-  │ code    qwen3.5:4b            │          │ code    qwen3.5:9b            │
-  │ vision  qwen3.5:4b            │          │ vision  qwen3-vl:8b           │
+  │ reason  qwen3.5:4b            │ ───────► │ reason  glm-5.3        think  │
+  │ code    qwen3.5:4b            │          │ code    deepseek-v4-pro       │
+  │ vision  qwen3.5:4b            │          │ vision  qwen3-vl:235b-a22b    │
   │ embed   nomic-embed-text      │          │ embed   qwen3-embedding:8b    │
   ├───────────────────────────────┤          ├───────────────────────────────┤
   │ max_loaded_models: 1          │          │ max_loaded_models: 4          │
@@ -240,7 +240,7 @@ There are exactly two. The same code runs on both — `active_profile:` in
   └───────────────────────────────┘          └───────────────────────────────┘
      ~22 s per answer                           falls back to tier-S if the
      EVERY NUMBER IN THIS REPO                  node does not answer in 2 s
-     WAS MEASURED HERE
+     WAS MEASURED HERE                          NOTHING HERE HAS BEEN RUN
 ```
 
 **8 GB is the floor the product is designed against, not a compromise.** It is
@@ -249,24 +249,65 @@ in this repository was run. `max_loaded_models: 1` is what makes it work:
 models hot-swap rather than coexist, and the swap measures ~2 s against a ~20 s
 answer.
 
+### tier-L is the largest open weights that exist, per lane
+
+| lane | model | size | license | why |
+|---|---|---|---|---|
+| reason | **glm-5.3** | ~753B | MIT | top open-weight entry on the Artificial Analysis intelligence index (45, Sept 2026), ahead of kimi-k3 on 44 |
+| code | **deepseek-v4-pro** | 1.6T MoE | MIT | 80.6% SWE-bench Verified |
+| vision | **qwen3-vl:235b-a22b** | 235B-A22B | Apache-2.0 | flagship open VLM, 256K context, rivals Gemini-2.5-Pro on multimodal benchmarks |
+| embed | **qwen3-embedding:8b** | 8B | Apache-2.0 | MTEB ~70.6, the largest in its family |
+| router | qwen3.5:2b | 2B | Apache-2.0 | **deliberately not maximised — see below** |
+
+`kimi-k3` (2.8T, the largest open weight released) is a drop-in alternative on
+the reason lane if you have 8× B300. At INT4 (~370–390 GB) glm-5.3 fits 8× H100
+or 4× H200; the FP8 release (~755 GB) needs 8× H200.
+
+**Two honest notes on this table.**
+
+*Nothing in it has been run.* tier-S is measured; tier-L is a configuration. It
+is written down because it is the proof that "a new open-weight model is
+addable without redesigning the system" is demonstrable rather than claimed —
+lane names, event stream, prompts and every tool are byte-identical between the
+two profiles. Only the block changes.
+
+*It will be out of date.* Open-weight leadership changed hands three times in
+2026. That is the argument **for** the lane abstraction, not against it: when
+the next one lands, it is six lines of YAML and no code anywhere.
+
+### Why the router is the one lane we did not maximise
+
+The router emits 32 tokens of JSON to pick a lane. On tier-S, few-shot examples
+took a 0.8b model from 83% to **100%** on a held-out set — the accuracy came
+from the examples, not the parameters. Putting a trillion-parameter model on a
+classification a 2b model already gets right would add latency to every single
+request for nothing.
+
+The same logic caps the vision lane's job. `qwen3-vl:235b-a22b` is a far better
+model than anything on the laptop, and it still does not **count** symbols on a
+drawing — `tools/pid_ocr.py` does, deterministically. Scale changes which model
+explains best; it does not change which component should be trusted to
+enumerate.
+
 ### What a 24 GB laptop changes
 
 Between the two tiers sits the machine most engineering teams actually buy. It
 does not get its own profile — it runs `tier-L` with two lanes stepped down.
 
-| lane | tier-S (8 GB) | 24 GB laptop | tier-L (GPU node) |
+| lane | tier-S (8 GB) | 24 GB laptop | tier-L (8× H200) |
 |---|---|---|---|
 | router | qwen3.5:0.8b | qwen3.5:2b | qwen3.5:2b |
-| reason | qwen3.5:4b | **qwen3.5:9b** | qwen3.5:27b + think |
-| code | qwen3.5:4b | qwen3.5:9b | qwen3.5:9b |
-| vision | qwen3.5:4b | **qwen3-vl:8b** | qwen3-vl:8b |
+| reason | qwen3.5:4b | **qwen3.5:9b** | glm-5.3 + think |
+| code | qwen3.5:4b | qwen3.5:9b | deepseek-v4-pro |
+| vision | qwen3.5:4b | **qwen3-vl:8b** | qwen3-vl:235b-a22b |
 | embed | nomic-embed-text | **qwen3-embedding:8b** | qwen3-embedding:8b |
 | resident | 1 (hot-swap) | 2 | 4 |
 
 The three bold rows are the upgrades that matter, and 24 GB is the first point
 at which they fit together: a ~5 GB vision model beside a ~5 GB embedding model
-beside a 9b reason model. A 27b reason model at 4-bit is ~17 GB and does not
-join them, which is why it stays on the GPU node.
+beside a 9b reason model. Nothing in the tier-L column is reachable from here —
+the smallest of those weights is an order of magnitude past 24 GB — so the
+laptop column tops out at the 8b-class models.
 
 > That sizing is arithmetic on the weights, **not a measurement.** Nothing in
 > this repository has been benchmarked on a 24 GB machine. The 8 GB and GPU
