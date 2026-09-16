@@ -538,6 +538,59 @@ the traps a real inspection engineer has to survive. All of these pass:
 | Tag reading, 433 symbols | **86.8%** |
 | Connectivity | F1 **0.179** — the weakest stage, reported as such |
 
+### What tier-L would and would not move
+
+We have not run tier-L, so there is no measured number for it and none is
+printed here. But which capabilities *can* move is not a guess — it follows
+from where a model sits in the pipeline, and most of this system is
+deterministic code.
+
+```
+                          MEASURED ON TIER-S (8 GB)        does a bigger model move it?
+                    0%         50%              100%
+                    ├──────────┼─────────────────┤
+  Symbol detection  ███████████████████░░░░ 81.7%   NO  · YOLOv8s + tiling
+  Tag reading       ████████████████████░░░ 86.8%   NO  · RapidOCR
+  Connectivity      ████░░░░░░░░░░░░░░░░░░░ 17.9%   NO  · OpenCV + networkx
+  ─────────────────────────────────────────────────────────────────────────
+  Capability suite  ███████████████████████ 9/9     YES · reason lane
+  Industry suite    ██████████████████████░ 17/18   YES · reason lane
+  Router accuracy   ██████████████████████░ 93%     AT CEILING · see below
+```
+
+**The top three do not contain a model.** Detection is a convolutional
+detector, tag reading is an OCR engine, connectivity is morphology and graph
+traversal. `glm-5.3` cannot raise 81.7%, and `qwen3-vl:235b` cannot either —
+the drawing is never shown to a language model, by design. Connectivity at
+0.179 is the weakest number in this repository and **no model upgrade touches
+it**; it needs better line tracing.
+
+**The bottom three are model-bound, and two are close to their ceiling.** The
+capability suite is already 9/9 — there is no headroom to buy. The router is at
+93% lane accuracy and few-shot examples took it from 83% to 100% on a held-out
+set, so the accuracy came from examples, not parameters.
+
+That leaves the honest answer: **tier-L buys answer quality on hard,
+multi-document judgement questions — the one open failure and the class of
+question the industry suite is made of.** That is worth having. It is not a
+uniform lift across the product, and a chart that implied otherwise would be
+selling something.
+
+### What we actually measured when we scaled a model
+
+Three times in this project a model was made bigger or better. The results did
+not point one way, which is why tier-L is presented as untested rather than as
+an upgrade.
+
+| change | effect |
+|---|---|
+| reason 2b → 4b | **Better.** 2b invented a verdict ("exceeds the standard threshold for immediate action") that appears in no passage and contradicts the approval note. 4b correctly said the criteria were not in the documents. |
+| reason 2b → 4b | **Worse, on safety.** Asked how to isolate a tank, 2b named the one correct valve. 4b read the same block and helpfully added neighbouring tags — including the tank's only relief device. Telling a technician to close a PSV is a safety error, produced *because* the larger model summarised more. |
+| embed nomic → qwen3-embedding:0.6b | **No change.** MTEB 62 → 64.3 on the public leaderboard; **identical** score on this corpus, for 2.3× the memory. Reverted. |
+
+A bigger model is a change, not an improvement, until it is measured on this
+corpus. That is what tier-L is waiting for.
+
 ### Speed
 
 | operation | result |
