@@ -127,6 +127,35 @@ profiles:
   # times in 2026. That is the argument for the lane abstraction, not against
   # it: when the next one lands, it is six lines here and no code anywhere.
   # ---------------------------------------------------------------------
+  # ---------------------------------------------------------------------
+  # tier-R - a rented GPU, reachable over the public internet.
+  #
+  # Same open weights as tier-L, on hardware nobody here owns. It exists so the
+  # capability can be shown without a plant GPU node, and it is NOT sovereign:
+  # airgap.py classifies a public address as EXTERNAL, the seal refuses the
+  # call, and the header badge turns red and says "data leaves this machine".
+  #
+  # That is the point rather than a snag. A monitor that never changes colour
+  # proves nothing; one that refuses a call on stage proves it is the object
+  # doing the blocking. Put the rented endpoint below and switch in the header.
+  #
+  # A third-party model API (DeepSeek, OpenAI, Anthropic) is deliberately NOT
+  # offered here. Renting a GPU to run weights you chose is a hardware
+  # decision; posting plant documents to somebody else's model is the exact
+  # thing this product exists to make impossible.
+  # ---------------------------------------------------------------------
+  tier-R:
+    endpoint: http://REPLACE-ME.runpod.net:8000   # vLLM, OpenAI-compatible
+    max_loaded_models: 4
+    keep_alive: 60m
+    fallback_profile: tier-S
+    lanes:
+      router:  { model: qwen3.5:2b,           think: false, max_tokens: 32 }
+      reason:  { model: glm-5.3,              think: true,  max_tokens: 8192 }
+      code:    { model: deepseek-v4-pro,      think: false, max_tokens: 4096 }
+      vision:  { model: qwen3-vl:235b-a22b,   think: false, max_tokens: 4096 }
+      embed:   { model: qwen3-embedding:8b,   dim: 4096 }
+
   tier-L:
     endpoint: http://192.168.1.50:8000      # vLLM, OpenAI-compatible
     max_loaded_models: 4                    # all of them can stay resident

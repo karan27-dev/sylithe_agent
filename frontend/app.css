@@ -404,3 +404,19 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
 .srcfile{color:var(--dim2);text-decoration:underline;
   text-decoration-color:var(--line2);text-underline-offset:2px;cursor:pointer}
 .srcfile:hover{color:var(--accent);text-decoration-color:var(--accent)}
+
+/* ---- tier selector ----
+   The badge beside it changes with the tier, deliberately. A profile whose
+   engine sits on a public address is not air-gapped, and a green counter next
+   to it would imply something untrue. */
+.tiersel{display:inline-flex;gap:2px;padding:2px;border-radius:9px;
+         background:var(--side2);flex:none}
+.tiersel button{border:none;background:none;color:var(--dim);cursor:pointer;
+  font:600 11px/1 var(--mono);letter-spacing:.04em;padding:5px 9px;
+  border-radius:7px;text-transform:uppercase}
+.tiersel button:hover{color:var(--ink)}
+.tiersel button.on{background:var(--bg);color:var(--ink);
+  box-shadow:0 1px 2px rgba(0,0,0,.08)}
+#pill-reach.ok{color:var(--ok)}
+#pill-reach.ext{color:var(--bad);
+  background:color-mix(in srgb, var(--bad) 12%, transparent)}

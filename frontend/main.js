@@ -60,6 +60,7 @@ async function boot(){
       ? `<b>${b.health.lanes.reason}</b>`
       : `<b style="color:var(--bad)">engine offline</b>`;
     $("#pill-index").innerHTML = `<b>${b.index.chunks || 0}</b> chunks`;
+    if(b.profiles) renderTiers(b.profiles);
     if(b.health.missing?.length) toast("Models missing: " + b.health.missing.join(", "), 7000);
   }catch(e){ toast("Could not reach the server"); }
   await loadChats();
@@ -89,6 +90,56 @@ async function loadChats(){
     if(chatId === b.dataset.del){ chatId = null; feed.innerHTML = ""; hero(); }
     loadChats();
   });
+}
+
+/* ---------- tier selector ----------
+   Switching tier changes which engine answers, and the badge beside it says
+   where that engine is. A LAN GPU node is inside the plant and the seal holds;
+   a rented box on a public address is not, and the UI has to say so rather
+   than let a green "0 external calls" imply something it cannot promise. */
+function renderTiers(profiles){
+  const box = $("#tiersel");
+  box.innerHTML = profiles.map(p =>
+    `<button data-tier="${esc(p.name)}" class="${p.active ? "on" : ""}"
+       title="${esc(p.endpoint)}">${esc(p.name.replace(/^tier-/i, ""))}</button>`
+  ).join("");
+  box.querySelectorAll("button").forEach(b => {
+    b.onclick = () => setTier(b.dataset.tier);
+  });
+  showReach(profiles.find(p => p.active));
+}
+
+function showReach(p){
+  const el = $("#pill-reach");
+  if(!p){ el.textContent = "\u2014"; return; }
+  if(p.sovereign){
+    el.className = "pill ok";
+    el.innerHTML = `<b>on-premise</b> \u00b7 ${esc(p.reach)}`;
+    el.title = `Engine at ${p.endpoint} - inside the plant, seal holds`;
+  }else{
+    el.className = "pill ext";
+    el.innerHTML = `<b>EXTERNAL</b> \u00b7 data leaves this machine`;
+    el.title = `Engine at ${p.endpoint} is outside the plant. `
+             + `Under seal these calls are refused.`;
+  }
+}
+
+async function setTier(name){
+  try{
+    const r = await (await fetch("/api/profile?name=" + encodeURIComponent(name),
+                                 {method:"POST"})).json();
+    if(!r.ok){ toast(r.error || "Could not switch tier"); return; }
+    const all = await (await fetch("/api/profiles")).json();
+    renderTiers(all.profiles);
+    $("#pill-model").innerHTML = `<b>${esc(r.health.lanes.reason)}</b>`;
+    if(!r.sovereign){
+      toast(`${name}: engine is OUTSIDE this machine. `
+            + (r.sealed ? "The seal will refuse these calls."
+                        : "Data will leave the box."), 9000);
+    }else{
+      toast(`${name} \u00b7 ${esc(r.health.lanes.reason)}`);
+    }
+  }catch(e){ toast("Could not switch tier"); }
 }
 
 async function newChat(){

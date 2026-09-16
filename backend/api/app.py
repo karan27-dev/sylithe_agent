@@ -178,10 +178,63 @@ def boot(chat_id: str = "") -> dict:
     return {
         "remembered": [b.line() for b in sess(chat_id)["briefs"][:3]],
         "health": health,
+        "profiles": [_profile_card(n) for n in CLIENT.reg.profiles],
         "index": idx,
         "sovereignty": MONITOR.summary(),
         "corpus_dir": str(pipeline.CORPUS_DIR),
     }
+
+
+def _reach(endpoint: str) -> str:
+    """
+    Where a profile's engine actually lives: local, lan or EXTERNAL.
+
+    The tier selector is only honest if the sovereignty badge moves with it. A
+    LAN GPU node is still inside the plant and the seal holds. A rented GPU on
+    a public address is not, and the UI has to say so in as many words rather
+    than let a green counter imply something untrue.
+    """
+    from urllib.parse import urlparse
+    from core import airgap
+    host = urlparse(endpoint).hostname or ""
+    return airgap._classify(host)
+
+
+def _profile_card(name: str) -> dict:
+    prof = CLIENT.reg.profile(name)
+    reach = _reach(prof.endpoint)
+    return {
+        "name": name,
+        "endpoint": prof.endpoint,
+        "reach": reach,
+        "sovereign": reach in ("local", "lan"),
+        "lanes": {n: l.model for n, l in prof.lanes.items()},
+        "active": name == CLIENT.profile_name,
+    }
+
+
+@app.get("/api/profiles")
+def api_profiles() -> dict:
+    return {"active": CLIENT.profile_name,
+            "profiles": [_profile_card(n) for n in CLIENT.reg.profiles]}
+
+
+@app.post("/api/profile")
+def api_profile_set(name: str) -> dict:
+    """
+    Switch tier at runtime. models.yaml on disk is not edited.
+
+    Nothing is blocked here. If the chosen engine sits outside the plant the
+    call will be refused by core/airgap.py under seal, which is the system
+    working - and the card returned says so before a single question is asked.
+    """
+    if name not in CLIENT.reg.profiles:
+        return JSONResponse({"ok": False, "error": f"no profile '{name}'"},
+                            status_code=400)
+    CLIENT.profile_name = name
+    card = _profile_card(name)
+    return {"ok": True, **card, "health": CLIENT.health(),
+            "sealed": MONITOR.mode == "seal"}
 
 
 @app.get("/api/sovereignty")
