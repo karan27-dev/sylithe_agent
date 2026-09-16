@@ -1,5 +1,5 @@
 {
- "saved": 1789562492.8592992,
+ "saved": 1789563137.632999,
  "chats": {
   "388e430265c9": {
    "uploads": [],
@@ -320,6 +320,141 @@
    ],
    "folder": null,
    "corpus": []
+  },
+  "3aebcb470c2b": {
+   "uploads": [],
+   "drawings": [],
+   "images": [],
+   "briefs": [],
+   "folder": "/Users/karan/Downloads/PACK-B-Unit33-hard",
+   "corpus": []
+  },
+  "8afb2ecaa121": {
+   "uploads": [],
+   "drawings": [],
+   "images": [],
+   "briefs": [],
+   "folder": "/Users/karan/Downloads/PACK-B-Unit33-hard",
+   "corpus": []
+  },
+  "921d0c2a34c9": {
+   "uploads": [
+    "B13_E-3304_bundle_quotations.csv",
+    "B12_equipment_register.xlsx",
+    "B11_V-3302_nameplate_photo.png",
+    "B10_shift_log_scanned.pdf",
+    "B09_ncr_register.csv",
+    "B08_E-3304_shell_survey.docx",
+    "B07_DEV-2027-009_deviation_approval.docx",
+    "B06_PSV-3318_test_certificate.pdf"
+   ],
+   "drawings": [
+    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/B14_PID-U33-014.png"
+   ],
+   "images": [
+    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/B14_PID-U33-014.png",
+    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/B11_V-3302_nameplate_photo.png"
+   ],
+   "briefs": [
+    {
+     "name": "B14_PID-U33-014.png",
+     "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/B14_PID-U33-014.png",
+     "kind": "drawing",
+     "chunks": 0,
+     "tags": [
+      "PSV-3312",
+      "HV-3351",
+      "V-3302",
+      "LT-3305",
+      "HV-3352",
+      "P-3320A",
+      "FV-3360",
+      "HV-3365"
+     ],
+     "preview": "",
+     "detail": "engineering drawing, 4 symbols detected, 8 tags read"
+    },
+    {
+     "name": "B13_E-3304_bundle_quotations.csv",
+     "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/B13_E-3304_bundle_quotations.csv",
+     "kind": "spreadsheet",
+     "chunks": 1,
+     "tags": [
+      "B-13",
+      "E-3304",
+      "SA-179",
+      "SA-213",
+      "T-11"
+     ],
+     "preview": "B13 E-3304 bundle quotations\nGodrej Process Equipment, price_inr = 5230000. Godrej Process Equipment, delivery_weeks = 30. Godrej Process Equipment, warranty_months = 18. Godrej Process Equipment, material = SA-179. ISGEC Heavy Engineering, price_inr = 4880000. ISGEC Heavy Engineering, delivery_weeks = 26. ISGEC Heavy Engineering, warranty_months = 12. ISGEC Heavy Engineering, material = SA-179. T",
+     "detail": "1 indexed passages"
+    },
+    {
+     "name": "B12_equipment_register.xlsx",
+     "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/B12_equipment_register.xlsx",
+     "kind": "spreadsheet",
+     "chunks": 2,
+     "tags": [
+      "B-12",
+      "V-3302",
+      "APR-2027",
+      "E-3304",
+      "TK-3340",
+      "P-3320A",
+      "P-3320B",
+      "PSV-3312",
+      "PSV-3318"
+     ],
+     "preview": "B12 equipment register\nV-3302, description = HP Separator. V-3302, unit = 33. V-3302, design_barg = 62. V-3302, last_thickness_survey = 06-Apr-2027. E-3304, description = Feed/Effluent Exchanger. E-3304, unit = 33. E-3304, design_barg = 68. E-3304, last_thickness_survey = 10-Apr-2027. TK-3340, description = Slop Tank. TK-3340, unit = 33. TK-3340, design_barg = ATMOSPHERIC. TK-3340, last_thickness_",
+     "detail": "2 indexed passages over 2 page(s)"
+    },
+    {
+     "name": "B11_V-3302_nameplate_photo.png",
+     "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/B11_V-3302_nameplate_photo.png",
+     "kind": "scan",
+     "chunks": 1,
+     "tags": [
+      "V-3302",
+      "HP-2009",
+      "TEMP-370",
+      "SA-387"
+     ],
+     "preview": "EQUIPMENT TAG V-3302 SERIAL NO HP-2009-8812 YEAR BUILT 2009 DESIGN PRESSURE 62 barg DESIGN TEMP 370 degC MDMT -20 degC MATERIAL SA-387 Gr.11 HYDROTEST 93.0 barg",
+     "detail": "1 indexed passages over 1 page(s)"
+    },
+    {
+     "name": "B10_shift_log_scanned.pdf",
+     "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/B10_shift_log_scanned.pdf",
+     "kind": "document",
+     "chunks": 1,
+     "tags": [
+      "AT-78",
+      "V-3302",
+      "P-3320A",
+      "TK-3340",
+      "P-3320B",
+      "UNIT-33"
+     ],
+     "preview": "22:05 Took over charge. Unit stable at 78% throughput.\nV-3302 level 51%, pressure 54.8 barg.\n01:55P-3320B tripped on HIGH VIBRATION.\nVibration recorded 9.4 mm/s RMS at DE bearing.\nTrip setpoint is 8 mm/s RMS.\nStandby pump P-3320A started immediately.\nNo process upset. Throughput maintained.\n03:20 TK-3340 slop tank level48%.\nRoutine transfer lined up. No abnormality.\n- 05:40Handover to day shift. P",
+     "detail": "1 indexed passages over 1 page(s)"
+    }
+   ],
+   "folder": null,
+   "corpus": [
+    "B01_V-3302_thickness_survey.docx",
+    "B02_inspection_policy.md",
+    "B03_DHDS-SOP-210_Rev4_SUPERSEDED.pdf",
+    "B04_DHDS-SOP-210_Rev5_CURRENT.pdf",
+    "B05_PSV-3312_test_certificate.pdf",
+    "B06_PSV-3318_test_certificate.pdf",
+    "B07_DEV-2027-009_deviation_approval.docx",
+    "B08_E-3304_shell_survey.docx",
+    "B09_ncr_register.csv",
+    "B10_shift_log_scanned.pdf",
+    "B11_V-3302_nameplate_photo.png",
+    "B12_equipment_register.xlsx",
+    "B13_E-3304_bundle_quotations.csv"
+   ]
   }
  }
 }

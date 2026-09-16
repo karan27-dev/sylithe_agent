@@ -351,6 +351,7 @@ class Plan:
     per_source: int = 0                              # spread hits across files
     no_floor: bool = False                           # ignore the score floor
     pre_tool: str | None = None                      # e.g. analyze_pid
+    chat_corpus: int = 0                             # documents this chat owns
 
 
 def detect_deliverable(text: str) -> str | None:
@@ -502,6 +503,8 @@ def _how(plan: "Plan", hits: list) -> str:
     """Explain in the activity feed why retrieval behaved the way it did."""
     if plan.scope:
         return f"scoped to {len(plan.scope)} uploaded file(s)"
+    if getattr(plan, "chat_corpus", 0):
+        return f"this chat's {plan.chat_corpus} document(s) only"
     if plan.per_source:
         return f"spread across {len({h.chunk.source for h in hits})} files"
     if plan.no_floor:
@@ -606,46 +609,30 @@ class Agent:
 
     def _retrieve(self, rq: str, kk: int, plan):
         """
-        This chat's own documents first, then the rest of the corpus.
+        A chat searches its own documents, and nothing else.
 
-        Two bugs pull in opposite directions and both are real:
+        If this chat ingested documents, they ARE its corpus. No topping up
+        from everything else on the box, because "everything else" is other
+        people's plants: asked for the corrosion rate of D-1201, an earlier
+        build answered 11.2 mm, which belongs to a vessel in a different unit
+        loaded weeks before.
 
-        Searching everything mixed corpora - a question about D-1201 answered
-        with 11.2 mm, which belongs to a vessel in a different unit loaded
-        weeks earlier. So the chat's own documents have to win.
+        A middle version ranked the chat's own documents first and then filled
+        the remaining slots from the global index. It reads as safe and is
+        not - a question the chat's own documents cannot answer quietly gets
+        answered from a stranger's, and the citation looks just as good. An
+        answer drawn from the wrong plant is worse than no answer, so when the
+        chat's documents come up short the result is short.
 
-        Searching ONLY the chat's own documents was worse. A chat that had
-        attached a single P&ID lost the other thirteen documents it was
-        plainly working with: "scoped to 1 uploaded file(s)", one passage, and
-        a question about a quotations spreadsheet answered "not in the record"
-        while the spreadsheet sat indexed. Uploading one file must not
-        disconnect the shared plant knowledge base.
-
-        So: rank the chat's own documents first, then top up from the corpus.
-        Nothing is hidden, and nothing borrowed outranks what the user brought.
+        A chat that brought no documents searches the whole corpus, which is
+        the shared plant knowledge base and the right default for "what does
+        SOP-114 say".
         """
-        if plan.scope:                       # an explicit scope stays explicit
-            return pipeline.context(
-                rq, kk, client=self.c, sources=plan.scope,
-                per_source=plan.per_source,
-                min_score=0.0 if plan.no_floor else None)
-
-        floor = 0.0 if plan.no_floor else None
-        own_hits = []
-        if self._corpus:
-            _, own_hits = pipeline.context(
-                rq, kk, client=self.c, sources=self._corpus,
-                per_source=plan.per_source, min_score=floor)
-
-        _, rest = pipeline.context(rq, kk, client=self.c,
-                                   per_source=plan.per_source, min_score=floor)
-
-        seen = {h.chunk.chunk_id for h in own_hits}
-        merged = own_hits + [h for h in rest if h.chunk.chunk_id not in seen]
-        merged = merged[:max(kk, len(own_hits))]
-        blocks = [f"[{i}] {h.chunk.cite()}\n{h.chunk.text}"
-                  for i, h in enumerate(merged, 1)]
-        return "\n\n".join(blocks), merged
+        sources = plan.scope or (self._corpus or None)
+        return pipeline.context(
+            rq, kk, client=self.c, sources=sources,
+            per_source=plan.per_source,
+            min_score=0.0 if plan.no_floor else None)
 
     def run(self, question: str, history: list[dict] | None = None,
             k: int = 4, recent_files: list[str] | None = None,
@@ -681,6 +668,7 @@ class Agent:
         try:
             plan = self.plan(question, recent_files, briefs,
                              drawing_present=bool(drawing))
+            plan.chat_corpus = len(self._corpus)
         except (ModelError, Exception) as exc:
             yield {"type": "error", "message": f"planning failed: {exc}"}
             return
