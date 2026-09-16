@@ -1,5 +1,5 @@
 {
- "saved": 1789561260.249723,
+ "saved": 1789562492.8592992,
  "chats": {
   "388e430265c9": {
    "uploads": [],
@@ -98,13 +98,7 @@
    "corpus": []
   },
   "a05b21c594d2": {
-   "uploads": [
-    "A5_equipment_register.xlsx",
-    "A4_shift_log.txt",
-    "A3_PSV-1205_test_certificate.csv",
-    "A2_D-1201_thickness_survey.pdf",
-    "A1_D-1201_datasheet.docx"
-   ],
+   "uploads": [],
    "drawings": [],
    "images": [],
    "briefs": [
@@ -185,6 +179,147 @@
     "A4_shift_log.txt",
     "A5_equipment_register.xlsx"
    ]
+  },
+  "20571c15b2f5": {
+   "uploads": [],
+   "drawings": [
+    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/B14_PID-U33-014.png"
+   ],
+   "images": [
+    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/B14_PID-U33-014.png",
+    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/B11_V-3302_nameplate_photo.png"
+   ],
+   "briefs": [
+    {
+     "name": "B14_PID-U33-014.png",
+     "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/B14_PID-U33-014.png",
+     "kind": "drawing",
+     "chunks": 0,
+     "tags": [
+      "PSV-3312",
+      "HV-3351",
+      "V-3302",
+      "LT-3305",
+      "HV-3352",
+      "P-3320A",
+      "FV-3360",
+      "HV-3365"
+     ],
+     "preview": "",
+     "detail": "engineering drawing, 4 symbols detected, 8 tags read"
+    },
+    {
+     "name": "B11_V-3302_nameplate_photo.png",
+     "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/B11_V-3302_nameplate_photo.png",
+     "kind": "scan",
+     "chunks": 1,
+     "tags": [
+      "V-3302",
+      "HP-2009",
+      "TEMP-370",
+      "SA-387"
+     ],
+     "preview": "EQUIPMENT TAG V-3302 SERIAL NO HP-2009-8812 YEAR BUILT 2009 DESIGN PRESSURE 62 barg DESIGN TEMP 370 degC MDMT -20 degC MATERIAL SA-387 Gr.11 HYDROTEST 93.0 barg",
+     "detail": "1 indexed passages over 1 page(s)"
+    }
+   ],
+   "folder": "/Users/karan/Downloads/PACK-B-Unit33-hard",
+   "corpus": [
+    "B11_V-3302_nameplate_photo.png"
+   ]
+  },
+  "e6257d3185cf": {
+   "uploads": [],
+   "drawings": [
+    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/B14_PID-U33-014.png"
+   ],
+   "images": [
+    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/B14_PID-U33-014.png"
+   ],
+   "briefs": [
+    {
+     "name": "B14_PID-U33-014.png",
+     "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/B14_PID-U33-014.png",
+     "kind": "drawing",
+     "chunks": 0,
+     "tags": [
+      "PSV-3312",
+      "HV-3351",
+      "V-3302",
+      "LT-3305",
+      "HV-3352",
+      "P-3320A",
+      "FV-3360",
+      "HV-3365"
+     ],
+     "preview": "",
+     "detail": "engineering drawing, 4 symbols detected, 8 tags read"
+    }
+   ],
+   "folder": null,
+   "corpus": []
+  },
+  "0683535aa687": {
+   "uploads": [],
+   "drawings": [
+    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/B14_PID-U33-014.png"
+   ],
+   "images": [
+    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/B14_PID-U33-014.png"
+   ],
+   "briefs": [
+    {
+     "name": "B14_PID-U33-014.png",
+     "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/B14_PID-U33-014.png",
+     "kind": "drawing",
+     "chunks": 0,
+     "tags": [
+      "PSV-3312",
+      "HV-3351",
+      "V-3302",
+      "LT-3305",
+      "HV-3352",
+      "P-3320A",
+      "FV-3360",
+      "HV-3365"
+     ],
+     "preview": "",
+     "detail": "engineering drawing, 4 symbols detected, 8 tags read"
+    }
+   ],
+   "folder": null,
+   "corpus": []
+  },
+  "7138b23d6dd0": {
+   "uploads": [],
+   "drawings": [
+    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/B14_PID-U33-014.png"
+   ],
+   "images": [
+    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/B14_PID-U33-014.png"
+   ],
+   "briefs": [
+    {
+     "name": "B14_PID-U33-014.png",
+     "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/B14_PID-U33-014.png",
+     "kind": "drawing",
+     "chunks": 0,
+     "tags": [
+      "PSV-3312",
+      "HV-3351",
+      "V-3302",
+      "LT-3305",
+      "HV-3352",
+      "P-3320A",
+      "FV-3360",
+      "HV-3365"
+     ],
+     "preview": "",
+     "detail": "engineering drawing, 4 symbols detected, 8 tags read"
+    }
+   ],
+   "folder": null,
+   "corpus": []
   }
  }
 }

@@ -57,6 +57,16 @@ ACTION_VERBS = re.compile(
     r"\b(draft|make|create|generate|prepare|write|produce|build|export|"
     r"give me a|need a|want a)\b", re.I)
 
+# ...or when they name the output format outright. "Compare the four bundle
+# quotations IN AN EXCEL FILE" contains none of the verbs above, so no file was
+# produced: the request went to the code lane, which printed a script full of
+# correct numbers and wrote nothing to disk. Naming a format after "in"/"as" is
+# an unambiguous request for that file, whatever the verb in front of it.
+FILE_REQUEST = re.compile(
+    r"\b(in|as|into)\s+an?\s+"
+    r"(excel|xlsx|spreadsheet|word|docx|powerpoint|pptx|slide)\b"
+    r"|\b(as|in)\s+(excel|xlsx|docx|pptx)\b", re.I)
+
 # Queries that point at a document instead of naming a fact. They carry no
 # content words, so they embed poorly and score BELOW the relevance floor -
 # measured: "what there in this file" 0.473, "summarise this file" 0.491,
@@ -136,12 +146,27 @@ ACTION_TRACKER_INTENT = re.compile(
 # separately calling an unchanged line "new" because neither copy of it was
 # retrieved. A deterministic diff cannot make either mistake.
 COMPARE_INTENT = re.compile(
-    r"\bcompar(e|ing|ison)\b|\bversus\b|\bvs\.?\b"
-    r"|\bwhat\s+(changed|differs?|is\s+different)\b"
+    # "what changed" phrasings are unambiguous on their own
+    r"\bwhat\s+(changed|differs?|is\s+different)\b"
     r"|\b(values?|instructions?|findings?)\s+(that\s+)?changed\b"
     r"|\b(old|previous|earlier|original)\s+(and|vs\.?|versus|vs)\s+"
-    r"(new|latest|current|revised)\b",
+    r"(new|latest|current|revised)\b"
+    # a bare "compare" / "versus" only counts when the thing being compared is
+    # a DOCUMENT. Matching the word alone sent "compare the four bundle
+    # quotations in an Excel file" to the document differ, which duly reported
+    # that one file's contents had been "completely replaced" by another's -
+    # a true statement about two unrelated documents, and no answer at all to
+    # the question, which wanted four rows in a spreadsheet.
+    r"|\b(compar(e|ing|ison)|versus|vs\.?)\b[^.?!]{0,60}"
+    r"\b(document|documents|doc|docs|revision|revisions|rev\.?\s*\d|"
+    r"bulletin|circular|procedure|sop|report|file|files|version|versions)\b",
     re.I)
+
+# A request that ends in a file is a deliverable, not a document diff. Checked
+# before COMPARE_INTENT so "compare ... in an Excel file" builds the file.
+DELIVERABLE_HINT = re.compile(
+    r"\b(excel|xlsx|spreadsheet|word|docx|powerpoint|pptx|slide deck)\b"
+    r"|\bas an? (file|table|report|note|deck)\b", re.I)
 
 # Small models obey examples, not prohibitions. Telling qwen2.5-coder:1.5b
 # "do NOT read files" three different ways still produced
@@ -330,7 +355,7 @@ class Plan:
 
 def detect_deliverable(text: str) -> str | None:
     """Does the user want a FILE, or just an answer?"""
-    if not ACTION_VERBS.search(text):
+    if not ACTION_VERBS.search(text) and not FILE_REQUEST.search(text):
         return None
     low = text.lower()
     for pattern, kind in DELIVERABLE_HINTS:
@@ -515,7 +540,8 @@ class Agent:
         if ACTION_TRACKER_INTENT.search(question):
             klass_name, lane, pre_tool = "action_tracker", "reason", "extract_actions"
             retrieve_override = False
-        elif COMPARE_INTENT.search(question):
+        elif COMPARE_INTENT.search(question) and not (
+                kind or DELIVERABLE_HINT.search(question)):
             klass_name, lane, pre_tool = "compare", "reason", "compare_docs"
             retrieve_override = False
 
@@ -577,6 +603,49 @@ class Agent:
                     no_floor=no_floor, pre_tool=pre_tool)
 
     # -- execution ---------------------------------------------------------
+
+    def _retrieve(self, rq: str, kk: int, plan):
+        """
+        This chat's own documents first, then the rest of the corpus.
+
+        Two bugs pull in opposite directions and both are real:
+
+        Searching everything mixed corpora - a question about D-1201 answered
+        with 11.2 mm, which belongs to a vessel in a different unit loaded
+        weeks earlier. So the chat's own documents have to win.
+
+        Searching ONLY the chat's own documents was worse. A chat that had
+        attached a single P&ID lost the other thirteen documents it was
+        plainly working with: "scoped to 1 uploaded file(s)", one passage, and
+        a question about a quotations spreadsheet answered "not in the record"
+        while the spreadsheet sat indexed. Uploading one file must not
+        disconnect the shared plant knowledge base.
+
+        So: rank the chat's own documents first, then top up from the corpus.
+        Nothing is hidden, and nothing borrowed outranks what the user brought.
+        """
+        if plan.scope:                       # an explicit scope stays explicit
+            return pipeline.context(
+                rq, kk, client=self.c, sources=plan.scope,
+                per_source=plan.per_source,
+                min_score=0.0 if plan.no_floor else None)
+
+        floor = 0.0 if plan.no_floor else None
+        own_hits = []
+        if self._corpus:
+            _, own_hits = pipeline.context(
+                rq, kk, client=self.c, sources=self._corpus,
+                per_source=plan.per_source, min_score=floor)
+
+        _, rest = pipeline.context(rq, kk, client=self.c,
+                                   per_source=plan.per_source, min_score=floor)
+
+        seen = {h.chunk.chunk_id for h in own_hits}
+        merged = own_hits + [h for h in rest if h.chunk.chunk_id not in seen]
+        merged = merged[:max(kk, len(own_hits))]
+        blocks = [f"[{i}] {h.chunk.cite()}\n{h.chunk.text}"
+                  for i, h in enumerate(merged, 1)]
+        return "\n\n".join(blocks), merged
 
     def run(self, question: str, history: list[dict] | None = None,
             k: int = 4, recent_files: list[str] | None = None,
@@ -784,12 +853,7 @@ class Agent:
             rq = f"{prev} {rq_base}" if prev and len(question.split()) <= 6 else rq_base
             kk = max(k, 6) if (plan.per_source or plan.scope) else k
             try:
-                ctx, hits = pipeline.context(
-                    rq, kk, client=self.c,
-                    sources=plan.scope or (self._corpus or None),
-                    per_source=plan.per_source,
-                    min_score=0.0 if plan.no_floor else None,
-                )
+                ctx, hits = self._retrieve(rq, kk, plan)
             except Exception as exc:
                 yield {"type": "step", "id": "retrieve", "status": "warn",
                        "label": "Searching corpus", "detail": str(exc)}
