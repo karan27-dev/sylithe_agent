@@ -1,0 +1,10 @@
+field,value
+certificate,KM-PSV-2027-041
+tag,PSV-1205
+protects,D-1201
+set_pressure_barg,9.0
+applicable_tolerance,+/- 3% of set pressure
+as_found_barg,9.05
+as_left_barg,9.0
+test_date,20-Feb-2027
+test_medium,Nitrogen

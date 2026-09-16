@@ -96,6 +96,7 @@ def save(chats: dict[str, dict]) -> None:
                     "briefs": [asdict(b) if is_dataclass(b) else dict(b)
                                for b in v.get("briefs", [])],
                     "folder": v.get("folder"),
+                    "corpus": list(v.get("corpus", [])),
                 }
                 for cid, v in trimmed.items()
             },

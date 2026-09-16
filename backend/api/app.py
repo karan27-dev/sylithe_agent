@@ -126,6 +126,22 @@ def _remember_drawing(chat_id: str | None, path: Path) -> None:
 
 def _remember_upload(chat_id: str | None, name: str) -> None:
     _push(sess(chat_id)["uploads"], name, RECENT_MAX)
+    _remember_corpus(chat_id, [name])
+
+
+def _remember_corpus(chat_id: str | None, names: list[str]) -> None:
+    """
+    Record which indexed documents belong to this chat.
+
+    Retrieval is scoped to this list when it is non-empty. "uploads" is a
+    short recency window used to answer "what is in this file"; this one is
+    the chat's whole document set and does not expire, or a chat would start
+    searching other people's documents after the ninth upload.
+    """
+    c = sess(chat_id).setdefault("corpus", [])
+    for n in names:
+        if n not in c:
+            c.append(n)
     _remember()
 
 
@@ -207,6 +223,7 @@ async def _ask_stream(q: str, k: int, chat_id: str | None = None) -> AsyncIterat
         try:
             ctx = sess(chat_id)
             for ev in AGENT.run(q, history=past, k=k,
+                                corpus=list(ctx.get("corpus", [])),
                                 recent_files=list(ctx["uploads"]),
                                 drawing=ctx["drawings"][0] if ctx["drawings"] else None,
                                 image=ctx["images"][0] if ctx["images"] else None,
@@ -435,6 +452,9 @@ async def api_folder_ingest(path: str, chat_id: str = "") -> dict:
     scan = await loop.run_in_executor(
         None, lambda: folder.ingest(path, client=CLIENT))
     if scan.indexed:
+        # The folder belongs to the chat that opened it, whether or not the
+        # briefs succeed - scoping must not depend on a best-effort summary.
+        _remember_corpus(chat_id, [Path(f).name for f in scan.files])
         try:
             from tools.brief import describe
             for f in scan.files[:3]:

@@ -1,213 +1,190 @@
 {
- "saved": 1789554179.19263,
+ "saved": 1789561260.249723,
  "chats": {
   "388e430265c9": {
    "uploads": [],
-   "drawings": [
-    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-CDU2-004.png"
-   ],
-   "images": [
-    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-CDU2-004.png"
-   ],
-   "briefs": [
-    {
-     "name": "PID-CDU2-004.png",
-     "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-CDU2-004.png",
-     "kind": "drawing",
-     "chunks": 0,
-     "tags": [
-      "PSV-2041",
-      "LT-4102",
-      "TK-4102",
-      "HV-4021",
-      "FV-4033",
-      "P-4110A"
-     ],
-     "preview": "",
-     "detail": "engineering drawing, 2 symbols detected, 6 tags read"
-    }
-   ],
-   "folder": null
+   "drawings": [],
+   "images": [],
+   "briefs": [],
+   "folder": null,
+   "corpus": []
   },
   "neverseen123": {
    "uploads": [],
    "drawings": [],
    "images": [],
    "briefs": [],
-   "folder": null
+   "folder": null,
+   "corpus": []
   },
   "f2db8a977f47": {
    "uploads": [],
    "drawings": [],
    "images": [],
    "briefs": [],
-   "folder": null
+   "folder": null,
+   "corpus": []
   },
   "": {
    "uploads": [],
-   "drawings": [
-    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/gate-valve-symbols_14_png_jpg.rf.e3da93e3db463a583325bdebc8b0a350.jpg"
-   ],
-   "images": [
-    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/gate-valve-symbols_14_png_jpg.rf.e3da93e3db463a583325bdebc8b0a350.jpg",
-    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/basic-simple-p-id-diagram_31_png_jpg.rf.7eb369ba80de62e8d0ca56dfb8efaafc.jpg"
-   ],
-   "briefs": [
-    {
-     "name": "gate-valve-symbols_14_png_jpg.rf.e3da93e3db463a583325bdebc8b0a350.jpg",
-     "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/gate-valve-symbols_14_png_jpg.rf.e3da93e3db463a583325bdebc8b0a350.jpg",
-     "kind": "drawing",
-     "chunks": 0,
-     "tags": [],
-     "preview": "",
-     "detail": "engineering drawing, 1 symbols detected, 0 tags read"
-    },
-    {
-     "name": "basic-simple-p-id-diagram_31_png_jpg.rf.7eb369ba80de62e8d0ca56dfb8efaafc.jpg",
-     "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/basic-simple-p-id-diagram_31_png_jpg.rf.7eb369ba80de62e8d0ca56dfb8efaafc.jpg",
-     "kind": "scan",
-     "chunks": 1,
-     "tags": [
-      "IEI-10",
-      "IE-11",
-      "BALL-14",
-      "BALL-15",
-      "BALL-16",
-      "BALL-17",
-      "BALL-18",
-      "BALL-20",
-      "E-10"
-     ],
-     "preview": "IE6\n4-100-24\nIEI\n10-100-42A\nE5\nCATALYST\n1E7\n1E9 1E2 1E8\nIE11\nE3\n1E5\nPos. Name Descipton Tipe INSTRUMENT\nDISCRETE FIELD\n2\nINSTRUMENT\nDISCRETE, FIELD\n3\nCONNECTOR\nOFFSHEET CONNECT\n4\n50\nINSTRUMENT\nDISCRETE, FIELD\nE1\nVESSEL\nSPHERICAL, ON LE\n6\nE2\nVESSEL\nSPHERICAL, ONLE\n7\nE3\nVESSEL\nVESSEL WITHDISH\n8\nE4\nPUMP\nCENTRIFUGAL\n6\nE5\nPUMP\nCENTRIFUGAL\n10\nE6\nPUMP\nCENTRIFUGAL\n11\nE7\nPUMP\nCENTRIFUGAL\n12\nE8\nPUMP\nCENTRIF",
-     "detail": "1 indexed passages over 1 page(s)"
-    }
-   ],
-   "folder": null
+   "drawings": [],
+   "images": [],
+   "briefs": [],
+   "folder": null,
+   "corpus": []
   },
   "aa7901305115": {
    "uploads": [],
    "drawings": [],
    "images": [],
    "briefs": [],
-   "folder": null
+   "folder": null,
+   "corpus": []
   },
   "2891c3189591": {
    "uploads": [],
-   "drawings": [
-    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-CDU2-004.png"
-   ],
-   "images": [
-    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-CDU2-004.png"
-   ],
-   "briefs": [
-    {
-     "name": "PID-CDU2-004.png",
-     "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-CDU2-004.png",
-     "kind": "drawing",
-     "chunks": 0,
-     "tags": [
-      "PSV-2041",
-      "LT-4102",
-      "TK-4102",
-      "HV-4021",
-      "FV-4033",
-      "P-4110A"
-     ],
-     "preview": "",
-     "detail": "engineering drawing, 2 symbols detected, 6 tags read"
-    }
-   ],
-   "folder": null
+   "drawings": [],
+   "images": [],
+   "briefs": [],
+   "folder": null,
+   "corpus": []
   },
   "f6bf97f813eb": {
    "uploads": [],
-   "drawings": [
-    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-CDU2-004.png"
-   ],
-   "images": [
-    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-CDU2-004.png"
-   ],
-   "briefs": [
-    {
-     "name": "PID-CDU2-004.png",
-     "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-CDU2-004.png",
-     "kind": "drawing",
-     "chunks": 0,
-     "tags": [
-      "PSV-2041",
-      "LT-4102",
-      "TK-4102",
-      "HV-4021",
-      "FV-4033",
-      "P-4110A"
-     ],
-     "preview": "",
-     "detail": "engineering drawing, 2 symbols detected, 6 tags read"
-    }
-   ],
-   "folder": null
+   "drawings": [],
+   "images": [],
+   "briefs": [],
+   "folder": null,
+   "corpus": []
   },
   "956d22c79cba": {
    "uploads": [],
-   "drawings": [
-    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/basic-simple-valves-p-id-diagram_77_png_jpg.rf.eccad7fcaff96ab46b607f92165a5ce9.jpg"
-   ],
-   "images": [
-    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/basic-simple-valves-p-id-diagram_77_png_jpg.rf.eccad7fcaff96ab46b607f92165a5ce9.jpg"
-   ],
-   "briefs": [
-    {
-     "name": "basic-simple-valves-p-id-diagram_77_png_jpg.rf.eccad7fcaff96ab46b607f92165a5ce9.jpg",
-     "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/basic-simple-valves-p-id-diagram_77_png_jpg.rf.eccad7fcaff96ab46b607f92165a5ce9.jpg",
-     "kind": "drawing",
-     "chunks": 0,
-     "tags": [
-      "PC-005",
-      "IP-005",
-      "PY-005",
-      "PT-005",
-      "PV-005"
-     ],
-     "preview": "",
-     "detail": "engineering drawing, 4 symbols detected, 5 tags read"
-    }
-   ],
-   "folder": null
+   "drawings": [],
+   "images": [],
+   "briefs": [],
+   "folder": null,
+   "corpus": []
   },
   "e54ac25878ac": {
    "uploads": [],
-   "drawings": [
-    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-CDU2-004.png"
-   ],
-   "images": [
-    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-CDU2-004.png"
-   ],
-   "briefs": [
-    {
-     "name": "PID-CDU2-004.png",
-     "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/PID-CDU2-004.png",
-     "kind": "drawing",
-     "chunks": 0,
-     "tags": [
-      "PSV-2041",
-      "LT-4102",
-      "TK-4102",
-      "HV-4021",
-      "FV-4033",
-      "P-4110A"
-     ],
-     "preview": "",
-     "detail": "engineering drawing, 2 symbols detected, 6 tags read"
-    }
-   ],
-   "folder": null
+   "drawings": [],
+   "images": [],
+   "briefs": [],
+   "folder": null,
+   "corpus": []
   },
   "b184861966c4": {
    "uploads": [],
    "drawings": [],
    "images": [],
    "briefs": [],
-   "folder": "/Users/karan/Downloads/corpus"
+   "folder": "/Users/karan/Downloads/corpus",
+   "corpus": []
+  },
+  "f490f2f57616": {
+   "uploads": [],
+   "drawings": [],
+   "images": [],
+   "briefs": [],
+   "folder": "/Users/karan/Downloads/PACK-A-Unit12-easy",
+   "corpus": []
+  },
+  "3f261511ad7f": {
+   "uploads": [],
+   "drawings": [],
+   "images": [],
+   "briefs": [],
+   "folder": "/Users/karan/Downloads/PACK-B-Unit33-hard",
+   "corpus": []
+  },
+  "a05b21c594d2": {
+   "uploads": [
+    "A5_equipment_register.xlsx",
+    "A4_shift_log.txt",
+    "A3_PSV-1205_test_certificate.csv",
+    "A2_D-1201_thickness_survey.pdf",
+    "A1_D-1201_datasheet.docx"
+   ],
+   "drawings": [],
+   "images": [],
+   "briefs": [
+    {
+     "name": "A5_equipment_register.xlsx",
+     "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/A5_equipment_register.xlsx",
+     "kind": "spreadsheet",
+     "chunks": 1,
+     "tags": [
+      "D-1201",
+      "FEB-2027",
+      "P-1210A",
+      "PSV-1205"
+     ],
+     "preview": "A5 equipment register\nD-1201, description = Kerosene Settler Drum. D-1201, unit = 12. D-1201, design_barg = 9.5. D-1201, last_survey = 18-Feb-2027. P-1210A, description = Kerosene Transfer Pump. P-1210A, unit = 12. P-1210A, design_barg = 14. P-1210A, last_survey = \u2014. PSV-1205, description = Relief Device. PSV-1205, unit = 12. PSV-1205, design_barg = 9. PSV-1205, last_survey = 20-Feb-2027",
+     "detail": "1 indexed passages over 1 page(s)"
+    },
+    {
+     "name": "A4_shift_log.txt",
+     "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/A4_shift_log.txt",
+     "kind": "document",
+     "chunks": 1,
+     "tags": [
+      "FEB-2027",
+      "D-1201",
+      "P-1210A",
+      "PSV-1205"
+     ],
+     "preview": "18-Feb-2027 06:10  Took over. D-1201 level 58%, pressure 7.2 barg. Normal. 18-Feb-2027 09:35  UT survey of D-1201 completed, three locations. 18-Feb-2027 14:20  P-1210A running, discharge steady. No abnormality. 20-Feb-2027 11:05  PSV-1205 returned from shop test, certificate filed. 20-Feb-2027 18:00  Handover to B shift. Unit stable. SIGNED: A. DSOUZA, SHIFT IN-CHARGE",
+     "detail": "1 indexed passages"
+    },
+    {
+     "name": "A3_PSV-1205_test_certificate.csv",
+     "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/A3_PSV-1205_test_certificate.csv",
+     "kind": "spreadsheet",
+     "chunks": 1,
+     "tags": [
+      "PSV-1205",
+      "PSV-2027",
+      "D-1201",
+      "FEB-2027"
+     ],
+     "preview": "A3 PSV-1205 test certificate\ncertificate, value = KM-PSV-2027-041. tag, value = PSV-1205. protects, value = D-1201. set_pressure_barg, value = 9.0. applicable_tolerance, value = +/- 3% of set pressure. as_found_barg, value = 9.05. as_left_barg, value = 9.0. test_date, value = 20-Feb-2027. test_medium, value = Nitrogen",
+     "detail": "1 indexed passages"
+    },
+    {
+     "name": "A2_D-1201_thickness_survey.pdf",
+     "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/A2_D-1201_thickness_survey.pdf",
+     "kind": "document",
+     "chunks": 1,
+     "tags": [
+      "UNIT-12",
+      "FEB-2027",
+      "AT-10",
+      "API-510"
+     ],
+     "preview": "Unit: Unit 12 - Kerosene Merox Survey date: 18-Feb-2027\nMethod: ultrasonic, Olympus 38DL Plus, 5 MHz twin crystal\nLocation            Measured (mm) Shell Course 1      10.40 Shell Course 2      10.85 Head - top          11.40\nGoverning (thinnest) location is Shell Course 1 at 10.40 mm. Minimum required thickness (t-min) is 8.00 mm. Only one survey exists for this vessel. No corrosion rate can be d",
+     "detail": "1 indexed passages over 1 page(s)"
+    },
+    {
+     "name": "A1_D-1201_datasheet.docx",
+     "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/A1_D-1201_datasheet.docx",
+     "kind": "document",
+     "chunks": 1,
+     "tags": [
+      "D-1201",
+      "SA-516"
+     ],
+     "preview": "A1 D-1201 datasheet \u00b7 Equipment Datasheet - D-1201\nDesign Pressure, Value = 9.5 barg. Design Temperature, Value = 120 degC. Material, Value = SA-516 Gr.70. Year of Manufacture, Value = 2014. Nominal Shell Thickness, Value = 12.00 mm. Corrosion Allowance, Value = 2.50 mm. Minimum Required Thickness (t-min), Value = 8.00 mm",
+     "detail": "1 indexed passages"
+    }
+   ],
+   "folder": null,
+   "corpus": [
+    "A1_D-1201_datasheet.docx",
+    "A2_D-1201_thickness_survey.pdf",
+    "A3_PSV-1205_test_certificate.csv",
+    "A4_shift_log.txt",
+    "A5_equipment_register.xlsx"
+   ]
   }
  }
 }

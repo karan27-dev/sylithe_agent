@@ -1,0 +1,3 @@
+ncr,raised,equipment,description,status
+NCR-2027-066,03-Apr-2027,PSV-3318,"As-found 19.1 barg against set 18 barg, outside the +/-3% band. No as-left test performed. No deviation in force.",OPEN
+NCR-2027-061,11-Apr-2027,E-3304,Shell thickness below code t-min; covered by DEV-2027-009.,OPEN

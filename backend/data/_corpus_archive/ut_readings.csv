@@ -1,0 +1,6 @@
+tag,location,nominal_mm,measured_mm,loss_mm,date,inspector
+TK-4102,Course-1 N,12.0,11.2,0.8,2026-09-12,R. Nair
+TK-4102,Course-1 S,12.0,11.4,0.6,2026-09-12,R. Nair
+TK-4102,Course-2 N,12.0,11.8,0.2,2026-09-12,R. Nair
+TK-4102,Annular ring,8.0,7.6,0.4,2026-09-12,R. Nair
+P-4110A,Casing,14.0,13.7,0.3,2025-08-02,M. Iyer

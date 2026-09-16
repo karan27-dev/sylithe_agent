@@ -1,0 +1,9 @@
+CDU-7 SHIFT LOG - B SHIFT
+=========================
+
+11-Feb-2026 0620  PSV-7301 and PSV-7302 removed for shop test, spares fitted. Certificates to follow.
+11-Feb-2026 1410  Shop reports PSV-7302 as-found 15.4 barg. Flagged to inspection - well outside band.
+12-Feb-2026 0705  PSV-7303 and PSV-7304 returned from shop, both reset to specified. Installed on unit.
+13-Feb-2026 0930  NCR-2026-0412 raised against PSV-7302. A. Menon informed.
+15-Mar-2026 1100  UT survey of V-7101 completed, four locations. E-7204 survey NOT done - no scaffolding.
+22-Feb-2026 1615  MOC-2026-044 approved for PSV-7301. Copy filed with inspection.

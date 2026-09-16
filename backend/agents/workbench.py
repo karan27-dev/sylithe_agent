@@ -583,13 +583,28 @@ class Agent:
             drawing: str | None = None,
             image: str | None = None,
             briefs: list | None = None,
-            folder: str | None = None) -> Iterator[dict]:
+            folder: str | None = None,
+            corpus: list[str] | None = None) -> Iterator[dict]:
         t0 = time.perf_counter()
         history_all = history or []
         history = select_relevant_history(question, history_all)
         recent_files = recent_files or []
         briefs = briefs or []
         uploaded = context_block(briefs)
+
+        # Documents this CHAT put in, if any.
+        #
+        # One index held every document ever ingested and every chat searched
+        # all of it, so a question about a vessel in one unit was answered from
+        # a different unit's demo files - the numbers were real, they were just
+        # somebody else's. Asked for the corrosion rate of D-1201, the reply
+        # quoted 11.2 mm, which belongs to TK-4102 in a corpus loaded weeks
+        # earlier.
+        #
+        # A chat that brought its own documents searches THOSE. A chat that
+        # brought none searches the whole corpus, which is the shared plant
+        # knowledge base and the right default for "what does SOP-114 say".
+        self._corpus = list(corpus or [])
 
         # 1 -- understand ---------------------------------------------------
         yield {"type": "step", "id": "understand", "status": "running",
@@ -771,7 +786,7 @@ class Agent:
             try:
                 ctx, hits = pipeline.context(
                     rq, kk, client=self.c,
-                    sources=plan.scope or None,
+                    sources=plan.scope or (self._corpus or None),
                     per_source=plan.per_source,
                     min_score=0.0 if plan.no_floor else None,
                 )

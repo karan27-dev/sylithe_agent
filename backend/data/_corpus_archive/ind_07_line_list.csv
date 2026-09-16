@@ -1,0 +1,5 @@
+line_number,service,from,to,size_in,design_barg,design_degC,material,insulation
+12"-P-7105-A1A,Overhead vapour,V-7101,E-7204,12,21.0,165,A106 Gr B,Hot
+8"-P-7106-A1A,Accumulator drain,V-7101,P-7110A,8,21.0,120,A106 Gr B,None
+6"-P-7107-B2C,Reflux to tower,P-7110A,T-7001,6,28.0,140,A312 TP316L,Hot
+10"-P-7108-A1A,Cooling water return,E-7204,CW Header,10,10.0,60,A106 Gr B,None
