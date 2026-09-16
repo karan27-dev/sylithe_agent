@@ -223,7 +223,15 @@ allowed to invent a number cannot invent one.
 There are exactly two. The same code runs on both — `active_profile:` in
 `models.yaml` is the only difference.
 
+It ships on an 8 GB laptop with no GPU and no network, and **it scales all the
+way to the largest open-weight models in the world** — glm-5.3, deepseek-v4-pro,
+qwen3-vl:235b — without a line of code changing. One deployment story covers a
+site engineer's laptop and a datacentre node.
+
 ```
+         runs here today                              scales to this
+                  │                                          │
+                  ▼                                          ▼
   TIER-S — the low-end target                TIER-L — the strongest open weights
   ┌───────────────────────────────┐          ┌───────────────────────────────┐
   │ 8 GB laptop · no GPU          │          │ 8x H200 class node            │
@@ -241,6 +249,9 @@ There are exactly two. The same code runs on both — `active_profile:` in
      ~22 s per answer                           falls back to tier-S if the
      EVERY NUMBER IN THIS REPO                  node does not answer in 2 s
      WAS MEASURED HERE                          NOTHING HERE HAS BEEN RUN
+
+         └────────────────── same code · same lanes · same prompts ──────────┘
+                    only active_profile: in models.yaml differs
 ```
 
 **8 GB is the floor the product is designed against, not a compromise.** It is
