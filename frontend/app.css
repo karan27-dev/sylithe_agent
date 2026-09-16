@@ -375,15 +375,32 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
 /* ---- reasoning timeline: a dot per step, joined by a line ---- */
 .stp{position:relative}
 .act-body{padding-left:4px}
-.stp .rail{width:14px;flex:none;margin-block:-6px;padding-top:9px;
+.stp .rail{width:22px;flex:none;margin-block:-6px;padding-top:9px;
            display:flex;flex-direction:column;
            align-items:center;align-self:stretch}
-.stp .dot{width:7px;height:7px;border-radius:50%;background:var(--line2);flex:none}
-.stp.run .dot{background:var(--accent);
+.stp .ic{width:20px;height:20px;flex:none;display:grid;place-items:center;
+          border-radius:6px;background:var(--side2);color:var(--dim2)}
+.stp .ic svg{width:13px;height:13px}
+.stp.run .ic{background:color-mix(in srgb, var(--accent) 16%, transparent);color:var(--accent);
               box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent)}
-.stp.done .dot{background:var(--ok)}
-.stp.warn .dot{background:var(--warn)}
-.stp.fail .dot{background:var(--bad)}
+.stp.done .ic{color:var(--ok)}
+.stp.warn .ic{color:var(--warn)}
+.stp.fail .ic{color:var(--bad)}
 .stp .line{width:2px;flex:1;min-height:6px;background:var(--line);
            border-radius:2px;margin-top:3px}
 .stp:last-child .line{background:linear-gradient(to bottom,var(--line),transparent)}
+
+/* ---- stacked step icons in the collapsed header ---- */
+.act-head .stack{display:inline-flex;align-items:center;flex:none;margin-right:2px}
+.act-head .stack .si{width:19px;height:19px;margin-right:-5px;flex:none;
+  display:grid;place-items:center;border-radius:6px;background:var(--side2);
+  border:1px solid var(--bg);color:var(--dim2);position:relative;
+  transition:rotate .18s ease}
+.act-head .stack .si svg{width:12px;height:12px}
+.act-head .stack .si.more{font-size:9px;font-family:var(--mono);color:var(--dim2)}
+.activity.open .act-head .stack .si{rotate:0deg !important;margin-right:-3px}
+
+/* a filename in a step detail opens the file it names */
+.srcfile{color:var(--dim2);text-decoration:underline;
+  text-decoration-color:var(--line2);text-underline-offset:2px;cursor:pointer}
+.srcfile:hover{color:var(--accent);text-decoration-color:var(--accent)}

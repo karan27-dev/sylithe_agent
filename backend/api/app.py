@@ -462,6 +462,35 @@ def api_deliverable_get(name: str):
                         media_type="application/octet-stream")
 
 
+@app.get("/api/source/{name}")
+def api_source_get(name: str):
+    """
+    Serve an indexed source file so the UI can open what it cites.
+
+    The activity feed names the file it worked from - "about
+    982_png_jpg.rf.e30...jpg" - and that name was dead text. A reader who
+    wants to check the evidence had to go find the file on disk, which is
+    exactly the friction citations exist to remove.
+
+    Inline, not as a download: a drawing or a scan should open in the tab.
+    The path is pinned to the corpus directory the same way deliverables are.
+    """
+    from fastapi.responses import FileResponse
+
+    safe = Path(name).name
+    path = (pipeline.CORPUS_DIR / safe).resolve()
+    if not path.exists() or path.parent != pipeline.CORPUS_DIR.resolve():
+        return JSONResponse({"error": "not found"}, status_code=404)
+    kind = {
+        ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
+        ".webp": "image/webp", ".bmp": "image/bmp", ".tiff": "image/tiff",
+        ".pdf": "application/pdf", ".txt": "text/plain; charset=utf-8",
+        ".md": "text/plain; charset=utf-8", ".csv": "text/plain; charset=utf-8",
+        ".html": "text/html; charset=utf-8",
+    }.get(path.suffix.lower(), "application/octet-stream")
+    return FileResponse(path, media_type=kind)
+
+
 # ---------------------------------------------------------------------------
 # static
 # ---------------------------------------------------------------------------

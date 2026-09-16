@@ -176,6 +176,118 @@ function addBotStatic(m){
   return d;
 }
 
+/* ---------- step icons ----------
+   The activity panel used one dot for every step, so six different kinds of
+   work looked identical. Each stage now carries its own mark, and the model
+   lanes carry the vendor's own logo, because "which model ran this" is the
+   thing the panel exists to answer.
+
+   Every glyph is inline SVG. A CDN icon pack is exactly the dependency the
+   air gap forbids - blocked when sealed, and silently, since a missing icon
+   renders as nothing rather than as an error.                              */
+
+const QWEN_LOGO = `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+  <path d="M12 2.2 3.1 7.3v9.4L12 21.8l8.9-5.1V7.3L12 2.2Zm6.6 13.2L12 19.2
+    l-6.6-3.8V8.6L12 4.8l6.6 3.8v6.8Z"/>
+  <path d="M12 7.1 7.8 9.5v4.9L12 16.9l4.2-2.5V9.5L12 7.1Z" opacity=".55"/>
+</svg>`;
+
+const STEP_SVG = {
+  understand: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="7"/><path d="M11 8v3l2 1"/></svg>`,
+  route: QWEN_LOGO,
+  retrieve: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg>`,
+  pid: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 12h4M17 12h4"/><circle cx="12" cy="12" r="3"/>
+      <path d="M12 3v6M12 15v6"/></svg>`,
+  actions: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 6h16M4 12h16M4 18h10"/></svg>`,
+  compare: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="4" width="7" height="16" rx="1"/>
+      <rect x="14" y="4" width="7" height="16" rx="1"/></svg>`,
+  skills: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3 4 7v6c0 4.5 3.4 7.3 8 8 4.6-.7 8-3.5 8-8V7l-8-4Z"/></svg>`,
+  answer: QWEN_LOGO,
+  code: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="m9 8-5 4 5 4M15 8l5 4-5 4"/></svg>`,
+  verify: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3 4 6v6c0 4.4 3.3 7.4 8 9 4.7-1.6 8-4.6 8-9V6l-8-3Z"/>
+      <path d="m9 12 2 2 4-4"/></svg>`,
+  verify_claims: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>`,
+  spec: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z"/>
+      <path d="M14 3v5h5"/></svg>`,
+  file: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z"/>
+      <path d="M9 14h6M9 17h4"/></svg>`,
+  scan: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1
+        0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><path d="M4 12h16"/></svg>`,
+  index: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <ellipse cx="12" cy="6" rx="8" ry="3"/>
+      <path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12v6c0 1.7 3.6 3 8 3s8-1.3
+        8-3v-6"/></svg>`,
+};
+
+const STEP_FALLBACK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14.7 6.3a4 4 0 0 1-5 5L5 16v3h3l4.7-4.7a4 4 0 0 1 5-5l2-2-3-3-2 2Z"/>
+  </svg>`;
+
+/* The collapsed header carries a stacked, slightly fanned row of the icons for
+   the steps that actually ran - so what happened is legible without opening
+   the panel. Deduplicated: two retrieval passes are one search, not two. */
+function stackIcons(head, body){
+  let stack = head.querySelector(".stack");
+  if(!stack){
+    stack = document.createElement("span");
+    stack.className = "stack";
+    head.insertBefore(stack, head.querySelector(".lbl"));
+  }
+  const seen = [];
+  body.querySelectorAll(".stp").forEach(r => {
+    const id = r.dataset.step;
+    if(id && !seen.includes(id)) seen.push(id);
+  });
+  const show = seen.slice(0, 6);
+  stack.innerHTML = show.map((id, i) =>
+    `<span class="si" style="rotate:${show.length > 1 ? (i % 2 ? "-8deg" : "8deg") : "0deg"};
+       z-index:${i}">${stepIcon(id)}</span>`).join("")
+    + (seen.length > show.length
+        ? `<span class="si more">+${seen.length - show.length}</span>` : "");
+}
+
+function stepIcon(id){
+  return STEP_SVG[id] || STEP_FALLBACK;
+}
+
+/* Filenames in a step detail were dead text: the panel named the evidence and
+   then made you go find it on disk. Anything that looks like an indexed file
+   becomes a link that opens it. */
+const FILE_IN_TEXT =
+  /\b([\w.\-]+\.(?:png|jpe?g|webp|bmp|tiff?|pdf|docx?|xlsx?|pptx?|csv|md|txt|html))\b/gi;
+
+function linkFiles(text){
+  return esc(text).replace(FILE_IN_TEXT, (m) =>
+    `<a class="srcfile" href="/api/source/${encodeURIComponent(m)}"
+        target="_blank" rel="noopener" title="Open ${m}">${m}</a>`);
+}
+
 /* ---------- ask ---------- */
 
 const FILE_TAG = { docx: "DOC", xlsx: "XLS", pptx: "PPT" };
@@ -255,11 +367,12 @@ async function ask(){
       body.appendChild(row);
     }
     row.className = "stp " + ({running:"run",done:"done",warn:"warn",fail:"fail"}[ev.status]);
-    row.innerHTML = `<span class="rail"><span class="dot"></span>
+    row.innerHTML = `<span class="rail"><span class="ic">${stepIcon(ev.id)}</span>
         <span class="line"></span></span>
       <span class="nm">${ev.status === "running"
         ? `<span class="shimmer">${esc(ev.label)}</span>` : esc(ev.label)}</span>
-      <span class="dt">${ev.detail ? esc(ev.detail) : ""}</span>`;
+      <span class="dt">${ev.detail ? linkFiles(ev.detail) : ""}</span>`;
+    stackIcons(head, body);
     // The panel row IS the live indicator - it already carries a spinner and
     // the current label. A second standalone line below it showed the same
     // text twice on screen at the same time.
@@ -521,11 +634,12 @@ function analyseFolder(path){
     if(!row){ row = document.createElement("div"); row.dataset.step = ev.id;
               body.appendChild(row); }
     row.className = "stp " + ({running:"run",done:"done",warn:"warn",fail:"fail"}[ev.status]);
-    row.innerHTML = `<span class="rail"><span class="dot"></span>
+    row.innerHTML = `<span class="rail"><span class="ic">${stepIcon(ev.id)}</span>
         <span class="line"></span></span>
       <span class="nm">${ev.status === "running"
         ? `<span class="shimmer">${esc(ev.label)}</span>` : esc(ev.label)}</span>
-      <span class="dt">${ev.detail ? esc(ev.detail) : ""}</span>`;
+      <span class="dt">${ev.detail ? linkFiles(ev.detail) : ""}</span>`;
+    stackIcons(head, body);
   }
 
   const es = new EventSource("/api/folder/analyse?path=" + encodeURIComponent(path));
