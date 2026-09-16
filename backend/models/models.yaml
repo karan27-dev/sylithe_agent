@@ -3,7 +3,7 @@
 # PS requirement: "New open weight models should be addable later
 #                  without redesigning the system."
 
-active_profile: tier-M
+active_profile: tier-S
 
 # ---------------------------------------------------------------------------
 # MEASURED ON THIS MACHINE (MacBook Air M1, 8 GB)
@@ -35,7 +35,28 @@ defaults:
 
 profiles:
 
-  tier-S:                                   # MacBook Air M1 8 GB - demo default
+  # ---------------------------------------------------------------------
+  # tier-S - the low-end target, and what every number in this repo was
+  # measured on: MacBook Air M1, 8 GB, no GPU, no network.
+  #
+  # 8 GB is the floor the product is designed against, not a compromise we
+  # tolerate. max_loaded_models: 1 is what makes it work - models hot-swap
+  # instead of coexisting, and the swap was measured at ~2s, which is cheap
+  # next to a 20s answer.
+  #
+  # WHY 4b AND NOT 2b ON THE REASON LANE (measured, 3 grounded questions,
+  # full retrieve+generate flow on the same 8 GB machine):
+  #   reason 2b : 45.3s total, ~15s per answer, swap +855 MB
+  #   reason 4b : 84.0s total, ~28s per answer, swap +462 MB
+  # Speed is not the real difference - grounding is. Asked whether a
+  # deviation was acceptable, 2b invented a verdict ("exceeds the standard
+  # threshold for immediate action") that appears in no passage and
+  # contradicts the approval note. 4b said the acceptance criteria were not
+  # in the documents, which is correct. A wrong answer costs more than 13
+  # seconds, so 4b takes the lane. On 8 GB this pushes into swap - do not
+  # run it with a browser full of tabs.
+  # ---------------------------------------------------------------------
+  tier-S:
     endpoint: http://localhost:11434
     max_loaded_models: 1                    # hot-swap; this is what makes 8 GB work
     keep_alive: 30s
@@ -45,7 +66,7 @@ profiles:
         think: false
         max_tokens: 32                      # only a JSON classification is needed
       reason:
-        model: qwen3.5:2b
+        model: qwen3.5:4b
         think: false                        # <- changed after measuring, see above
         max_tokens: 1024
       code:
@@ -56,57 +77,39 @@ profiles:
         # The coder model writes code that runs and then quietly uses the wrong
         # numbers - on one task it took P-4110A's design pressure of 18.0 barg
         # and used it as a wall thickness. Code that runs with invented inputs
-        # is worse than code that fails, because nothing flags it. The 2b model
-        # reads the passages properly, so it takes the lane.
-        model: qwen3.5:2b
+        # is worse than code that fails, because nothing flags it. A general
+        # model reads the passages properly, so it takes the lane - and no
+        # later profile should quietly reintroduce the coder model.
+        model: qwen3.5:4b
         think: false
         max_tokens: 1024
       vision:
-        model: qwen3.5:2b                   # natively multimodal - no separate VLM needed
+        model: qwen3.5:4b                   # natively multimodal - no separate VLM needed
         think: false
         max_tokens: 1024
       embed:
+        # nomic-embed-text is 274 MB. Qwen3-Embedding-0.6B (639 MB, MTEB 64.3
+        # vs ~62) was tried on this project's own benchmark and scored
+        # IDENTICALLY, for 2.3x the memory, so it was reverted. The 8B variant
+        # tops the open leaderboard at 70.6 but weighs ~5 GB - with
+        # max_loaded_models: 1 it would swap against the reason model on every
+        # query, so it lives in tier-L. A model earns its place on THIS corpus,
+        # not on a public leaderboard.
+        # Changing this model invalidates the index: rebuild before trusting it.
         model: nomic-embed-text
         dim: 768
 
-  # Same laptop, bigger reason model. Switch with: active_profile: tier-M
+  # ---------------------------------------------------------------------
+  # tier-L - the strongest open-weight models available, on hardware that can
+  # hold them. Same code, same lanes; only active_profile changes.
   #
-  # MEASURED (8 GB M1, 3 grounded questions, full retrieve+generate flow):
-  #   tier-S (reason 2b) : 45.3s total, ~15s per answer, swap +855 MB
-  #   tier-M (reason 4b) : 84.0s total, ~28s per answer, swap +462 MB
-  #
-  # Speed is not the real difference - grounding is. Asked whether a
-  # deviation was acceptable, 2b invented a verdict ("exceeds the standard
-  # threshold for immediate action") that appears in no passage and
-  # contradicts the approval note. 4b instead said the acceptance criteria
-  # were not in the documents, which is correct.
-  #
-  # So: tier-S when demo speed matters, tier-M when a wrong answer costs
-  # more than 13 extra seconds. On 8 GB both already push into swap, so do
-  # not run tier-M with a browser full of tabs.
-  tier-M:
-    endpoint: http://localhost:11434
-    max_loaded_models: 1
-    keep_alive: 30s
-    fallback_profile: tier-S
-    lanes:
-      router:  { model: qwen3.5:0.8b,     think: false, max_tokens: 32 }
-      reason:  { model: qwen3.5:4b,       think: false, max_tokens: 1024 }
-      # tier-S already moved its code lane off qwen2.5-coder:1.5b, measured:
-      # the coder model runs 3/3 but is CORRECT 1/3, because it writes code
-      # that executes on invented numbers - on one task it took a design
-      # pressure of 18.0 barg and used it as a wall thickness. tier-M should
-      # not quietly reintroduce it.
-      code:    { model: qwen3.5:4b,       think: false, max_tokens: 1024 }
-      vision:  { model: qwen3.5:4b,       think: false, max_tokens: 1024 }
-      # Qwen3-Embedding-0.6B: 639 MB vs nomic's 274 MB, MTEB 64.34 vs ~62.
-      # The 8B variant tops the open leaderboard at 70.58 but weighs ~5 GB -
-      # on an 8 GB box with max_loaded_models: 1 it would have to swap against
-      # the 4b reason model on every single query, so it lives in tier-L.
-      # Changing this model invalidates the index: rebuild before trusting it.
-      embed:   { model: nomic-embed-text, dim: 768 }
-
-  tier-L:                                   # GPU box - on the LAN or at the venue
+  # Sized for a GPU node on the LAN. A 24 GB laptop runs most of this: the
+  # 8b vision and 8b embedding models fit alongside a 9b reason model, but a
+  # 27b reason model does not - keep reason at 9b there and raise
+  # max_loaded_models to 2. That sizing is arithmetic on the weights, NOT a
+  # measurement; nothing in this repo has been benchmarked on 24 GB.
+  # ---------------------------------------------------------------------
+  tier-L:
     endpoint: http://192.168.1.50:8000      # vLLM, OpenAI-compatible
     max_loaded_models: 4                    # all of them can stay resident
     keep_alive: 60m

@@ -91,7 +91,7 @@ datasets or generated. That is what `tools/make_corpus.py` is for.
 | `qwen3.5:2b` | reason + vision (natively multimodal) | `ollama pull qwen3.5:2b` | 2.7 GB |
 | `qwen2.5-coder:1.5b` | code | `ollama pull qwen2.5-coder:1.5b` | 986 MB |
 | `nomic-embed-text` | embeddings | `ollama pull nomic-embed-text` | 274 MB |
-| `qwen3.5:4b` | tier-M reason | `ollama pull qwen3.5:4b` | 3.4 GB |
+| `qwen3.5:4b` | tier-S reason | `ollama pull qwen3.5:4b` | 3.4 GB |
 | docling layout + RapidOCR | OCR / layout | auto-cached to `~/.cache/docling/models` | 1.3 GB |
 
 All Apache-2.0 or similarly permissive. Browse more at https://ollama.com/search

@@ -220,43 +220,73 @@ allowed to invent a number cannot invent one.
 
 ## The two tiers
 
-The same code runs on both. `active_profile:` in `models.yaml` is the only
-difference.
+There are exactly two. The same code runs on both — `active_profile:` in
+`models.yaml` is the only difference.
 
 ```
-  TIER-M — what we operate on                TIER-L — where it scales to
-  ┌─────────────────────────────┐            ┌─────────────────────────────┐
-  │ MacBook Air M1 · 8 GB       │            │ GPU node on the LAN         │
-  │ no GPU · no internet        │            │ vLLM, OpenAI-compatible     │
-  ├─────────────────────────────┤            ├─────────────────────────────┤
-  │ router  qwen3.5:0.8b        │            │ router  qwen3.5:2b          │
-  │ reason  qwen3.5:4b          │  ────────► │ reason  qwen3.5:27b  think  │
-  │ code    qwen3.5:4b          │            │ code    qwen3.5:9b          │
-  │ vision  qwen3.5:4b          │            │ vision  qwen3-vl:8b         │
-  │ embed   nomic-embed-text    │            │ embed   qwen3-embedding:8b  │
-  │                             │            │                             │
-  │ max_loaded_models: 1        │            │ max_loaded_models: 4        │
-  │ models hot-swap (~2 s)      │            │ all resident                │
-  └─────────────────────────────┘            └─────────────────────────────┘
-          ~22 s per answer                      falls back to tier-S if the
-                                                node does not answer in 2 s
+  TIER-S — the low-end target                TIER-L — the strongest open weights
+  ┌───────────────────────────────┐          ┌───────────────────────────────┐
+  │ 8 GB laptop · no GPU          │          │ GPU node on the LAN           │
+  │ MacBook Air M1 · no internet  │          │ vLLM, OpenAI-compatible       │
+  ├───────────────────────────────┤          ├───────────────────────────────┤
+  │ router  qwen3.5:0.8b          │          │ router  qwen3.5:2b            │
+  │ reason  qwen3.5:4b            │ ───────► │ reason  qwen3.5:27b   think   │
+  │ code    qwen3.5:4b            │          │ code    qwen3.5:9b            │
+  │ vision  qwen3.5:4b            │          │ vision  qwen3-vl:8b           │
+  │ embed   nomic-embed-text      │          │ embed   qwen3-embedding:8b    │
+  ├───────────────────────────────┤          ├───────────────────────────────┤
+  │ max_loaded_models: 1          │          │ max_loaded_models: 4          │
+  │ models hot-swap (~2 s)        │          │ all resident                  │
+  └───────────────────────────────┘          └───────────────────────────────┘
+     ~22 s per answer                           falls back to tier-S if the
+     EVERY NUMBER IN THIS REPO                  node does not answer in 2 s
+     WAS MEASURED HERE
 ```
 
-`tier-S` also ships — `qwen3.5:2b` on the reason lane — for the fastest
-possible demo on the same 8 GB laptop.
+**8 GB is the floor the product is designed against, not a compromise.** It is
+the machine an inspection engineer already has, and it is where every benchmark
+in this repository was run. `max_loaded_models: 1` is what makes it work:
+models hot-swap rather than coexist, and the swap measures ~2 s against a ~20 s
+answer.
 
-**Tier-L carries the strongest open-weight models we found, and they are
-deliberately not on the laptop.** `qwen3-embedding:8b` tops the open MTEB
-leaderboard at ~70.6, against nomic-embed-text's ~62 — but it is ~5 GB against
-274 MB. With `max_loaded_models: 1` on an 8 GB box it would swap against the
-reason model on every single query. We measured the smaller upgrade
-(`qwen3-embedding:0.6b`, MTEB 64.3) on our own benchmark: **identical scores,
-2.3× the memory.** It was reverted.
+### What a 24 GB laptop changes
 
-That is the rule the model registry encodes: a model earns its place on *this*
-corpus, not on a public leaderboard. The same discipline removed
-`qwen2.5-coder:1.5b` from the code lane — a coding model that produced code
-that ran and quietly used the wrong numbers.
+Between the two tiers sits the machine most engineering teams actually buy. It
+does not get its own profile — it runs `tier-L` with two lanes stepped down.
+
+| lane | tier-S (8 GB) | 24 GB laptop | tier-L (GPU node) |
+|---|---|---|---|
+| router | qwen3.5:0.8b | qwen3.5:2b | qwen3.5:2b |
+| reason | qwen3.5:4b | **qwen3.5:9b** | qwen3.5:27b + think |
+| code | qwen3.5:4b | qwen3.5:9b | qwen3.5:9b |
+| vision | qwen3.5:4b | **qwen3-vl:8b** | qwen3-vl:8b |
+| embed | nomic-embed-text | **qwen3-embedding:8b** | qwen3-embedding:8b |
+| resident | 1 (hot-swap) | 2 | 4 |
+
+The three bold rows are the upgrades that matter, and 24 GB is the first point
+at which they fit together: a ~5 GB vision model beside a ~5 GB embedding model
+beside a 9b reason model. A 27b reason model at 4-bit is ~17 GB and does not
+join them, which is why it stays on the GPU node.
+
+> That sizing is arithmetic on the weights, **not a measurement.** Nothing in
+> this repository has been benchmarked on a 24 GB machine. The 8 GB and GPU
+> numbers are measured; this column is a fitting exercise.
+
+### A model earns its place on this corpus, not on a leaderboard
+
+`qwen3-embedding:8b` tops the open MTEB leaderboard at ~70.6 against
+nomic-embed-text's ~62 — and sits in tier-L, not on the laptop, because it is
+~5 GB against 274 MB and would swap against the reason model on every query.
+
+So we tested the version that *does* fit: `qwen3-embedding:0.6b`, MTEB 64.3,
+639 MB. On this project's own benchmark it scored **identically**, for 2.3× the
+memory. It was reverted.
+
+The same discipline removed `qwen2.5-coder:1.5b` from the code lane. A coding
+model wrote code that ran and quietly used the wrong numbers — on one task it
+took a pump's design pressure of 18.0 barg and used it as a wall thickness.
+Code that runs on invented inputs is worse than code that fails, because
+nothing flags it.
 
 Switching tier:
 
@@ -426,7 +456,7 @@ docs/
 
 ## Measured results
 
-MacBook Air M1, 8 GB, `tier-M`. Every number measured, none estimated.
+MacBook Air M1, 8 GB, `tier-S`. Every number measured, none estimated.
 
 ### Capability — 9 / 9
 

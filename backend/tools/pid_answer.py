@@ -68,7 +68,7 @@ def describe(image: str | Path, conf: float = 0.25) -> dict:
 
     # One line per tag, and the question is about ONE of them.
     #
-    # tier-S answered "close HV-4021" and stopped. tier-M reads the whole
+    # tier-S answered "close HV-4021" and stopped. the 4b model reads the whole
     # block and helpfully adds the neighbouring tags' lines too - so asked how
     # to isolate TK-4102 it also named PSV-2041, the tank's only relief path.
     # Telling a technician to close a relief device is a safety error, and the
