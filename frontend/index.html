@@ -137,6 +137,27 @@
   </div>
 </div>
 
+<div id="foldermodal">
+  <div class="sheet">
+    <h3>Choose a folder
+      <button class="iconbtn" style="margin-left:auto" id="fmodalx">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button></h3>
+    <div class="body">
+      <div class="placechips" id="fplaces"></div>
+      <div class="crumbs" id="fcrumbs"></div>
+      <div class="dirlist" id="fdirs"></div>
+      <div class="fpicked" id="fpicked"></div>
+      <div class="pathrow">
+        <input id="fpathinput" placeholder="or type a path, e.g. ~/Documents/Plant Manuals">
+        <button id="fpathgo">Go</button>
+      </div>
+      <button id="fusehere" class="fusebtn">Use this folder</button>
+    </div>
+  </div>
+</div>
+
 <script type="module" src="/static/main.js"></script>
 </body>
 </html>

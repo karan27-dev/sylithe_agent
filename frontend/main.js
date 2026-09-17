@@ -1063,12 +1063,13 @@ folderBtn.onclick = async () => {
   folderBtn.classList.add("on");
   try{
     await needChat();
-      const r = await (await fetch("/api/folder/choose", {method:"POST"})).json();
+    const r = await (await fetch("/api/folder/choose", {method:"POST"})).json();
     if(r.path){ await attachFolder(r.path); return; }
     if(r.cancelled) return;                 // said no - do nothing at all
-    toast((r.error || "Could not open the folder chooser")
-          + ' - you can also say it in the chat: "analyse the documents in '
-          + '~/Documents/Plant Manuals"', 7000);
+    // No native dialog on this OS (or it failed) - fall back to the browser
+    // built from the same directory listing the picker uses, instead of just
+    // telling the user to type a path they may not know by heart.
+    openFolderBrowser();
   }catch(e){
     toast("Could not open the folder chooser: " + e.message, 5000);
   }finally{
@@ -1076,6 +1077,79 @@ folderBtn.onclick = async () => {
     folderBtn.classList.remove("on");
   }
 };
+
+/* ---- fallback folder browser ----
+   Windows and Linux have no `osascript`, so /api/folder/choose always
+   reports the native dialog is unavailable there - which used to just be a
+   toast telling the user to type a path from memory. The backend already
+   had folder.places()/listdir() for a browser-safe path picker; nothing
+   used them. This wires them into an actual modal. */
+let FB_PATH = null, FB_PLACES = null;
+
+async function openFolderBrowser(startPath){
+  $("#foldermodal").classList.add("on");
+  if(!FB_PLACES){
+    try{ FB_PLACES = (await (await fetch("/api/folder/places")).json()).places || [];
+    }catch(e){ FB_PLACES = []; }
+    $("#fplaces").innerHTML = FB_PLACES.map(p =>
+      `<button data-p="${esc(p.path)}">${esc(p.label)}</button>`).join("");
+    $("#fplaces").querySelectorAll("[data-p]").forEach(b =>
+      b.onclick = () => fbList(b.dataset.p));
+  }
+  fbList(startPath || FB_PLACES[0]?.path || "~");
+}
+
+async function fbList(path){
+  $("#fpathinput").value = "";
+  $("#fdirs").innerHTML = `<div class="dirempty">Loading…</div>`;
+  let d;
+  try{ d = await (await fetch("/api/folder/list?path=" + encodeURIComponent(path))).json();
+  }catch(e){ d = { error: e.message }; }
+  if(d.error){
+    $("#fdirs").innerHTML = `<div class="dirempty">${esc(d.error)}</div>`;
+    $("#fusehere").disabled = true;
+    return;
+  }
+  FB_PATH = d.path;
+  $("#fcrumbs").innerHTML = d.crumbs.map((c, i) => `${i ? '<span class="sep">/</span>' : ""}
+    <button data-p="${esc(c.path)}">${esc(c.name)}</button>`).join("");
+  $("#fcrumbs").querySelectorAll("[data-p]").forEach(b =>
+    b.onclick = () => fbList(b.dataset.p));
+  $("#fdirs").innerHTML = d.dirs.length
+    ? d.dirs.map(dd => `<button class="dirrow" data-p="${esc(dd.path)}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+        </svg>
+        <span>${esc(dd.name)}</span>
+        <span class="docs">${dd.docs < 0 ? "no access"
+          : dd.docs ? dd.docs + " doc" + (dd.docs === 1 ? "" : "s") : ""}</span>
+      </button>`).join("")
+    : `<div class="dirempty">No subfolders here.</div>`;
+  $("#fdirs").querySelectorAll("[data-p]").forEach(b =>
+    b.onclick = () => fbList(b.dataset.p));
+  $("#fpicked").textContent = d.supported
+    ? `${d.supported} readable document${d.supported === 1 ? "" : "s"} directly in this folder`
+    : "No readable documents directly in this folder — open a subfolder, or use it anyway";
+  $("#fusehere").disabled = false;
+}
+
+$("#fpathgo").onclick = () => { if($("#fpathinput").value.trim()) fbList($("#fpathinput").value.trim()); };
+$("#fpathinput").addEventListener("keydown", e => {
+  if(e.key === "Enter" && $("#fpathinput").value.trim()) fbList($("#fpathinput").value.trim());
+});
+$("#fusehere").onclick = async () => {
+  if(!FB_PATH) return;
+  $("#foldermodal").classList.remove("on");
+  await attachFolder(FB_PATH);
+};
+$("#fmodalx").onclick = () => $("#foldermodal").classList.remove("on");
+$("#foldermodal").onclick = e => {
+  if(e.target.id === "foldermodal") $("#foldermodal").classList.remove("on");
+};
+document.addEventListener("keydown", e => {
+  if(e.key === "Escape") $("#foldermodal").classList.remove("on");
+});
 
 /* Choosing a folder ATTACHES it. It does not ask a question.
    Selecting one used to post "Analyse the folder X" into the chat and stream a

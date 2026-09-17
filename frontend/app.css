@@ -235,6 +235,45 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
             text-overflow:ellipsis}
 .netlog .x{color:var(--bad)}.netlog .l{color:var(--ok)}
 
+/* ---- folder browser: the fallback for machines with no native chooser ---- */
+#foldermodal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;
+  place-items:center;z-index:60;padding:24px}
+#foldermodal.on{display:grid}
+.placechips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.placechips button{padding:6px 12px;border:1px solid var(--line);border-radius:8px;
+  background:var(--surface);color:var(--ink2);font-size:12.5px;cursor:pointer}
+.placechips button:hover{border-color:var(--accent)}
+.crumbs{display:flex;flex-wrap:wrap;align-items:center;gap:3px;margin-bottom:10px;
+  font-size:12.5px;color:var(--dim)}
+.crumbs button{border:none;background:none;color:var(--dim);cursor:pointer;
+  padding:3px 5px;border-radius:5px;font-size:12.5px}
+.crumbs button:last-child{color:var(--ink);font-weight:600}
+.crumbs button:hover{background:var(--side2);color:var(--ink)}
+.crumbs .sep{color:var(--dim2)}
+.dirlist{border:1px solid var(--line);border-radius:10px;max-height:280px;
+  overflow-y:auto;margin-bottom:10px}
+.dirrow{display:flex;align-items:center;gap:10px;width:100%;padding:9px 12px;
+  border:none;background:none;border-top:1px solid var(--line);cursor:pointer;
+  color:var(--ink2);font-size:13px;text-align:left}
+.dirrow:first-child{border-top:none}
+.dirrow:hover{background:var(--side)}
+.dirrow svg{width:15px;height:15px;flex:none;color:var(--dim2)}
+.dirrow .docs{margin-left:auto;font-family:var(--mono);font-size:11px;
+  color:var(--dim2)}
+.dirempty{padding:16px 12px;color:var(--dim2);font-size:12.5px}
+.fpicked{font-size:12px;color:var(--dim);margin-bottom:12px}
+.pathrow{display:flex;gap:8px;margin-bottom:12px}
+.pathrow input{flex:1;padding:8px 11px;border:1px solid var(--line);
+  border-radius:8px;background:var(--surface);color:var(--ink);font:13px var(--sans)}
+.pathrow input:focus{outline:none;border-color:var(--accent)}
+.pathrow button{padding:8px 14px;border:1px solid var(--line);border-radius:8px;
+  background:var(--surface);color:var(--ink2);font-size:13px;cursor:pointer}
+.fusebtn{width:100%;padding:10px;border:none;border-radius:9px;
+  background:var(--accent);color:var(--accent-ink);font-weight:600;
+  font-size:13.5px;cursor:pointer}
+.fusebtn:hover{filter:brightness(1.05)}
+.fusebtn:disabled{opacity:.5;cursor:default}
+
 ::-webkit-scrollbar{width:10px;height:10px}
 ::-webkit-scrollbar-thumb{background:var(--line2);border-radius:6px;
                           border:2px solid var(--bg)}
