@@ -182,31 +182,30 @@ cd backend
 
 ```mermaid
 flowchart TD
-    U["Browser UI<br/>vanilla HTML / CSS / JS · no build step"] -->|Server-Sent Events| API["FastAPI<br/>api/app.py"]
-    API --> AGENT["Agent loop<br/>agents/workbench.py"]
+    U["You ask a question<br/>in the browser"] --> AGENT["The agent"]
 
-    subgraph PIPE["plan → act, one pass per question"]
+    subgraph PIPE["six steps, every question"]
         direction LR
-        C1["① classify"] --> C2["② pre-tool"] --> C3["③ retrieve"] --> C4["④ answer"] --> C5["⑤ verify"] --> C6["⑥ deliver"]
+        C1["① Classify"] --> C2["② Pre-tool"] --> C3["③ Retrieve"] --> C4["④ Answer"] --> C5["⑤ Verify"] --> C6["⑥ Deliver"]
     end
 
     AGENT --> C1
-    C1 -.lane request.-> ROUTER
-    C4 -.lane request.-> ROUTER
-    C3 --> DB[("LanceDB<br/>hybrid search")]
-    C6 --> FILE[("OOXML<br/>.docx / .xlsx / .pptx")]
+    C1 -.needs a model.-> ROUTER
+    C4 -.needs a model.-> ROUTER
+    C3 --> DB[("your documents")]
+    C6 --> FILE[("Word / Excel / PPT")]
 
-    subgraph ROUTER["core/llm.py — the only caller of a model"]
+    subgraph ROUTER["lane router — picks the model, never named in code"]
         direction TB
-        PICK{"active_profile<br/>in models.yaml"}
-        PICK -->|tier-S| LOCAL["Local · Ollama<br/>8 GB laptop, no GPU"]
-        PICK -->|tier-L| WORLD["World's best model, per lane<br/>self-hosted GPU node OR any hosted API<br/>— through that model's own deployment"]
+        PICK{"which tier?"}
+        PICK -->|tier-S| LOCAL["local model<br/>8 GB laptop, no GPU"]
+        PICK -->|tier-L| WORLD["world's best model<br/>GPU node or hosted API"]
     end
 
     LOCAL --> WALL
-    WORLD --> WALL{"core/airgap.py<br/>socket + DNS interceptor"}
-    WALL -->|local / lan| OUT["streamed back to the browser"]
-    WALL -.->|EXTERNAL, under seal| BLOCK["SovereigntyViolation<br/>logged, never sent"]
+    WORLD --> WALL{"air-gap check"}
+    WALL -->|on this machine / this network| OUT["answer streamed back"]
+    WALL -.->|leaving the network, sealed| BLOCK["blocked and logged"]
 
     classDef stage fill:#3f5cc4,stroke:#243a99,color:#fff
     classDef guard fill:#c0392b,stroke:#7a2019,color:#fff
@@ -218,60 +217,29 @@ flowchart TD
     class PICK pick
 ```
 
-*Deterministic code does stages ①②③⑤⑥ — detection, retrieval, arithmetic and
-file-writing never touch a model. Only ④ (and the classification inside ①)
-calls one, and always through the lane router, never by name. The block below
-is the same flow spelled out for readers whose renderer does not draw the
-diagram above.*
+In plain terms, every question goes through the same six steps:
 
-```
-   ┌────────────┐
-   │  browser   │   vanilla HTML/CSS/JS · no npm · no CDN · no build step
-   └─────┬──────┘
-         │  Server-Sent Events  (step · route · sources · token · file · done)
-   ┌─────▼────────────────────────────────────────────────────────────┐
-   │  api/app.py          FastAPI · SSE bridge · uploads · downloads  │
-   └─────┬────────────────────────────────────────────────────────────┘
-         │
-   ┌─────▼────────────────────────────────────────────────────────────┐
-   │  agents/workbench.py — the plan/act loop                         │
-   └─────┬────────────────────────────────────────────────────────────┘
-         │
-         │  ① CLASSIFY  ─────────────────────────────────────────────┐
-         │     router lane decides the class from few-shot examples  │
-         │     defined in models.yaml — not in code                  │
-         │     document · reason · code · pid · compare · chitchat   │
-         │                                                           │
-         │  ② PRE-TOOL  ─────────────────────────────────────────────┤
-         │     deterministic work BEFORE any model sees the question │
-         │     analyze_pid · extract_actions · compare_docs          │
-         │                                                           │
-         │  ③ RETRIEVE  ─────────────────────────────────────────────┤
-         │     hybrid search over LanceDB, tag-boosted,              │
-         │     0.50 relevance floor, skipped entirely for chitchat   │
-         │                                                           │
-         │  ④ ANSWER  ───────────────────────────────────────────────┤
-         │     reason lane, grounded prompt, citations required      │
-         │     for plant facts and forbidden for general knowledge   │
-         │                                                           │
-         │  ⑤ VERIFY  ───────────────────────────────────────────────┤
-         │     arithmetic and tolerance bands checked by regex,      │
-         │     not by asking the model to grade itself               │
-         │                                                           │
-         │  ⑥ DELIVER  ──────────────────────────────────────────────┘
-         │     model returns structured JSON → Python renders OOXML
-         ▼
-   ┌──────────────────────────────────────────────────────────────────┐
-   │  core/llm.py          lane router — the only caller of a model   │
-   │  ingest/pipeline.py   docling → chunks → embeddings → LanceDB    │
-   │  tools/               deliverables · sandbox · verify · pid      │
-   │  core/airgap.py       socket + DNS interceptor                   │
-   └─────┬────────────────────────────────────────────────────────────┘
-         │  localhost only
-   ┌─────▼──────────────────────────────────────────────────────────┐
-   │  Ollama  (or vLLM on a GPU node — same interface)              │
-   └────────────────────────────────────────────────────────────────┘
-```
+1. **Classify** — a small, fast model reads the question and tags what kind
+   it is: a document question, a drawing question, a comparison, or just chat.
+2. **Pre-tool** — anything that can be worked out with plain code, before any
+   AI model looks at the question, is done right here (P&ID analysis, action
+   extraction, document comparison).
+3. **Retrieve** — the system searches your own documents for the passages
+   that actually relate to the question. Nothing else is shown to the model.
+4. **Answer** — a model reads only those passages and writes the answer,
+   with a `[1]` citation on every plant fact. If the passages don't cover it,
+   it says so instead of guessing.
+5. **Verify** — any numbers in the answer (tolerances, corrosion rates,
+   dates) are checked by plain arithmetic, not by asking the model to mark
+   its own work.
+6. **Deliver** — if you asked for a file, the answer is turned into a real
+   `.docx` / `.xlsx` / `.pptx`, not just a chat reply.
+
+Only step 4 (and the tagging in step 1) ever calls a model, and it always
+asks for a *lane* — `reason`, `code`, `vision` — never a model by name.
+`models.yaml` decides what actually answers: a tiny local model on a laptop,
+or the world's best model for that lane on a GPU node or a hosted API. Every
+other step is ordinary code, so it behaves the same either way.
 
 ### Two ideas hold the design together
 
