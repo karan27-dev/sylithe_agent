@@ -182,64 +182,57 @@ cd backend
 
 ```mermaid
 flowchart TD
-    U["You ask a question<br/>in the browser"] --> AGENT["The agent"]
+    START(["You ask a question<br/>— you can attach a document or a drawing"]) --> WHAT{"What is the question about?"}
 
-    subgraph PIPE["six steps, every question"]
-        direction LR
-        C1["① Classify"] --> C2["② Pre-tool"] --> C3["③ Retrieve"] --> C4["④ Answer"] --> C5["⑤ Verify"] --> C6["⑥ Deliver"]
-    end
+    WHAT -->|"a document"| DOC["Search your documents<br/>for the parts that matter"]
+    WHAT -->|"a drawing"| HAND["Hand the drawing to the<br/>drawing pipeline, below"]
+    WHAT -->|"comparing two versions"| CMP["Compare them,<br/>line by line"]
+    WHAT -->|"a number to work out"| CALC["Calculate it in plain code<br/>— never guessed by a model"]
+    WHAT -->|"just chatting"| SKIP["Skip the document search"]
 
-    AGENT --> C1
-    C1 -.needs a model.-> ROUTER
-    C4 -.needs a model.-> ROUTER
-    C3 --> DB[("your documents")]
-    C6 --> FILE[("Word / Excel / PPT")]
-
-    subgraph ROUTER["lane router — picks the model, never named in code"]
+    subgraph PIDBOX["Reading a drawing — plain code, no model involved"]
         direction TB
-        PICK{"which tier?"}
-        PICK -->|tier-S| LOCAL["local model<br/>8 GB laptop, no GPU"]
-        PICK -->|tier-L| WORLD["world's best model<br/>GPU node or hosted API"]
+        P1["Find every symbol<br/>valve · pump · tank · gauge"] --> P2["Read every tag<br/>HV-4021 · TK-4102 · PSV-2041"]
+        P2 --> P3["Trace which pipe<br/>connects to which"]
+        P3 --> P4["Build a map of the drawing"]
     end
 
-    LOCAL --> WALL
-    WORLD --> WALL{"air-gap check"}
-    WALL -->|on this machine / this network| OUT["answer streamed back"]
-    WALL -.->|leaving the network, sealed| BLOCK["blocked and logged"]
+    HAND --> P1
 
-    classDef stage fill:#3f5cc4,stroke:#243a99,color:#fff
-    classDef guard fill:#c0392b,stroke:#7a2019,color:#fff
-    classDef store fill:#2f7d4f,stroke:#1d4d30,color:#fff
-    classDef pick fill:#b5741f,stroke:#7a4d12,color:#fff
-    class C1,C2,C3,C4,C5,C6 stage
-    class WALL,BLOCK guard
-    class DB,FILE store
-    class PICK pick
+    DOC --> WRITE
+    P4 --> WRITE
+    CMP --> WRITE
+    CALC --> WRITE
+    SKIP --> WRITE
+
+    WRITE["A model writes the answer<br/>using only what was found above"] --> CHECK["Every number in that answer<br/>is checked again, by code"]
+    CHECK --> WANT{"What did you ask for?"}
+    WANT -->|"just an answer"| OUT1["Shown in chat<br/>with a source on every fact"]
+    WANT -->|"a file"| OUT2["A real Word, Excel<br/>or PowerPoint file"]
+
+    classDef route fill:#3f5cc4,stroke:#243a99,color:#fff
+    classDef pidnode fill:#b5741f,stroke:#7a4d12,color:#fff
+    classDef out fill:#2f7d4f,stroke:#1d4d30,color:#fff
+    class DOC,CMP,CALC,SKIP,WRITE,CHECK route
+    class P1,P2,P3,P4 pidnode
+    class OUT1,OUT2 out
 ```
 
-In plain terms, every question goes through the same six steps:
+**A document question** is answered only from passages your own files search
+turned up — nothing else is shown to the model, and if those passages don't
+cover it, it says so instead of guessing.
 
-1. **Classify** — a small, fast model reads the question and tags what kind
-   it is: a document question, a drawing question, a comparison, or just chat.
-2. **Pre-tool** — anything that can be worked out with plain code, before any
-   AI model looks at the question, is done right here (P&ID analysis, action
-   extraction, document comparison).
-3. **Retrieve** — the system searches your own documents for the passages
-   that actually relate to the question. Nothing else is shown to the model.
-4. **Answer** — a model reads only those passages and writes the answer,
-   with a `[1]` citation on every plant fact. If the passages don't cover it,
-   it says so instead of guessing.
-5. **Verify** — any numbers in the answer (tolerances, corrosion rates,
-   dates) are checked by plain arithmetic, not by asking the model to mark
-   its own work.
-6. **Deliver** — if you asked for a file, the answer is turned into a real
-   `.docx` / `.xlsx` / `.pptx`, not just a chat reply.
+**A drawing question** never shows the picture to a model at all. Plain code
+finds every symbol, reads every tag, and traces every pipe between them
+first; a model only turns that finished map into a sentence — so it cannot
+see a valve that isn't there.
 
-Only step 4 (and the tagging in step 1) ever calls a model, and it always
-asks for a *lane* — `reason`, `code`, `vision` — never a model by name.
-`models.yaml` decides what actually answers: a tiny local model on a laptop,
-or the world's best model for that lane on a GPU node or a hosted API. Every
-other step is ordinary code, so it behaves the same either way.
+**Whichever path it took**, the last three boxes are the same: a model
+writes the answer from what was found, every number in it is checked again
+by code, and it comes back either as a cited chat answer or as a real file.
+The only thing that changes between a laptop and a GPU server is *which*
+model does the writing — a small local one, or the best one available — and
+that is a one-line setting, not a different pipeline.
 
 ### Two ideas hold the design together
 
