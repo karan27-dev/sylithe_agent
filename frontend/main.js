@@ -544,7 +544,12 @@ async function hero(){
             <button data-hd="90">90d</button>
           </div>
         </div>
-        <div class="ubody"><div class="uskel"></div></div>
+        <div class="ubody"><div class="uskel">
+          <div class="hcells">${Array(6).fill(
+            `<div class="hcell"><span class="k"> </span><b> </b></div>`
+          ).join("")}</div>
+          <div class="heat">${Array(35).fill("<i></i>").join("")}</div>
+        </div></div>
       </div>
     </div>`;
 
