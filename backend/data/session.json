@@ -1,5 +1,5 @@
 {
- "saved": 1789655964.524179,
+ "saved": 1789656260.7832,
  "chats": {
   "388e430265c9": {
    "uploads": [],
@@ -1060,6 +1060,118 @@
    "briefs": [],
    "folder": "/Users/karan/Downloads/PACK-A-Unit12-easy",
    "corpus": []
+  },
+  "a145679f7427": {
+   "uploads": [],
+   "drawings": [],
+   "images": [],
+   "briefs": [
+    {
+     "name": "A3_PSV-1205_test_certificate.csv",
+     "path": "/Users/karan/Downloads/PACK-A-Unit12-easy/A3_PSV-1205_test_certificate.csv",
+     "kind": "spreadsheet",
+     "chunks": 1,
+     "tags": [
+      "PSV-1205",
+      "PSV-2027",
+      "D-1201",
+      "FEB-2027"
+     ],
+     "preview": "A3 PSV-1205 test certificate\ncertificate, value = KM-PSV-2027-041. tag, value = PSV-1205. protects, value = D-1201. set_pressure_barg, value = 9.0. applicable_tolerance, value = +/- 3% of set pressure. as_found_barg, value = 9.05. as_left_barg, value = 9.0. test_date, value = 20-Feb-2027. test_medium, value = Nitrogen",
+     "detail": "1 indexed passages"
+    },
+    {
+     "name": "A2_D-1201_thickness_survey.pdf",
+     "path": "/Users/karan/Downloads/PACK-A-Unit12-easy/A2_D-1201_thickness_survey.pdf",
+     "kind": "document",
+     "chunks": 1,
+     "tags": [
+      "UNIT-12",
+      "FEB-2027",
+      "AT-10",
+      "API-510"
+     ],
+     "preview": "Unit: Unit 12 - Kerosene Merox Survey date: 18-Feb-2027\nMethod: ultrasonic, Olympus 38DL Plus, 5 MHz twin crystal\nLocation            Measured (mm) Shell Course 1      10.40 Shell Course 2      10.85 Head - top          11.40\nGoverning (thinnest) location is Shell Course 1 at 10.40 mm. Minimum required thickness (t-min) is 8.00 mm. Only one survey exists for this vessel. No corrosion rate can be d",
+     "detail": "1 indexed passages over 1 page(s)"
+    },
+    {
+     "name": "A1_D-1201_datasheet.docx",
+     "path": "/Users/karan/Downloads/PACK-A-Unit12-easy/A1_D-1201_datasheet.docx",
+     "kind": "document",
+     "chunks": 1,
+     "tags": [
+      "D-1201",
+      "SA-516"
+     ],
+     "preview": "A1 D-1201 datasheet \u00b7 Equipment Datasheet - D-1201\nDesign Pressure, Value = 9.5 barg. Design Temperature, Value = 120 degC. Material, Value = SA-516 Gr.70. Year of Manufacture, Value = 2014. Nominal Shell Thickness, Value = 12.00 mm. Corrosion Allowance, Value = 2.50 mm. Minimum Required Thickness (t-min), Value = 8.00 mm",
+     "detail": "1 indexed passages"
+    }
+   ],
+   "folder": null,
+   "corpus": [
+    "A1_D-1201_datasheet.docx",
+    "A2_D-1201_thickness_survey.pdf",
+    "A3_PSV-1205_test_certificate.csv",
+    "A4_shift_log.txt",
+    "A5_equipment_register.xlsx",
+    "A6_PID-U12-001.png"
+   ]
+  },
+  "b5258a4b4919": {
+   "uploads": [],
+   "drawings": [],
+   "images": [],
+   "briefs": [
+    {
+     "name": "A3_PSV-1205_test_certificate.csv",
+     "path": "/Users/karan/Downloads/PACK-A-Unit12-easy/A3_PSV-1205_test_certificate.csv",
+     "kind": "spreadsheet",
+     "chunks": 1,
+     "tags": [
+      "PSV-1205",
+      "PSV-2027",
+      "D-1201",
+      "FEB-2027"
+     ],
+     "preview": "A3 PSV-1205 test certificate\ncertificate, value = KM-PSV-2027-041. tag, value = PSV-1205. protects, value = D-1201. set_pressure_barg, value = 9.0. applicable_tolerance, value = +/- 3% of set pressure. as_found_barg, value = 9.05. as_left_barg, value = 9.0. test_date, value = 20-Feb-2027. test_medium, value = Nitrogen",
+     "detail": "1 indexed passages"
+    },
+    {
+     "name": "A2_D-1201_thickness_survey.pdf",
+     "path": "/Users/karan/Downloads/PACK-A-Unit12-easy/A2_D-1201_thickness_survey.pdf",
+     "kind": "document",
+     "chunks": 1,
+     "tags": [
+      "UNIT-12",
+      "FEB-2027",
+      "AT-10",
+      "API-510"
+     ],
+     "preview": "Unit: Unit 12 - Kerosene Merox Survey date: 18-Feb-2027\nMethod: ultrasonic, Olympus 38DL Plus, 5 MHz twin crystal\nLocation            Measured (mm) Shell Course 1      10.40 Shell Course 2      10.85 Head - top          11.40\nGoverning (thinnest) location is Shell Course 1 at 10.40 mm. Minimum required thickness (t-min) is 8.00 mm. Only one survey exists for this vessel. No corrosion rate can be d",
+     "detail": "1 indexed passages over 1 page(s)"
+    },
+    {
+     "name": "A1_D-1201_datasheet.docx",
+     "path": "/Users/karan/Downloads/PACK-A-Unit12-easy/A1_D-1201_datasheet.docx",
+     "kind": "document",
+     "chunks": 1,
+     "tags": [
+      "D-1201",
+      "SA-516"
+     ],
+     "preview": "A1 D-1201 datasheet \u00b7 Equipment Datasheet - D-1201\nDesign Pressure, Value = 9.5 barg. Design Temperature, Value = 120 degC. Material, Value = SA-516 Gr.70. Year of Manufacture, Value = 2014. Nominal Shell Thickness, Value = 12.00 mm. Corrosion Allowance, Value = 2.50 mm. Minimum Required Thickness (t-min), Value = 8.00 mm",
+     "detail": "1 indexed passages"
+    }
+   ],
+   "folder": "/Users/karan/Downloads/PACK-A-Unit12-easy",
+   "corpus": [
+    "A1_D-1201_datasheet.docx",
+    "A2_D-1201_thickness_survey.pdf",
+    "A3_PSV-1205_test_certificate.csv",
+    "A4_shift_log.txt",
+    "A5_equipment_register.xlsx",
+    "A6_PID-U12-001.png"
+   ]
   }
  }
 }

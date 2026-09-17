@@ -61,6 +61,7 @@ async function boot(){
       : `<b style="color:var(--bad)">engine offline</b>`;
     $("#pill-index").innerHTML = `<b>${b.index.chunks || 0}</b> chunks`;
     if(b.profiles) renderTiers(b.profiles);
+    if(b.folder && !FOLDER){ FOLDER = b.folder; renderChips(); }
     if(b.health.missing?.length) toast("Models missing: " + b.health.missing.join(", "), 7000);
   }catch(e){ toast("Could not reach the server"); }
   await loadChats();
@@ -449,7 +450,11 @@ function heat(daily, days){
     cells.push(`<i class="l${lvl}" title="${key} \u00b7 ${
       v ? fmtTok(v) + " tokens" : "nothing"}"></i>`);
   }
-  return `<div class="heat">${cells.join("")}</div>`;
+  // A 7-day range is one column of seven; cap the square size so it does not
+  // become a row of tiles the width of the card.
+  const cols = Math.ceil(days / 7);
+  return `<div class="heat" style="max-width:${cols < 8 ? cols * 26 : 100000}px">`
+       + cells.join("") + `</div>`;
 }
 
 function modelsTab(h){
@@ -1019,7 +1024,7 @@ folderBtn.onclick = async () => {
   try{
     await needChat();
       const r = await (await fetch("/api/folder/choose", {method:"POST"})).json();
-    if(r.path){ analyseFolder(r.path); return; }
+    if(r.path){ await attachFolder(r.path); return; }
     if(r.cancelled) return;                 // said no - do nothing at all
     toast((r.error || "Could not open the folder chooser")
           + ' - you can also say it in the chat: "analyse the documents in '
@@ -1031,6 +1036,33 @@ folderBtn.onclick = async () => {
     folderBtn.classList.remove("on");
   }
 };
+
+/* Choosing a folder ATTACHES it. It does not ask a question.
+   Selecting one used to post "Analyse the folder X" into the chat and stream a
+   summary nobody had asked for, so the first thing in every conversation was a
+   message the user did not write, and being rid of it meant starting a new
+   chat. A folder is context, like an attachment: it goes on the chip row and
+   waits to be used. */
+async function attachFolder(path){
+  FOLDER = path;
+  renderChips();
+  const name = path.split("/").filter(Boolean).pop();
+  toast(`Reading ${name}\u2026`);
+  try{
+    const r = await (await fetch(
+      `/api/folder/ingest?path=${encodeURIComponent(path)}`
+      + `&chat_id=${encodeURIComponent(await needChat())}`,
+      { method: "POST" })).json();
+    if(r.error){ toast(r.error, 7000); FOLDER = null; renderChips(); return; }
+    const n = (r.files || []).length || r.indexed || 0;
+    toast(`${name}: ${n} file${n === 1 ? "" : "s"} ready. Ask anything about them.`,
+          5000);
+    boot();
+  }catch(e){
+    toast("Could not read that folder: " + e.message, 6000);
+    FOLDER = null; renderChips();
+  }
+}
 
 /* The in-page folder browser is gone.
    It existed because a browser cannot return a real filesystem path, but the

@@ -187,6 +187,9 @@ def boot(chat_id: str = "") -> dict:
     return {
         "remembered": [b.line() for b in sess(chat_id)["briefs"][:3]],
         "health": health,
+        # The chosen folder, so its chip survives a reload rather than the
+        # server knowing something the page has forgotten.
+        "folder": sess(chat_id).get("folder"),
         "profiles": [_profile_card(n) for n in CLIENT.reg.profiles],
         "index": idx,
         "sovereignty": MONITOR.summary(),
@@ -517,6 +520,12 @@ async def api_folder_ingest(path: str, chat_id: str = "") -> dict:
         # The folder belongs to the chat that opened it, whether or not the
         # briefs succeed - scoping must not depend on a best-effort summary.
         _remember_corpus(chat_id, [Path(f).name for f in scan.files])
+        # Remembered here too, not only on folder/select and folder/analyse.
+        # Attaching a folder is now the ordinary path, and without this the
+        # server knew the documents while the page had forgotten the folder,
+        # so its chip vanished on reload.
+        sess(chat_id)["folder"] = str(Path(path).expanduser())
+        _remember()
         try:
             from tools.brief import describe
             for f in scan.files[:3]:
