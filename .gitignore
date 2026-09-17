@@ -9,6 +9,7 @@ venv/
 backend/data/index/
 backend/data/deliverables/
 backend/data/chats.json
+backend/data/admin_limits.json
 backend/data/mrpl/
 
 # MRPL's annual report is their copyrighted filing - don't redistribute it.

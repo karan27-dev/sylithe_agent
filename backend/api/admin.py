@@ -18,9 +18,12 @@ from __future__ import annotations
 
 import hashlib
 import hmac
+import json
 import os
 import secrets
+import threading
 import time
+from pathlib import Path
 
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
@@ -29,6 +32,29 @@ router = APIRouter(prefix="/api/admin")
 
 SESSIONS: dict[str, float] = {}
 SESSION_HOURS = 12
+
+# ---------------------------------------------------------------------------
+# per-employee token limits — the only thing this dashboard writes, not just
+# reads. A budget an admin sets by hand, kept next to the usage logs rather
+# than in models.yaml, because it is deployment policy, not model config.
+# ---------------------------------------------------------------------------
+_LIMITS_FILE = Path(__file__).resolve().parent.parent / "data" / "admin_limits.json"
+_limits_lock = threading.Lock()
+
+
+def _load_limits() -> dict[str, dict]:
+    try:
+        return json.loads(_LIMITS_FILE.read_text())
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+
+
+def _save_limits(d: dict[str, dict]) -> None:
+    with _limits_lock:
+        _LIMITS_FILE.parent.mkdir(parents=True, exist_ok=True)
+        tmp = _LIMITS_FILE.with_suffix(".tmp")
+        tmp.write_text(json.dumps(d, indent=1))
+        tmp.replace(_LIMITS_FILE)
 
 
 def _creds() -> tuple[str, str]:
@@ -181,6 +207,30 @@ def _roles() -> dict[str, dict]:
     return out
 
 
+@router.post("/limit")
+async def set_limit(request: Request) -> dict:
+    if (bad := guard(request)):
+        return bad
+    body = await request.json()
+    machine = str(body.get("machine", "")).strip()
+    if not machine:
+        return JSONResponse({"ok": False, "error": "no machine given"},
+                            status_code=400)
+    raw = body.get("token_limit")
+    limit = int(raw) if raw not in (None, "") else None
+    if limit is not None and limit < 0:
+        return JSONResponse({"ok": False, "error": "limit cannot be negative"},
+                            status_code=400)
+
+    limits = _load_limits()
+    if limit is None:
+        limits.pop(machine, None)
+    else:
+        limits[machine] = {"token_limit": limit, "set_at": time.time()}
+    _save_limits(limits)
+    return {"ok": True, "machine": machine, "token_limit": limit}
+
+
 @router.get("/overview")
 def overview(request: Request, days: int = 30):
     if (bad := guard(request)):
@@ -193,6 +243,7 @@ def overview(request: Request, days: int = 30):
     rate = usage.gpu_rate(c.reg.onprem)
     secs = s["capacity"]["engine_seconds"]
     roles = _roles()
+    limits = _load_limits()
 
     for row in s["machines"]:
         meta = roles.get(row["key"], {})
@@ -204,6 +255,7 @@ def overview(request: Request, days: int = 30):
             row["seconds"] / 3600 * float(c.reg.onprem.get("draw_watts", 0)) / 1000, 3)
         row["power_cost"] = round(
             row["energy_kwh"] * float(c.reg.onprem.get("power_per_kwh", 0)), 2)
+        row["token_limit"] = limits.get(row["key"], {}).get("token_limit")
 
     watts = float(c.reg.onprem.get("draw_watts", 0))
     kwh = secs / 3600 * watts / 1000
@@ -234,10 +286,12 @@ def person(machine: str, request: Request, days: int = 30):
     from core.llm import Client
 
     c = Client()
+    limit = _load_limits().get(machine, {}).get("token_limit")
     rows = [d for d in usage.read(_t.time() - days * 86400)
             if d.get("machine") == machine]
     if not rows:
-        return {"machine": machine, "calls": 0, "found": False}
+        return {"machine": machine, "calls": 0, "found": False,
+                "token_limit": limit}
 
     by_lane: dict[str, dict] = {}
     by_model: dict[str, dict] = {}
@@ -274,6 +328,7 @@ def person(machine: str, request: Request, days: int = 30):
                     "calls": v["calls"]} for h, v in sorted(by_hour.items())],
         "first_seen": min(d["ts"] for d in rows),
         "last_seen": max(d["ts"] for d in rows),
+        "token_limit": limit,
     }
 
 

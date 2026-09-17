@@ -22,6 +22,14 @@ async function api(path){
   return r.json();
 }
 
+async function apiPost(path, body){
+  const r = await fetch(path, { method: "POST",
+    headers: { "Content-Type": "application/json", "X-Admin-Token": TOKEN },
+    body: JSON.stringify(body) });
+  if(r.status === 401){ signedOut(); throw new Error("signed out"); }
+  return r.json();
+}
+
 /* ---------- theme ----------
    Three states, matching the workbench: an explicit choice is stamped on
    <html> and remembered, and with nothing stamped the OS decides. The stamp is
@@ -199,15 +207,20 @@ function fleet(v, banner){
   <table><thead><tr>
     <th>engineer</th><th>machine</th><th>role</th>
     <th class="num">calls</th><th class="num">tokens</th>
-    <th class="num">engine h</th><th class="num">power</th></tr></thead>
+    <th class="num">engine h</th><th class="num">power</th><th>limit</th></tr></thead>
   <tbody>${d.machines.map(m => {
     const tk = m.prompt_tokens + m.output_tokens;
+    const over = m.token_limit && tk > m.token_limit;
     return `<tr class="${m.calls ? "" : "dim"}">
       <td><a href="#" data-go="${esc(m.key)}">${esc(m.name || m.user || "-")}</a>
         <div class="bar"><i style="width:${Math.round(tk / topTok * 100)}%"></i></div></td>
       <td>${esc(m.key)}</td><td>${esc(m.role || "-")}</td>
       <td class="num">${int(m.calls)}</td><td class="num">${tok(tk)}</td>
       <td class="num">${m.engine_hours}</td><td class="num">${money(m.power_cost)}</td>
+      <td>${m.token_limit
+          ? `<span class="tag ${over ? "bad" : "ok"}">${
+              over ? "over " : ""}${tok(m.token_limit)}</span>`
+          : `<a href="#" data-go="${esc(m.key)}" class="tag quiet">set</a>`}</td>
     </tr>`;
   }).join("")}</tbody></table>`;
   v.querySelectorAll("[data-go]").forEach(a => {
@@ -215,12 +228,82 @@ function fleet(v, banner){
   });
 }
 
+// A budget the admin sets by hand, not something the model enforces - this
+// card is the only editable thing on the whole dashboard, so it gets its
+// own render path (view state) instead of piggybacking on the read-only card.
+function limitCardHTML(p){
+  const limit = p.token_limit;
+  const used = p.total ? p.total.tokens : 0;
+  const pct = limit ? Math.min(999, Math.round(used / limit * 100)) : 0;
+  const over = limit && used > limit;
+  return `<div class="card limit ${over ? "bad" : ""}" id="limitcard">
+    <div class="k">token limit</div>
+    <div class="v">${limit ? tok(limit) : "No limit"}</div>
+    <div class="n">${limit
+      ? `${tok(used)} used this window · ${pct}%${over ? " — over" : ""}`
+      : "Unlimited for now"}</div>
+    ${limit ? `<div class="bar"><i class="${over ? "bad" : ""}"
+      style="width:${Math.min(100, pct)}%"></i></div>` : ""}
+    <button class="editbtn" id="editlimit" data-machine="${esc(p.machine)}"
+      data-limit="${limit || ""}">Edit</button>
+  </div>`;
+}
+
+function limitEditHTML(machine, current){
+  return `<div class="card limitedit" id="limitcard">
+    <div class="k">token limit</div>
+    <input type="number" id="limitinput" min="0" step="1000"
+      placeholder="e.g. 5000000" value="${current || ""}">
+    <div class="editrow">
+      <button id="savelimit">Save</button>
+      <button id="clearlimit" class="ghost">No limit</button>
+      <button id="cancellimit" class="ghost">Cancel</button>
+    </div>
+  </div>`;
+}
+
+function bindLimitEdit(p){
+  const swapIn = html => {
+    const card = $("#limitcard");
+    if(!card) return;
+    card.outerHTML = html;
+    wire();
+  };
+  function wire(){
+    const edit = $("#editlimit");
+    if(edit) edit.onclick = () =>
+      swapIn(limitEditHTML(edit.dataset.machine, edit.dataset.limit));
+    const save = $("#savelimit");
+    if(save) save.onclick = async () => {
+      save.disabled = true;
+      const v = $("#limitinput").value;
+      const r = await apiPost("/api/admin/limit",
+        { machine: p.machine, token_limit: v ? +v : null });
+      p.token_limit = r.token_limit;
+      swapIn(limitCardHTML(p));
+    };
+    const clear = $("#clearlimit");
+    if(clear) clear.onclick = async () => {
+      clear.disabled = true;
+      await apiPost("/api/admin/limit", { machine: p.machine, token_limit: null });
+      p.token_limit = null;
+      swapIn(limitCardHTML(p));
+    };
+    const cancel = $("#cancellimit");
+    if(cancel) cancel.onclick = () => swapIn(limitCardHTML(p));
+  }
+  wire();
+}
+
 async function person(v, banner){
   v.innerHTML = `<p class="note">Loading…</p>`;
   const p = await api(`/api/admin/person/${encodeURIComponent(PERSON)}?days=${DAYS}`);
+  p.machine = PERSON;
   if(!p.found){ v.innerHTML = `${banner}<div class="empty">
     <b>${esc(PERSON)}</b> has not made a single request in this window.
-    The workbench is installed and has never been opened.</div>`; return; }
+    The workbench is installed and has never been opened.</div>
+    <div class="cards" style="margin-top:14px">${limitCardHTML(p)}</div>`;
+    bindLimitEdit(p); return; }
   const t = p.total, ln = DATA.lane_notes || {};
   v.innerHTML = `${banner}
   <div class="cards">
@@ -237,6 +320,7 @@ async function person(v, banner){
     <div class="card ok"><div class="k">their electricity</div>
       <div class="v">${money(p.power_cost)}</div>
       <div class="n">${p.energy_kwh} kWh</div></div>
+    ${limitCardHTML(p)}
   </div>
 
   <div class="split">
@@ -269,6 +353,7 @@ async function person(v, banner){
 
   <h2 class="sec">Daily</h2>
   ${bars(p.daily.map(d => ({ ...d, hour: d.key })), "calls", d => d.key)}`;
+  bindLimitEdit(p);
 }
 
 let MODEL = null, RAM = 64, CTX = 8;
