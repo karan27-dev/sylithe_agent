@@ -20,6 +20,7 @@ Two rules that matter more than they look:
 
 from __future__ import annotations
 
+import os
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -29,8 +30,20 @@ from ingest import pipeline
 # Walking an entire home directory by accident should not be possible.
 MAX_FILES = 400
 MAX_BYTES = 300 * 1024 * 1024
+# A hard ceiling on how many filesystem entries one scan will even look at,
+# independent of MAX_FILES - see the cycle note on preview() below for why
+# this needs to be a wall during the walk, not a check after it finishes.
+SCAN_CAP = 20_000
 SKIP_DIRS = {".git", "node_modules", "__pycache__", ".venv", "venv",
-             "Library", "System", ".Trash", "site-packages", ".cache"}
+             "Library", "System", ".Trash", "site-packages", ".cache",
+             # Windows noise, and the two that matter most: "Application
+             # Data" and "Local Settings" are legacy reparse points that
+             # exist purely to redirect old software into AppData - walking
+             # into one revisits AppData a second time under a different
+             # name, and on some profiles they form an outright cycle back
+             # on themselves.
+             "AppData", "Application Data", "Local Settings",
+             "$RECYCLE.BIN", "System Volume Information"}
 
 
 @dataclass
@@ -55,7 +68,21 @@ class Scan:
 
 
 def preview(folder: str | Path) -> Scan:
-    """What is in there, without reading a single document."""
+    """What is in there, without reading a single document.
+
+    Walks with os.walk rather than Path.rglob, and for one reason: rglob
+    follows a directory-shaped reparse point wherever it points, and never
+    checks whether it has been there before. A Windows profile is full of
+    exactly that - "Application Data" and "Local Settings" are legacy
+    junctions back into AppData, and on some profiles they form an actual
+    cycle. rglob("*") on one of those does not error and does not finish; it
+    was reported back as the folder picker "timing out", because from the
+    browser's side that is indistinguishable from a request that never
+    returns. Tracking each directory's resolved real path and refusing to
+    descend into one twice closes that hole regardless of which specific
+    reparse point causes it, and a hard cap on entries visited is the
+    backstop for a folder that is merely enormous rather than cyclic.
+    """
     root = Path(folder).expanduser()
     s = Scan(root=str(root))
     if not root.exists():
@@ -66,25 +93,53 @@ def preview(folder: str | Path) -> Scan:
         return s
 
     total_bytes = 0
-    for p in sorted(root.rglob("*")):
-        if any(part in SKIP_DIRS or part.startswith(".") for part in p.parts[len(root.parts):]):
+    visited_dirs: set[str] = set()
+    scanned = 0
+    for dirpath, dirnames, filenames in os.walk(root, topdown=True, followlinks=False):
+        try:
+            real = os.path.realpath(dirpath)
+        except OSError:
+            real = dirpath
+        if real in visited_dirs:
+            dirnames[:] = []
             continue
-        if not p.is_file():
-            continue
-        s.found += 1
-        ext = p.suffix.lower()
-        if ext in pipeline.SUPPORTED:
-            s.supported += 1
-            s.by_type[ext] = s.by_type.get(ext, 0) + 1
-            total_bytes += p.stat().st_size
-            if len(s.files) < MAX_FILES:
-                s.files.append(str(p))
-    if s.supported > MAX_FILES:
-        s.error = (f"{s.supported} supported files - over the {MAX_FILES} limit. "
-                   "Point at a narrower folder.")
-    elif total_bytes > MAX_BYTES:
-        s.error = (f"{total_bytes/1048576:.0f} MB of documents - over the "
-                   f"{MAX_BYTES//1048576} MB limit for one scan.")
+        visited_dirs.add(real)
+
+        dirnames[:] = sorted(d for d in dirnames
+                             if d not in SKIP_DIRS and not d.startswith("."))
+        for fname in sorted(filenames):
+            if fname.startswith("."):
+                continue
+            scanned += 1
+            if scanned > SCAN_CAP:
+                s.error = (f"More than {SCAN_CAP:,} files under this folder - "
+                           "point at a narrower one.")
+                return s
+            p = Path(dirpath) / fname
+            try:
+                if not p.is_file():
+                    continue
+            except OSError:
+                continue
+            s.found += 1
+            ext = p.suffix.lower()
+            if ext in pipeline.SUPPORTED:
+                s.supported += 1
+                s.by_type[ext] = s.by_type.get(ext, 0) + 1
+                try:
+                    total_bytes += p.stat().st_size
+                except OSError:
+                    continue
+                if len(s.files) < MAX_FILES:
+                    s.files.append(str(p))
+        if s.supported > MAX_FILES:
+            s.error = (f"{s.supported} supported files - over the {MAX_FILES} limit. "
+                       "Point at a narrower folder.")
+            return s
+        if total_bytes > MAX_BYTES:
+            s.error = (f"{total_bytes/1048576:.0f} MB of documents - over the "
+                       f"{MAX_BYTES//1048576} MB limit for one scan.")
+            return s
     return s
 
 
@@ -184,22 +239,29 @@ def choose() -> dict:
     Open the machine's own folder chooser.
 
     A browser cannot open a dialog that returns a filesystem path - that is the
-    security boundary that forced typing in the first place. This backend is a
-    local process though, so it can ask the OS directly and hand back a real
-    path. On anything other than macOS this simply reports that the picker is
-    unavailable and the typed path still works.
+    security boundary that forced typing (and the in-page browser) in the
+    first place. This backend is a local process though, so it can ask the OS
+    directly and hand back a real path - one native dialog per platform, in
+    the toolkit that ships with that OS rather than one this project would
+    have to bundle.
     """
-    import subprocess
     import sys
 
-    if sys.platform != "darwin":
-        return {"error": "Native chooser is macOS only - type or browse instead."}
+    if sys.platform == "darwin":
+        return _choose_macos()
+    if sys.platform == "win32":
+        return _choose_windows()
+    return _choose_linux()
+
+
+def _choose_macos() -> dict:
+    import subprocess
     script = ('POSIX path of (choose folder with prompt '
               '"Choose a folder for the Sovereign Workbench to read")')
     try:
         r = subprocess.run(["osascript", "-e", script],
                            capture_output=True, text=True, timeout=180)
-    except subprocess.TimeoutExpired:
+    except (subprocess.TimeoutExpired, FileNotFoundError):
         return {"error": "The chooser timed out."}
     if r.returncode != 0:
         err = r.stderr or ""
@@ -213,3 +275,59 @@ def choose() -> dict:
             return {"cancelled": True}
         return {"error": err.strip()[:160] or "Could not open the chooser"}
     return {"path": r.stdout.strip().rstrip("/")}
+
+
+def _choose_windows() -> dict:
+    # WinForms' FolderBrowserDialog, driven from PowerShell so nothing needs
+    # bundling - every Windows box already has both. It needs an STA thread;
+    # classic powershell.exe (not pwsh/PowerShell 7) is STA by default, which
+    # is the whole reason this targets "powershell" specifically.
+    import subprocess
+    script = (
+        "Add-Type -AssemblyName System.Windows.Forms | Out-Null;"
+        "$f = New-Object System.Windows.Forms.FolderBrowserDialog;"
+        "$f.Description = 'Choose a folder for the Sovereign Workbench to read';"
+        "$f.ShowNewFolderButton = $false;"
+        "if ($f.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {"
+        "  Write-Output $f.SelectedPath"
+        "}"
+    )
+    try:
+        r = subprocess.run(
+            ["powershell", "-NoProfile", "-NonInteractive", "-Command", script],
+            capture_output=True, text=True, timeout=180)
+    except (subprocess.TimeoutExpired, FileNotFoundError):
+        return {"error": "Native chooser is unavailable - browse instead."}
+    if r.returncode != 0:
+        return {"error": (r.stderr or "").strip()[:160]
+                or "Could not open the chooser"}
+    path = r.stdout.strip()
+    # No SelectedPath printed means Cancel, not an error - ShowDialog()
+    # returned anything other than OK.
+    return {"path": path} if path else {"cancelled": True}
+
+
+def _choose_linux() -> dict:
+    # No single toolkit ships with every distro. Try the two that cover
+    # GNOME and KDE; if neither binary exists, fall back honestly instead of
+    # guessing at a third.
+    import shutil
+    import subprocess
+
+    for binary, args in (
+        ("zenity", ["--file-selection", "--directory",
+                    "--title=Choose a folder for the Sovereign Workbench to read"]),
+        ("kdialog", ["--getexistingdirectory", str(Path.home())]),
+    ):
+        if not shutil.which(binary):
+            continue
+        try:
+            r = subprocess.run([binary, *args], capture_output=True,
+                               text=True, timeout=180)
+        except subprocess.TimeoutExpired:
+            return {"error": "The chooser timed out."}
+        if r.returncode != 0:
+            return {"cancelled": True}      # both tools exit non-zero on Cancel
+        path = r.stdout.strip()
+        return {"path": path} if path else {"cancelled": True}
+    return {"error": "No folder chooser found (zenity/kdialog) - browse instead."}

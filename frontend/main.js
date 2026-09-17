@@ -1178,12 +1178,6 @@ async function attachFolder(path){
   }
 }
 
-/* The in-page folder browser is gone.
-   It existed because a browser cannot return a real filesystem path, but the
-   backend is a local process and opens the machine's own dialog - so the page
-   was showing a second, worse picker behind the real one. The typed path stays
-   as the fallback for when no native dialog is available. */
-
 /* ==================== folder analysis ==================== */
 
 function analyseFolder(path){
