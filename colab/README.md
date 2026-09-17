@@ -66,3 +66,48 @@ Roboflow downsampled the source drawings to 640×640. Real P&IDs are around
 7168×4561, where a valve is a handful of pixels. Production will need
 **tiling** - slice the drawing into overlapping tiles, detect per tile, merge -
 and that will matter more than the choice between YOLO and RF-DETR.
+
+## Results — what the trained detector actually measures
+
+Everything below is measured on real held-out P&ID sheets, not the Roboflow
+validation split. `81.7%` is the number that matters end to end; the rest is
+where it comes from and what tiling bought.
+
+| stage | result |
+|---|---|
+| Symbol detection, 496 annotated symbols | **81.7%** located, **76.4%** correct class, F1 **0.770** |
+| Same detector, tiling turned off (the control) | 37.3% located, F1 0.503 |
+| Tag reading (RapidOCR), 433 symbols | **86.8%** |
+| Connectivity (line tracing → graph) | F1 **0.179** — the weakest stage, and no model upgrade fixes it; it needs better line tracing |
+
+**Tiling is what production needed, not a bigger model.** A detector trained
+at 640–1024 px sees a full 7168×4562 sheet squeezed 7–11×, so a 24 px valve
+arrives at the model as a handful of pixels. Cutting the sheet into
+overlapping tiles and merging detections back fixed it — measured across 20
+sheets, 496 symbols, split by how crowded the sheet is:
+
+| symbols on the sheet | one pass (no tiling) | tiled |
+|---|---|---|
+| 6–9 | 79.6% | **91.8%** |
+| 12–20 | 39.5% | **77.9%** |
+| 22–30 | 51.8% | **83.0%** |
+| 34–48 | **17.7%** | **80.0%** |
+
+Read the left column downward: a single forward pass degrades hard as a sheet
+gets busier. Tiling holds roughly flat regardless of symbol count — the fix
+was resolution, not scale.
+
+**Why a detector instead of a vision-language model.** On a 28-symbol sheet,
+this pipeline returned 28 detections, 26 correctly classed, in 0.5 s. A
+general-purpose VLM shown the same image returned 28 by coincidence and
+invented categories that are not in the symbol legend — *"Check valve 2"*,
+*"Hnad-op"* — in 30.5 s. The published literature agrees: image-only prompting
+scores 36.7–41.3% exact match; the same models constrained to query a
+recovered graph score 74.3–76.0%
+([arXiv 2609.05880](https://arxiv.org/abs/2609.05880)). The variable that
+moves the number is whether a graph exists, not how large the model is — which
+is the whole argument for training this detector rather than asking a bigger
+VLM to read the drawing directly.
+
+Full method, the OCR-recovers-0%-of-tags bug this caught, and every caveat:
+[`docs/BENCHMARK-PID.md`](../docs/BENCHMARK-PID.md).

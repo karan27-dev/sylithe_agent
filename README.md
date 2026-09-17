@@ -18,6 +18,31 @@ answer is right or dangerous.
 ./start.sh          # → http://127.0.0.1:8000
 ```
 
+### At a glance
+
+What we built, in one place — the full breakdown with method and caveats is
+in [Measured results](#measured-results) further down.
+
+| | |
+|---|---|
+| **Symbol detection**, 496 annotated P&ID symbols | **81.7%** located · 76.4% correct class · F1 **0.770** |
+| **Tag reading** (OCR), 433 symbols | **86.8%** |
+| **Capability suite** — retrieval, refusal, air-gap, deliverables, P&ID | **9 / 9** |
+| **Industry trap suite** — superseded revisions, deviation approvals, missing surveys | **17 / 18** |
+| **External network calls, ever** | **0**, enforced at the socket layer |
+| **Runs on** | an 8 GB laptop with no GPU, today — scales to a GPU node or a hosted API by changing one line |
+
+**Feature set:** cited Q&A over your own documents (`[1]` → exact passage,
+file, page) · real `.docx` / `.xlsx` / `.pptx` deliverables, not chat replies
+· `.pdf .docx .pptx .xlsx .csv .md .html .txt .png .jpg .tiff .bmp .webp`,
+including OCR on scans and handwriting · P&ID drawings turned into a
+connectivity graph — symbol detection, tag reading, line tracing, all
+deterministic, never shown to a language model · a live activity feed that
+names which model answered and why · Python-executed arithmetic for anything
+that has to be calculated, not guessed · a per-organisation
+[fleet dashboard](#fleet--the-admin-dashboard) for token usage, model mix, RAM
+capacity and an on-prem electricity estimate.
+
 ---
 
 ## Contents
@@ -26,6 +51,7 @@ answer is right or dangerous.
 - [Getting started](#getting-started)
 - [How a question flows through the system](#how-a-question-flows-through-the-system)
 - [The two tiers](#the-two-tiers)
+- [Fleet — the admin dashboard](#fleet--the-admin-dashboard)
 - [Engineering drawings (P&ID)](#engineering-drawings-pid)
 - [Why it cannot call out](#why-it-cannot-call-out)
 - [Repository layout](#repository-layout)
@@ -154,6 +180,50 @@ cd backend
 
 ## How a question flows through the system
 
+```mermaid
+flowchart TD
+    U["Browser UI<br/>vanilla HTML / CSS / JS · no build step"] -->|Server-Sent Events| API["FastAPI<br/>api/app.py"]
+    API --> AGENT["Agent loop<br/>agents/workbench.py"]
+
+    subgraph PIPE["plan → act, one pass per question"]
+        direction LR
+        C1["① classify"] --> C2["② pre-tool"] --> C3["③ retrieve"] --> C4["④ answer"] --> C5["⑤ verify"] --> C6["⑥ deliver"]
+    end
+
+    AGENT --> C1
+    C1 -.lane request.-> ROUTER
+    C4 -.lane request.-> ROUTER
+    C3 --> DB[("LanceDB<br/>hybrid search")]
+    C6 --> FILE[("OOXML<br/>.docx / .xlsx / .pptx")]
+
+    subgraph ROUTER["core/llm.py — the only caller of a model"]
+        direction TB
+        PICK{"active_profile<br/>in models.yaml"}
+        PICK -->|tier-S| LOCAL["Local · Ollama<br/>8 GB laptop, no GPU"]
+        PICK -->|tier-L| WORLD["World's best model, per lane<br/>self-hosted GPU node OR any hosted API<br/>— through that model's own deployment"]
+    end
+
+    LOCAL --> WALL
+    WORLD --> WALL{"core/airgap.py<br/>socket + DNS interceptor"}
+    WALL -->|local / lan| OUT["streamed back to the browser"]
+    WALL -.->|EXTERNAL, under seal| BLOCK["SovereigntyViolation<br/>logged, never sent"]
+
+    classDef stage fill:#3f5cc4,stroke:#243a99,color:#fff
+    classDef guard fill:#c0392b,stroke:#7a2019,color:#fff
+    classDef store fill:#2f7d4f,stroke:#1d4d30,color:#fff
+    classDef pick fill:#b5741f,stroke:#7a4d12,color:#fff
+    class C1,C2,C3,C4,C5,C6 stage
+    class WALL,BLOCK guard
+    class DB,FILE store
+    class PICK pick
+```
+
+*Deterministic code does stages ①②③⑤⑥ — detection, retrieval, arithmetic and
+file-writing never touch a model. Only ④ (and the classification inside ①)
+calls one, and always through the lane router, never by name. The block below
+is the same flow spelled out for readers whose renderer does not draw the
+diagram above.*
+
 ```
    ┌────────────┐
    │  browser   │   vanilla HTML/CSS/JS · no npm · no CDN · no build step
@@ -228,6 +298,16 @@ way to the largest open-weight models in the world** — glm-5.3, deepseek-v4-pr
 qwen3-vl:235b — without a line of code changing. One deployment story covers a
 site engineer's laptop and a datacentre node.
 
+> **tier-L is not one fixed model list — it is "point every lane at whichever
+> model is best right now, through that model's own deployment."** That
+> deployment can be a self-hosted GPU node running the current best
+> open-weight release, or it can be a hosted API from any frontier lab —
+> whichever the organisation already trusts and has commercial terms with.
+> Swapping either is six lines of YAML (`endpoint` + `api_key_env` per lane in
+> `models.yaml`), never a code change. The table below shows the self-hosted
+> shape; [tier-L over a hosted API](#a-hosted-api-shape-of-tier-l) further
+> down shows the other one, already wired and running.
+
 ```
          runs here today                              scales to this
                   │                                          │
@@ -285,6 +365,51 @@ two profiles. Only the block changes.
 *It will be out of date.* Open-weight leadership changed hands three times in
 2026. That is the argument **for** the lane abstraction, not against it: when
 the next one lands, it is six lines of YAML and no code anywhere.
+
+### A hosted-API shape of tier-L
+
+The table above is one shape of tier-L — a GPU node you own, running open
+weights, never run in this repo because there is no such node on hand. The
+other shape needs no hardware at all: point individual lanes at a vendor's
+hosted API instead of a local engine, and let *their* deployment carry the
+weight.
+
+`Lane` in `core/llm.py` carries its own `endpoint` and `api_key_env`, so a
+single `tier-L` profile can mix vendors — one lane can run against a hosted
+frontier model while another stays local:
+
+```yaml
+tier-L:
+  endpoint: https://api.deepseek.com
+  api_key_env: TIER_L_API_KEY
+  lanes:
+    router:  { model: deepseek-flash,  think: false, max_tokens: 32 }
+    reason:  { model: deepseek-v4-pro, think: true, reasoning_effort: max }
+    code:    { model: deepseek-v4-pro, think: false }
+    vision:
+      model: gemini-3.5-flash            # a different vendor, same lane shape
+      endpoint: https://generativelanguage.googleapis.com/v1beta/openai
+      api_key_env: GEMINI_API_KEY
+    embed:   { model: nomic-embed-text, dim: 768 }   # stays local — no vendor
+                                                       # embeds a 768-d vector
+                                                       # any faster than a
+                                                       # network round trip
+```
+
+No key ever lives in this file or is committed — `api_key_env` **names** an
+environment variable; the value goes only in a gitignored `.env`. The keys
+never travel outside the process either: an API-backed lane is still one more
+`endpoint` behind `core/airgap.py`'s classifier, so it is logged as an
+EXTERNAL call and only reachable at all when `SOVEREIGN_MODE=audit` is set —
+`seal()`, the default, blocks it at the socket the same as it would block
+anything else leaving the machine. Choosing a hosted lane is a deliberate,
+visible, revocable decision, not a default.
+
+This is the shape that has actually been exercised end-to-end in this
+project — real requests, real answers, on documents the router had never
+seen — while the self-hosted table above waits for a node. Neither shape
+needed a code change to reach; both are `active_profile: tier-L` and a
+different block underneath it.
 
 ### Why the router is the one lane we did not maximise
 
@@ -345,6 +470,73 @@ Switching tier:
 ```yaml
 active_profile: tier-L      # that is the entire change
 ```
+
+---
+
+## Fleet — the admin dashboard
+
+A single laptop needs none of this. An organisation running the workbench on
+every engineer's machine — or on a shared GPU node several teams draw from —
+needs to know who is using it, on what, and what it costs to keep running.
+That is a separate, deliberately minimal dashboard at `/admin`, built around
+one constraint the first draft got wrong: **this is an on-prem deployment, not
+a metered API.** There is no vendor invoice to read a "cost" off of — cost has
+to be derived from the hardware itself.
+
+```mermaid
+flowchart LR
+    subgraph FLEET["every machine running the workbench"]
+        direction TB
+        P1["Inspection PC<br/>usage-NHT-INSP-01.jsonl"]
+        P2["Ops PC<br/>usage-CDU-OPS-04.jsonl"]
+        P3["… every other seat"]
+    end
+    P1 --> SHARE[("shared folder<br/>WORKBENCH_USAGE_DIR")]
+    P2 --> SHARE
+    P3 --> SHARE
+    SHARE --> ADMIN["/admin<br/>api/admin.py"]
+    ADMIN --> V1["Fleet overview"]
+    ADMIN --> V2["Per-employee usage"]
+    ADMIN --> V3["Per-model usage"]
+    ADMIN --> V4["Token matrix<br/>RAM → concurrent seats"]
+    ADMIN --> V5["Electricity estimate<br/>engine-seconds → kWh → ₹"]
+
+    classDef node fill:#3f5cc4,stroke:#243a99,color:#fff
+    classDef store fill:#2f7d4f,stroke:#1d4d30,color:#fff
+    class P1,P2,P3,ADMIN node
+    class SHARE store
+```
+
+Every call already logs to `core/usage.py` — tokens, latency, model, lane,
+tier, machine, **never the question or the answer**, because a usage log
+carrying plant content would defeat the point of the air gap it sits next to.
+Each machine writes its own `usage-<machine>.jsonl`; the admin process simply
+globs every file in the shared directory, so adding a seat to the fleet view
+is copying one folder path, not standing up a database.
+
+| view | what it answers |
+|---|---|
+| **Fleet overview** | total requests, tokens, engine time, active machines, busiest hour — the numbers a rollout needs on day one |
+| **Per-employee** | click a name in the sidebar; see only their machine's tokens, models used, and daily pattern |
+| **Models** | which lane each model serves (router / reason / code / vision / embed) and how much of the fleet's traffic it carries |
+| **Token matrix** | given the server's RAM, how many concurrent seats fit — `MODEL_FOOTPRINT` per model plus a KV-cache-per-context-size table, minus `RESERVED_GB` for the OS |
+| **Electricity** | `(node_cost ÷ life_years)` amortised hardware cost **plus** `draw_watts × engine_seconds × power_per_kwh` — an estimated bill from the GPU's own draw, not a per-token price that assumes someone else's server |
+
+That last row is the one the first draft got wrong: it started out billing
+local inference in **USD per million tokens**, the same shape as a hosted API
+invoice — plausible right up until you notice a self-hosted model has no
+invoice to read a price off of. `models.yaml` now carries an `onprem:` block
+(capital cost, amortisation life, draw in watts, ₹/kWh) instead, and local
+models are deliberately **absent** from `pricing:` so they are costed from the
+hardware, not a placeholder `$0.00`. Capacity and utilisation are the
+dashboard's headline; a dollar figure that assumed an invoice would have been
+wrong twice — once on the number, once on the premise.
+
+Auth is intentionally small: one account from `ADMIN_EMAIL` / `ADMIN_PASSWORD`
+in `.env`, `hmac.compare_digest` on both fields, and the login endpoint
+refuses to authenticate anyone if those variables are unset — it never
+defaults open. Same three-state light/dark toggle as the main workbench, same
+no-build-step frontend.
 
 ---
 
