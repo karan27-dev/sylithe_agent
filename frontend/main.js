@@ -92,6 +92,38 @@ async function loadChats(){
   });
 }
 
+/* ---------- context chips ----------
+   What the answer will be built from, next to where the question is typed:
+   which engine, and which folder. Both were already in the product and both
+   were somewhere else on the page - the tier in the header, the folder only
+   in a toast that had long since gone. */
+let FOLDER = null;
+
+function renderChips(){
+  const box = $("#chips");
+  if(!box) return;
+  const prof = (PROFILES || []).find(p => p.active);
+  const engine = prof
+    ? (prof.sovereign ? (prof.reach === "local" ? "Local" : "Plant LAN")
+                      : "External")
+    : "Local";
+  const cls = prof && !prof.sovereign ? "chip warn" : "chip";
+  box.innerHTML = `
+    <span class="${cls}" title="${prof ? esc(prof.endpoint) : ""}">
+      <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="13" rx="2"/>
+        <path d="M2 20h20"/></svg>${engine}</span>
+    ${FOLDER ? `<span class="chip" title="${esc(FOLDER)}">
+      <svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+      ${esc(FOLDER.split("/").filter(Boolean).pop())}
+      <b data-drop title="Stop using this folder">\u00d7</b></span>` : ""}
+    <button class="chip add" id="addfolder" title="Point at a folder on this machine">
+      <svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+        <path d="M12 11v4M10 13h4"/></svg></button>`;
+  const drop = box.querySelector("[data-drop]");
+  if(drop) drop.onclick = () => { FOLDER = null; renderChips(); };
+  $("#addfolder").onclick = () => $("#folderbtn").click();
+}
+
 /* ---------- tier selector ----------
    Switching tier changes which engine answers, and the badge beside it says
    where that engine is. A LAN GPU node is inside the plant and the seal holds;
@@ -108,6 +140,7 @@ function renderTiers(profiles){
     b.onclick = () => setTier(b.dataset.tier);
   });
   showReach(profiles.find(p => p.active));
+  renderChips();
 }
 
 function showReach(p){
@@ -196,9 +229,8 @@ async function setTier(name){
    budget, and is today unlike the other days. */
 let USAGE_DAYS = 30;
 
-const fmtInt = n => (n || 0).toLocaleString();
-const fmtTok = n => n >= 1e6 ? (n / 1e6).toFixed(2) + "M"
-                  : n >= 1e3 ? (n / 1e3).toFixed(1) + "k" : String(n || 0);
+
+
 const fmtUsd = n => n >= 1 ? "$" + n.toFixed(2)
                   : n > 0 ? "$" + n.toFixed(4) : "$0.00";
 
@@ -365,26 +397,173 @@ async function openChat(id){
 }
 
 /* ---------- hero ---------- */
-const CARDS = [
-  ["Deviation check", "What deviation was found on TK-4102, and is it acceptable against the SOP?"],
-  ["Spec compare", "Does the PSV-2041 set pressure match the specification?"],
+,
   ["Summary", "Summarise the inspection report in four lines."],
   ["Read a scan", "Which equipment tags are mentioned in the scanned report?"],
 ];
-function hero(){
+const fmtInt = n => (n || 0).toLocaleString();
+const fmtTok = n => n >= 1e6 ? (n / 1e6).toFixed(2) + "M"
+                  : n >= 1e3 ? (n / 1e3).toFixed(1) + "k" : String(n || 0);
+
+/* ---------- home ----------
+   The old home was a title, a sentence, and four example questions. The
+   examples were the wrong thing to put in front of someone on their second
+   day: by then they know what to ask, and the cards just pushed the composer
+   down the page. What is actually useful on opening is a greeting and a
+   straight answer to "what has this thing been doing" - the same panel the
+   fleet admin shows, scoped to this machine. */
+
+let HOME_TAB = "overview", HOME_DAYS = 30, HOME = null;
+
+/* Whoever the OS says is signed in, unless they have told us otherwise. Taken
+   from the login rather than asked for on first run: a name box on a blank
+   screen is a chore, and the machine already knows. */
+const WHO = () => {
+  const set = (localStorage.getItem("sy-name") || "").trim();
+  if(set) return set;
+  const u = (HOME && HOME.this_user) || "";
+  if(!u || u === "unknown") return "";
+  return u.split(/[.\-_ ]/).filter(Boolean)
+          .map(w => w[0].toUpperCase() + w.slice(1)).join(" ");
+};
+
+function partOfDay(){
+  const h = new Date().getHours();
+  return h < 5 ? "Still up" : h < 12 ? "Good morning"
+       : h < 17 ? "Good afternoon" : "Good evening";
+}
+
+function greeting(){
+  const who = WHO();
+  return who ? `${partOfDay()}, ${esc(who)}` : "What are we looking at today?";
+}
+
+function heat(daily, days){
+  /* A cell per day, oldest first, in week columns. Squares rather than a line
+     because the question it answers is "how often", not "how much" - and a
+     gap in a grid is easier to see than a dip in a chart. */
+  const byDay = new Map(daily.map(d => [d.key, d.prompt_tokens + d.output_tokens]));
+  const top = Math.max(1, ...byDay.values());
+  const cells = [];
+  const start = new Date(); start.setDate(start.getDate() - (days - 1));
+  for(let i = 0; i < days; i++){
+    const d = new Date(start); d.setDate(start.getDate() + i);
+    const key = d.toISOString().slice(0, 10);
+    const v = byDay.get(key) || 0;
+    const lvl = v === 0 ? 0 : v > top * 0.66 ? 3 : v > top * 0.33 ? 2 : 1;
+    cells.push(`<i class="l${lvl}" title="${key} \u00b7 ${
+      v ? fmtTok(v) + " tokens" : "nothing"}"></i>`);
+  }
+  return `<div class="heat">${cells.join("")}</div>`;
+}
+
+function modelsTab(h){
+  const rows = h.models;
+  const total = h.total.tokens || 1;
+  const days = [...new Set(h.daily_by_model.map(r => r.day))].sort();
+  const palette = ["var(--accent)", "var(--ok)", "var(--warn)", "var(--dim)",
+                   "var(--line2)"];
+  const colour = {};
+  rows.forEach((r, i) => { colour[r.key] = palette[i % palette.length]; });
+  const dayTotal = d => h.daily_by_model
+    .filter(r => r.day === d).reduce((a, r) => a + r.tokens, 0);
+  const peak = Math.max(1, ...days.map(dayTotal));
+
+  return `
+    <div class="mchart">${days.map(d => {
+      const parts = h.daily_by_model.filter(r => r.day === d);
+      const hgt = dayTotal(d) / peak * 100;
+      return `<span class="col" title="${d} \u00b7 ${fmtTok(dayTotal(d))} tokens">
+        <span class="stack" style="height:${Math.max(1.5, hgt)}%">${
+          parts.map(pr => `<i style="flex:${pr.tokens};background:${
+            colour[pr.model] || "var(--line2)"}"></i>`).join("")}</span></span>`;
+    }).join("")}</div>
+    <div class="mlegend">${rows.map(r => `
+      <div class="lrow">
+        <span class="dot" style="background:${colour[r.key]}"></span>
+        <span class="nm">${esc(r.key)}</span>
+        <span class="io">${fmtTok(r.prompt_tokens)} in \u00b7 ${
+          fmtTok(r.output_tokens)} out</span>
+        <span class="pc">${((r.prompt_tokens + r.output_tokens)
+          / total * 100).toFixed(1)}%</span>
+      </div>`).join("")}</div>`;
+}
+
+function overviewTab(h){
+  const t = h.total;
+  const hr = h.peak_hour;
+  const cells = [
+    ["Requests", fmtInt(t.calls)],
+    ["Tokens", fmtTok(t.tokens)],
+    ["Engine time", (t.seconds / 60).toFixed(0) + "m"],
+    ["Active days", fmtInt(h.active_days)],
+    ["Peak hour", hr == null ? "\u2013"
+      : (hr % 12 || 12) + (hr < 12 ? " AM" : " PM")],
+    ["Most used", h.top_model || "\u2013"],
+  ];
+  return `
+    <div class="hcells">${cells.map(([k, v]) =>
+      `<div class="hcell"><span class="k">${k}</span><b>${v}</b></div>`).join("")}</div>
+    ${heat(h.daily, h.days)}
+    <div class="hnote">${t.calls
+      ? `${fmtInt(Math.round(t.tokens / Math.max(1, t.calls)))} tokens per request
+         on average, all of it on this machine.`
+      : "Nothing run on this machine yet."}</div>`;
+}
+
+function renderHome(){
+  const box = feed.querySelector(".usage");
+  if(!box || !HOME) return;
+  box.querySelectorAll("[data-tab]").forEach(b =>
+    b.classList.toggle("on", b.dataset.tab === HOME_TAB));
+  box.querySelectorAll("[data-hd]").forEach(b =>
+    b.classList.toggle("on", +b.dataset.hd === HOME_DAYS));
+  box.querySelector(".ubody").innerHTML =
+    HOME_TAB === "models" ? modelsTab(HOME) : overviewTab(HOME);
+  // The name arrives with the usage payload, after the heading was first
+  // painted. Rewriting it here beats holding the whole screen back for it.
+  const h1 = feed.querySelector(".hero h1");
+  if(h1) h1.innerHTML = `<span class="spark-mark"></span>${greeting()}`;
+}
+
+async function hero(){
   feed.innerHTML = `
     <div class="hero">
-      <h1>Sovereign Workbench</h1>
-      <p>Plant documents, scans and drawings &mdash; all read on this machine.
-         Every answer cites its file and page.</p>
-      <div class="cards">
-        ${CARDS.map(([t, q]) =>
-          `<button class="card" data-q="${esc(q)}"><b>${t}</b>${esc(q)}</button>`).join("")}
+      <h1><span class="spark-mark"></span>${greeting()}</h1>
+      <div class="usage">
+        <div class="uhead">
+          <div class="tabs">
+            <button data-tab="overview" class="on">Overview</button>
+            <button data-tab="models">Models</button>
+          </div>
+          <div class="days">
+            <button data-hd="7">7d</button>
+            <button data-hd="30" class="on">30d</button>
+            <button data-hd="90">90d</button>
+          </div>
+        </div>
+        <div class="ubody"><div class="uskel"></div></div>
       </div>
     </div>`;
-  feed.querySelectorAll(".card").forEach(c => c.onclick = () => {
-    qEl.value = c.dataset.q; ask();
-  });
+
+  const box = feed.querySelector(".usage");
+  box.querySelectorAll("[data-tab]").forEach(b =>
+    b.onclick = () => { HOME_TAB = b.dataset.tab; renderHome(); });
+  box.querySelectorAll("[data-hd]").forEach(b =>
+    b.onclick = async () => { HOME_DAYS = +b.dataset.hd; await loadHome(); });
+  await loadHome();
+}
+
+async function loadHome(){
+  try{
+    HOME = await (await fetch("/api/usage?days=" + HOME_DAYS)).json();
+  }catch(e){ HOME = null; }
+  if(!HOME){
+    const b = feed.querySelector(".ubody");
+    if(b) b.innerHTML = `<div class="hnote">Usage is not available.</div>`;
+    return;
+  }
+  renderHome();
 }
 
 /* ---------- message rendering ---------- */

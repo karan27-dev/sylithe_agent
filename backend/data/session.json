@@ -1,5 +1,5 @@
 {
- "saved": 1789577094.9255612,
+ "saved": 1789655356.946014,
  "chats": {
   "388e430265c9": {
    "uploads": [],
@@ -1005,9 +1005,7 @@
    ]
   },
   "a759da351313": {
-   "uploads": [
-    "B11_V-3302_nameplate_photo.png"
-   ],
+   "uploads": [],
    "drawings": [],
    "images": [
     "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/B11_V-3302_nameplate_photo.png"
@@ -1032,6 +1030,28 @@
    "corpus": [
     "B11_V-3302_nameplate_photo.png"
    ]
+  },
+  "d6f5817df9ba": {
+   "uploads": [],
+   "drawings": [
+    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/Screenshot 2026-09-17 at 7.59.04\u202fPM.png"
+   ],
+   "images": [
+    "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/Screenshot 2026-09-17 at 7.59.04\u202fPM.png"
+   ],
+   "briefs": [
+    {
+     "name": "Screenshot 2026-09-17 at 7.59.04\u202fPM.png",
+     "path": "/Users/karan/Desktop/Sylithe Agent/backend/data/corpus/Screenshot 2026-09-17 at 7.59.04\u202fPM.png",
+     "kind": "drawing",
+     "chunks": 0,
+     "tags": [],
+     "preview": "",
+     "detail": "engineering drawing, 0 symbols detected, 0 tags read"
+    }
+   ],
+   "folder": null,
+   "corpus": []
   }
  }
 }

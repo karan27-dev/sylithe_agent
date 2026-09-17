@@ -220,8 +220,30 @@ def summary(days: int = 30) -> dict:
 
     idle = [m for m in by_machine if by_machine[m]["calls"] == 0]
 
+    # Per model per day, for the stacked bars on the Models tab. Kept as a
+    # flat list rather than a nested map so the front end does not have to
+    # invent an ordering.
+    per_md: dict[tuple[str, str], dict] = {}
+    for d in rows:
+        day = time.strftime("%Y-%m-%d", time.localtime(d.get("ts", 0)))
+        _add(per_md.setdefault((day, d.get("model", "?")), _empty()), d)
+
+    peak = max(by_hour.items(), key=lambda kv: kv[1]["calls"], default=None)
+
     tokens = total["prompt_tokens"] + total["output_tokens"]
     return {
+        "daily_by_model": [
+            {"day": day, "model": model,
+             "tokens": v["prompt_tokens"] + v["output_tokens"],
+             "prompt_tokens": v["prompt_tokens"],
+             "output_tokens": v["output_tokens"], "calls": v["calls"]}
+            for (day, model), v in sorted(per_md.items())],
+        "active_days": len(by_day),
+        "peak_hour": peak[0] if peak else None,
+        "top_model": (max(by_model.items(),
+                          key=lambda kv: kv[1]["prompt_tokens"]
+                          + kv[1]["output_tokens"])[0]
+                      if by_model else None),
         "capacity": {
             "engine_seconds": round(total["seconds"], 1),
             "window_hours": round(span_h, 2),
