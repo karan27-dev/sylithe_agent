@@ -396,11 +396,6 @@ async function openChat(id){
   scroll.scrollTop = scroll.scrollHeight;
 }
 
-/* ---------- hero ---------- */
-,
-  ["Summary", "Summarise the inspection report in four lines."],
-  ["Read a scan", "Which equipment tags are mentioned in the scanned report?"],
-];
 const fmtInt = n => (n || 0).toLocaleString();
 const fmtTok = n => n >= 1e6 ? (n / 1e6).toFixed(2) + "M"
                   : n >= 1e3 ? (n / 1e3).toFixed(1) + "k" : String(n || 0);
