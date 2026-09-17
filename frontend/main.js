@@ -46,6 +46,13 @@ $("#expand").onclick  = () => { $("#side").classList.remove("collapsed");
 scroll.addEventListener("scroll", () =>
   $("#top").classList.toggle("scrolled", scroll.scrollTop > 8));
 
+// A path's last segment, on either slash - a folder chosen through the
+// Windows native picker or the in-page browser arrives as "C:\Users\...",
+// and splitting on "/" alone left the whole path on screen instead of just
+// the folder name.
+const baseName = p => (p || "").replace(/[\\/]+$/, "").split(/[\\/]/)
+  .filter(Boolean).pop() || p;
+
 function toast(msg, ms = 2800){
   const t = $("#toast"); t.textContent = msg; t.classList.add("on");
   clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove("on"), ms);
@@ -115,7 +122,7 @@ function renderChips(){
         <path d="M2 20h20"/></svg>${engine}</span>
     ${FOLDER ? `<span class="chip" title="${esc(FOLDER)}">
       <svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
-      ${esc(FOLDER.split("/").filter(Boolean).pop())}
+      ${esc(baseName(FOLDER))}
       <b data-drop title="Stop using this folder">\u00d7</b></span>` : ""}
     <button class="chip add" id="addfolder" title="Point at a folder on this machine">
       <svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
@@ -1160,12 +1167,26 @@ document.addEventListener("keydown", e => {
 async function attachFolder(path){
   FOLDER = path;
   renderChips();
-  const name = path.split("/").filter(Boolean).pop();
+  const name = baseName(path);
   toast(`Reading ${name}\u2026`);
+  const cid = await needChat();
+  // A folder can be a few thousand files now (was capped at 400 - a real
+  // "Documents" folder cleared that easily), and docling takes real seconds
+  // per file. One static "Reading..." toast for the whole run reads as a
+  // hang on anything past a handful of files, so poll the same progress the
+  // backend already tracked internally and keep the toast alive with it.
+  const poll = setInterval(async () => {
+    try{
+      const p = await (await fetch(
+        `/api/folder/progress?chat_id=${encodeURIComponent(cid)}`)).json();
+      if(p.total) toast(`Reading ${name}: ${p.current}/${p.total} \u2014 ${
+        baseName(p.name)}`, 4000);
+    }catch(e){}
+  }, 900);
   try{
     const r = await (await fetch(
       `/api/folder/ingest?path=${encodeURIComponent(path)}`
-      + `&chat_id=${encodeURIComponent(await needChat())}`,
+      + `&chat_id=${encodeURIComponent(cid)}`,
       { method: "POST" })).json();
     if(r.error){ toast(r.error, 7000); FOLDER = null; renderChips(); return; }
     const n = (r.files || []).length || r.indexed || 0;
@@ -1175,6 +1196,8 @@ async function attachFolder(path){
   }catch(e){
     toast("Could not read that folder: " + e.message, 6000);
     FOLDER = null; renderChips();
+  }finally{
+    clearInterval(poll);
   }
 }
 
@@ -1186,7 +1209,7 @@ function analyseFolder(path){
   if(feed.querySelector(".hero")) feed.innerHTML = "";
   feed.classList.remove("home");
 
-  const name = path.split("/").filter(Boolean).pop() || path;
+  const name = baseName(path);
   addUser(`Analyse the folder ${name}`);
 
   const bot = document.createElement("div");

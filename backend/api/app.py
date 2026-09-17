@@ -509,13 +509,33 @@ def api_folder_preview(path: str) -> dict:
     return folder.preview(path).as_dict()
 
 
+# A folder can now be thousands of documents (MAX_FILES=3000), and docling
+# takes real seconds per file - a raised limit with no feedback in between
+# would just relocate the "this is hanging" report from the 400-file wall to
+# an ingest that silently runs for ten minutes. Keyed by chat_id so two
+# people ingesting at once don't see each other's progress.
+_FOLDER_PROGRESS: dict[str, dict] = {}
+
+
+@app.get("/api/folder/progress")
+def api_folder_progress(chat_id: str = "") -> dict:
+    return _FOLDER_PROGRESS.get(chat_id, {})
+
+
 @app.post("/api/folder/ingest")
 async def api_folder_ingest(path: str, chat_id: str = "") -> dict:
     """Index a local folder in place. Nothing is copied, nothing leaves."""
     from tools import folder
+
+    def _progress(i: int, total: int, name: str) -> None:
+        _FOLDER_PROGRESS[chat_id] = {"current": i, "total": total, "name": name}
+
     loop = asyncio.get_running_loop()
-    scan = await loop.run_in_executor(
-        None, lambda: folder.ingest(path, client=CLIENT))
+    try:
+        scan = await loop.run_in_executor(
+            None, lambda: folder.ingest(path, client=CLIENT, progress=_progress))
+    finally:
+        _FOLDER_PROGRESS.pop(chat_id, None)
     if scan.indexed:
         # The folder belongs to the chat that opened it, whether or not the
         # briefs succeed - scoping must not depend on a best-effort summary.

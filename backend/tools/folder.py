@@ -27,9 +27,13 @@ from pathlib import Path
 
 from ingest import pipeline
 
-# Walking an entire home directory by accident should not be possible.
-MAX_FILES = 400
-MAX_BYTES = 300 * 1024 * 1024
+# Walking an entire home directory by accident should not be possible - but
+# 400 turned out to be a wall a perfectly ordinary "Documents" folder hits
+# (1,964 supported files on one real laptop), not just an accident guard.
+# Raised to a size that covers a real folder of plant manuals; SCAN_CAP above
+# is still what stops someone pointing this at their whole home directory.
+MAX_FILES = 3000
+MAX_BYTES = 2 * 1024 * 1024 * 1024
 # A hard ceiling on how many filesystem entries one scan will even look at,
 # independent of MAX_FILES - see the cycle note on preview() below for why
 # this needs to be a wall during the walk, not a check after it finishes.
