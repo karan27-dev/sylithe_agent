@@ -555,14 +555,14 @@ function renderHome(){
   // The name arrives with the usage payload, after the heading was first
   // painted. Rewriting it here beats holding the whole screen back for it.
   const h1 = feed.querySelector(".hero h1");
-  if(h1) h1.innerHTML = `<span class="spark-mark"></span>${greeting()}`;
+  if(h1) h1.innerHTML = `<img class="brand-mark" src="/static/sylithe-logo.png" alt="">${greeting()}`;
 }
 
 async function hero(){
   feed.classList.add("home");          // escape the centred conversation column
   feed.innerHTML = `
     <div class="hero">
-      <h1><span class="spark-mark"></span>${greeting()}</h1>
+      <h1><img class="brand-mark" src="/static/sylithe-logo.png" alt="">${greeting()}</h1>
       <div class="usage">
         <div class="uhead">
           <div class="tabs">

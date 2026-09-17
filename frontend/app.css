@@ -496,14 +496,7 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
 .hero{margin:0;padding:38px 0 0 34px;text-align:left}
 .hero h1{display:flex;align-items:center;gap:11px;margin:0 0 30px;
   font-size:25px;font-weight:600;letter-spacing:-.02em}
-.spark-mark{width:26px;height:26px;flex:none;border-radius:50%;
-  background:radial-gradient(circle at 50% 50%,var(--accent) 0 30%,
-    transparent 31%),conic-gradient(from 0deg,var(--accent) 0 6%,transparent 6% 12.5%,
-    var(--accent) 12.5% 18.5%,transparent 18.5% 25%,var(--accent) 25% 31%,
-    transparent 31% 37.5%,var(--accent) 37.5% 43.5%,transparent 43.5% 50%,
-    var(--accent) 50% 56%,transparent 56% 62.5%,var(--accent) 62.5% 68.5%,
-    transparent 68.5% 75%,var(--accent) 75% 81%,transparent 81% 87.5%,
-    var(--accent) 87.5% 93.5%,transparent 93.5%);opacity:.9}
+.brand-mark{width:28px;height:28px;flex:none;object-fit:contain}
 
 /* Compact. It is a glance, not a dashboard - the fleet screen is where
    someone goes to study this. */
