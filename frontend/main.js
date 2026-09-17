@@ -453,7 +453,7 @@ function heat(daily, days){
   // A 7-day range is one column of seven; cap the square size so it does not
   // become a row of tiles the width of the card.
   const cols = Math.ceil(days / 7);
-  return `<div class="heat" style="max-width:${cols < 8 ? cols * 26 : 100000}px">`
+  return `<div class="heat" style="max-width:${cols < 8 ? cols * 21 : 100000}px">`
        + cells.join("") + `</div>`;
 }
 
