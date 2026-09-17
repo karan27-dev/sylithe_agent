@@ -37,9 +37,7 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
 .side-top{padding:12px 12px 8px;display:flex;align-items:center;gap:8px}
 .logo{font-weight:600;font-size:14.5px;letter-spacing:-.2px;flex:1;
       display:flex;align-items:center;gap:8px}
-.logo .mark{width:20px;height:20px;border-radius:5px;background:var(--accent);
-            display:grid;place-items:center;color:var(--accent-ink);
-            font-size:11px;font-weight:700;flex:none}
+.logo .mark{width:20px;height:20px;object-fit:contain;flex:none}
 .iconbtn{background:none;border:none;color:var(--dim);padding:5px;border-radius:6px;
          display:grid;place-items:center;line-height:0}
 .iconbtn:hover{background:var(--side2);color:var(--ink)}
