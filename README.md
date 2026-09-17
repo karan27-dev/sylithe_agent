@@ -205,17 +205,24 @@ flowchart TD
     CALC --> WRITE
     SKIP --> WRITE
 
-    WRITE["A model writes the answer<br/>using only what was found above"] --> CHECK["Every number in that answer<br/>is checked again, by code"]
-    CHECK --> WANT{"What did you ask for?"}
+    WRITE["A model needs to write<br/>the answer now"] --> GATE{"Does that model<br/>run on this machine?"}
+    GATE -->|"yes — local model"| CHECK
+    GATE -->|"no — allowed to leave, and unsealed"| CHECK
+    GATE -.->|"no, and sealed<br/>(the normal setting)"| BLOCK["Call is refused and logged<br/>— it falls back to the local model"]
+    BLOCK -.-> CHECK
+
+    CHECK["Every number in the answer<br/>is checked again, by code"] --> WANT{"What did you ask for?"}
     WANT -->|"just an answer"| OUT1["Shown in chat<br/>with a source on every fact"]
     WANT -->|"a file"| OUT2["A real Word, Excel<br/>or PowerPoint file"]
 
     classDef route fill:#3f5cc4,stroke:#243a99,color:#fff
     classDef pidnode fill:#b5741f,stroke:#7a4d12,color:#fff
     classDef out fill:#2f7d4f,stroke:#1d4d30,color:#fff
+    classDef guard fill:#c0392b,stroke:#7a2019,color:#fff
     class DOC,CMP,CALC,SKIP,WRITE,CHECK route
     class P1,P2,P3,P4 pidnode
     class OUT1,OUT2 out
+    class GATE,BLOCK guard
 ```
 
 **A document question** is answered only from passages your own files search
@@ -227,12 +234,18 @@ finds every symbol, reads every tag, and traces every pipe between them
 first; a model only turns that finished map into a sentence — so it cannot
 see a valve that isn't there.
 
-**Whichever path it took**, the last three boxes are the same: a model
-writes the answer from what was found, every number in it is checked again
+**Whichever path it took**, the last few boxes are the same: a model writes
+the answer from what was found, and before it does, the system checks where
+that model actually runs. A local model is always allowed. Anything that
+would leave the machine or the plant network is checked against the air-gap
+setting — normally **sealed**, so the call is refused and logged, and the
+question is answered by the local model instead without you having to do
+anything. Only when the system is deliberately unsealed does a call leave
+at all, and every one of those attempts is written to a log, whether it was
+allowed or blocked. After that, every number in the answer is checked again
 by code, and it comes back either as a cited chat answer or as a real file.
-The only thing that changes between a laptop and a GPU server is *which*
-model does the writing — a small local one, or the best one available — and
-that is a one-line setting, not a different pipeline.
+The only thing a laptop-vs-GPU-server setting changes is *which* model does
+the writing — a one-line setting, not a different pipeline.
 
 ### Two ideas hold the design together
 
@@ -547,6 +560,42 @@ TO ISOLATE TK-4102, CLOSE exactly 1 valve(s): HV-4021
 ```
 
 The answer is already computed. The model turns it into a sentence.
+
+**This is exactly what happens the moment you upload a drawing.** There is no
+separate "live" mode — the P&ID you attach in chat goes through the same five
+stages, in the same order, as every drawing in the benchmark below. Stage ①
+finds the symbols on your sheet, stage ② reads your tags, stage ③ traces your
+pipework, stage ④ builds the map, and only then does a model see anything —
+as the short text block above, never your image.
+
+### How the detector was trained, and what it actually gets right
+
+Stage ① is a YOLOv8s detector, and it is trained, not hand-coded — on a
+dataset built specifically for this: **2,399 training / 306 validation / 97
+test drawings**, 27 merged equipment classes (valves, pumps, tanks,
+instruments and more), every class present in both the train and validation
+splits so nothing is being scored on a class it never saw.
+
+**Trained at 1024 px, not the usual 640.** On a real P&ID, 43% of the symbols
+are smaller than 32×32 pixels — a small valve at 640 px input shrinks to
+14–24 px, too small to reliably classify. Training at 1024 px keeps that same
+valve at ~38 px. Full dataset notes, the resolution comparison, and the
+training script: [`colab/README.md`](colab/README.md).
+
+Measured on real held-out plant sheets — not the training or validation
+split:
+
+| stage | result |
+|---|---|
+| Symbol detection, 496 annotated symbols | **81.7%** located, 76.4% correct class |
+| Tag reading (OCR), 433 symbols | **86.8%** |
+| Connectivity (tracing pipe to pipe) | F1 **0.179** — the weakest stage, honestly reported |
+
+Detection and tag reading are strong enough to trust; connectivity is not,
+and no bigger model fixes it — it needs better line tracing, not more
+parameters. The tiling fix that took detection from 37% to 82% on busy
+sheets is below, and the full method and every caveat is in
+[`docs/BENCHMARK-PID.md`](docs/BENCHMARK-PID.md).
 
 ### Why not just use a vision model?
 
