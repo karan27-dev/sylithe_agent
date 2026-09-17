@@ -6,7 +6,7 @@
   --ink:#1f1e1d; --ink2:#3d3d3a; --dim:#73726c; --dim2:#9a9890;
   --line:#e3e0d6; --line2:#d4d1c6;
   --accent:#c96442; --accent-ink:#ffffff; --accent-soft:#f5e6e0;
-  --ok:#2f7d4f; --warn:#b5741f; --bad:#c0392b;
+  --ok:#2f7d4f; --warn:#b5741f; --bad:#c0392b; --heat:#4f74d6;
   --code-bg:#f5f3ed;
   --radius:12px;
   --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
@@ -17,7 +17,7 @@
   --ink:#f5f4ef; --ink2:#e5e3dc; --dim:#a8a69e; --dim2:#78766f;
   --line:#3b3a36; --line2:#4a4843;
   --accent:#d97757; --accent-ink:#1f1e1d; --accent-soft:#3a2a24;
-  --ok:#5cb87a; --warn:#d9a441; --bad:#e06c5a;
+  --ok:#5cb87a; --warn:#d9a441; --bad:#e06c5a; --heat:#5b7ce0;
   --code-bg:#1f1e1d;
 }
 *{box-sizing:border-box}
@@ -508,7 +508,7 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
 /* Compact. It is a glance, not a dashboard - the fleet screen is where
    someone goes to study this. */
 .usage{width:min(100%,528px);border:1px solid var(--line);border-radius:11px;
-  background:var(--card);padding:10px 11px 11px}
+  background:var(--surface);padding:10px 11px 11px}
 .uhead{display:flex;align-items:center;gap:10px;margin-bottom:9px}
 .tabs,.days{display:inline-flex;gap:2px;padding:2px;border-radius:8px;
   background:var(--side2)}
@@ -516,7 +516,7 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
 .tabs button,.days button{border:none;background:none;color:var(--dim);
   cursor:pointer;font:600 11.5px/1 var(--sans);padding:4.5px 9px;border-radius:5px}
 .days button{font-family:var(--mono);font-size:10px;padding:4.5px 7px}
-.tabs button.on,.days button.on{background:var(--card);color:var(--ink);
+.tabs button.on,.days button.on{background:var(--surface);color:var(--ink);
   box-shadow:0 1px 2px rgba(0,0,0,.07)}
 
 /* Shaped like the finished card - six empty cells and an empty heat strip -
@@ -534,33 +534,46 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
    panel read as a strip rather than a summary. */
 .hcells{display:grid;gap:6px;grid-template-columns:repeat(3,minmax(0,1fr));
   margin-bottom:9px}
-.hcell{border:1px solid var(--line);border-radius:7px;padding:6px 8px;
-  background:var(--bg)}
+.hcell{border:none;border-radius:7px;padding:6px 8px;
+  background:color-mix(in srgb,var(--ink) 8%,var(--surface))}
 .hcell .k{display:block;font-size:10px;color:var(--dim2);margin-bottom:2px}
 .hcell b{font-size:13.5px;font-weight:600;letter-spacing:-.01em;
   overflow:hidden;text-overflow:ellipsis;display:block;white-space:nowrap}
 
-/* One square per day, filling the card edge to edge: the grid stretches
-   instead of the squares being a fixed size, so a 7-day range and a 90-day
-   range both use the whole width rather than leaving a stub in the corner. */
+/* Fixed small squares, not stretched to fill the card - a 7-day range and a
+   365-day range both read as the same grid, one just runs further right and
+   can scroll, instead of the same handful of days being blown up to fill
+   the width. Colour is a dedicated blue: this grid is a calendar, not a
+   brand mark, and needs to read as its own thing next to the accent. */
 .heat{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,1fr);
-  grid-auto-columns:1fr;gap:2.5px;margin-bottom:8px;width:100%}
-.heat i{aspect-ratio:1;min-width:0;border-radius:2px;background:var(--side2)}
-.heat i.l1{background:color-mix(in srgb,var(--accent) 30%,var(--side2))}
-.heat i.l2{background:color-mix(in srgb,var(--accent) 60%,var(--side2))}
-.heat i.l3{background:var(--accent)}
+  grid-auto-columns:12px;gap:3px;margin-bottom:8px;max-width:100%;
+  overflow-x:auto;padding-bottom:1px}
+.heat i{width:12px;height:12px;border-radius:2.5px;background:var(--side2)}
+.heat i.l1{background:color-mix(in srgb,var(--heat) 35%,var(--side2))}
+.heat i.l2{background:color-mix(in srgb,var(--heat) 68%,var(--side2))}
+.heat i.l3{background:var(--heat)}
 .hnote{font-size:11.5px;color:var(--dim2)}
 
-.mchart{display:flex;align-items:flex-end;gap:2px;height:140px;margin-bottom:12px}
-.mchart .col{flex:1;height:100%;display:flex;align-items:flex-end}
+/* A scale down the left, not just bars floating with no reference - the
+   viewer should be able to read a bar's height as a number, not just
+   "taller than the one next to it". */
+.mwrap{display:flex;gap:8px;margin-bottom:10px}
+.myaxis{flex:none;display:flex;flex-direction:column;justify-content:space-between;
+  height:132px;font-family:var(--mono);font-size:10px;color:var(--dim2);
+  text-align:right}
+.mplot{flex:1;min-width:0}
+.mchart{display:flex;align-items:flex-end;gap:2px;height:132px;
+  border-bottom:1px solid var(--line)}
+.mchart .bcol{flex:1;height:100%;display:flex;align-items:flex-end}
 .mchart .stack{width:100%;display:flex;flex-direction:column-reverse;
-  border-radius:3px 3px 0 0;overflow:hidden;min-height:2px}
+  border-radius:2px 2px 0 0;overflow:hidden;min-height:2px}
 .mchart .stack i{display:block;width:100%;min-height:1px}
-.mlegend{display:flex;flex-direction:column;gap:1px}
-.lrow{display:flex;align-items:center;gap:8px;padding:4px 0;
-  border-top:1px solid var(--line);font-size:12px}
-.lrow:first-child{border-top:none}
-.lrow .dot{width:9px;height:9px;border-radius:3px;flex:none}
+.mxaxis{display:flex;gap:2px;margin-top:5px}
+.mxaxis span{flex:1;text-align:center;font-size:9.5px;color:var(--dim2);
+  white-space:nowrap;overflow:hidden}
+.mlegend{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+.lrow{display:flex;align-items:center;gap:8px;font-size:12px}
+.lrow .dot{width:8px;height:8px;border-radius:2.5px;flex:none}
 .lrow .nm{font-weight:500}
 .lrow .io{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--dim2)}
 .lrow .pc{font-family:var(--mono);font-size:11.5px;font-weight:600;
@@ -569,7 +582,7 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
 /* ---- context chips above the composer ---- */
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;padding:0 2px}
 .chip{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;
-  border:1px solid var(--line);border-radius:9px;background:var(--card);
+  border:1px solid var(--line);border-radius:9px;background:var(--surface);
   color:var(--ink2);font-size:12.5px;white-space:nowrap}
 .chip svg{width:14px;height:14px;flex:none;fill:none;stroke:currentColor;
   stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;opacity:.7}

@@ -451,34 +451,65 @@ function heat(daily, days){
     cells.push(`<i class="l${lvl}" title="${key} \u00b7 ${
       v ? fmtTok(v) + " tokens" : "nothing"}"></i>`);
   }
-  // A 7-day range is one column of seven; cap the square size so it does not
-  // become a row of tiles the width of the card.
-  const cols = Math.ceil(days / 7);
-  return `<div class="heat" style="max-width:${cols < 8 ? cols * 21 : 100000}px">`
-       + cells.join("") + `</div>`;
+  return `<div class="heat">` + cells.join("") + `</div>`;
 }
+
+// A round top and an even step, so the grid lines read as a scale rather
+// than wherever the tallest bar happened to land.
+function niceStep(rough){
+  const mag = Math.pow(10, Math.floor(Math.log10(rough || 1)));
+  const norm = (rough || 1) / mag;
+  return (norm <= 1 ? 1 : norm <= 2 ? 2 : norm <= 5 ? 5 : 10) * mag;
+}
+function fmtAxis(v){
+  if(!v) return "0";
+  if(v >= 1e6) return (Math.round(v / 1e5) / 10).toFixed(1).replace(/\.0$/, "") + "M";
+  if(v >= 1e3) return Math.round(v / 1e3) + "k";
+  return String(Math.round(v));
+}
+
+const MODEL_BLUES = ["#5b7fe0", "#8aa3ec", "#3f5cc4", "#b9c6f2", "#7093e6"];
 
 function modelsTab(h){
   const rows = h.models;
   const total = h.total.tokens || 1;
   const days = [...new Set(h.daily_by_model.map(r => r.day))].sort();
-  const palette = ["var(--accent)", "var(--ok)", "var(--warn)", "var(--dim)",
-                   "var(--line2)"];
   const colour = {};
-  rows.forEach((r, i) => { colour[r.key] = palette[i % palette.length]; });
+  rows.forEach((r, i) => { colour[r.key] = MODEL_BLUES[i % MODEL_BLUES.length]; });
   const dayTotal = d => h.daily_by_model
     .filter(r => r.day === d).reduce((a, r) => a + r.tokens, 0);
   const peak = Math.max(1, ...days.map(dayTotal));
 
+  const step = niceStep(peak / 5);
+  const top = Math.ceil(peak / step) * step;
+  const ticks = [];
+  for(let v = top; v >= 0; v -= step) ticks.push(v);
+
+  // A handful of evenly spaced dates under the axis, not one per bar -
+  // thirty-odd date labels in the same width would just collide.
+  const xcount = Math.min(days.length, 7);
+  const xidx = new Set(Array.from({length: xcount}, (_, i) =>
+    Math.round(i * (days.length - 1) / Math.max(1, xcount - 1))));
+
   return `
-    <div class="mchart">${days.map(d => {
-      const parts = h.daily_by_model.filter(r => r.day === d);
-      const hgt = dayTotal(d) / peak * 100;
-      return `<span class="col" title="${d} \u00b7 ${fmtTok(dayTotal(d))} tokens">
-        <span class="stack" style="height:${Math.max(1.5, hgt)}%">${
-          parts.map(pr => `<i style="flex:${pr.tokens};background:${
-            colour[pr.model] || "var(--line2)"}"></i>`).join("")}</span></span>`;
-    }).join("")}</div>
+    <div class="mwrap">
+      <div class="myaxis">${ticks.map(t => `<span>${fmtAxis(t)}</span>`).join("")}</div>
+      <div class="mplot">
+        <div class="mchart">${days.map((d, i) => {
+          const parts = h.daily_by_model.filter(r => r.day === d);
+          const hgt = dayTotal(d) / top * 100;
+          return `<span class="bcol" title="${d} \u00b7 ${fmtTok(dayTotal(d))} tokens">
+            <span class="stack" style="height:${Math.max(1.5, hgt)}%">${
+              parts.map(pr => `<i style="flex:${pr.tokens};background:${
+                colour[pr.model] || "var(--line2)"}"></i>`).join("")}</span></span>`;
+        }).join("")}</div>
+        <div class="mxaxis">${days.map((d, i) => `<span>${
+          xidx.has(i)
+            ? new Date(d + "T00:00:00").toLocaleDateString(undefined,
+                {month: "short", day: "numeric"})
+            : ""}</span>`).join("")}</div>
+      </div>
+    </div>
     <div class="mlegend">${rows.map(r => `
       <div class="lrow">
         <span class="dot" style="background:${colour[r.key]}"></span>
