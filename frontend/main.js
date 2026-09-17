@@ -389,6 +389,7 @@ async function openChat(id){
   const c = await (await fetch("/api/chats/" + id)).json();
   $("#chattitle").textContent = c.title || "Chat";
   feed.innerHTML = "";
+  feed.classList.remove("home");
   for(const m of c.messages || []){
     if(m.role === "user") addUser(m.content);
     else addBotStatic(m);
@@ -527,6 +528,7 @@ function renderHome(){
 }
 
 async function hero(){
+  feed.classList.add("home");          // escape the centred conversation column
   feed.innerHTML = `
     <div class="hero">
       <h1><span class="spark-mark"></span>${greeting()}</h1>
@@ -764,6 +766,8 @@ async function ask(){
   if(!text || busy) return;
   await needChat();
   if(feed.querySelector(".hero")) feed.innerHTML = "";
+  feed.classList.remove("home");
+  feed.classList.remove("home");
 
   busy = true; sendEl.disabled = true;
   qEl.value = ""; qEl.style.height = "auto";
@@ -1076,6 +1080,7 @@ function analyseFolder(path){
   if(busy) { toast("Still working on the last question", 3000); return; }
   busy = true; sendEl.disabled = true;
   if(feed.querySelector(".hero")) feed.innerHTML = "";
+  feed.classList.remove("home");
 
   const name = path.split("/").filter(Boolean).pop() || path;
   addUser(`Analyse the folder ${name}`);

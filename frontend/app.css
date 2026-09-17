@@ -87,6 +87,9 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
 
 #scroll{flex:1;overflow-y:auto;scroll-behavior:smooth}
 .col{max-width:46rem;margin:0 auto;padding:20px 24px 40px}
+/* A conversation reads better in a narrow centred column; the home panel is
+   not a conversation, and inside that column it can only ever be centred. */
+.col.home{max-width:none;margin:0;padding:0}
 
 /* ---- messages ---- */
 .msg{margin-bottom:26px}
@@ -167,17 +170,10 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
          overflow:hidden;position:relative}
 .src.open .tx{max-height:none}
 
-/* ---- empty state ---- */
-.hero{padding-top:12vh;text-align:center}
-.hero h1{font-size:26px;font-weight:600;letter-spacing:-.4px;margin:0 0 8px}
-.hero p{color:var(--dim);margin:0 auto 26px;max-width:30rem;font-size:14.5px}
-.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:34rem;margin:0 auto}
-.card{text-align:left;background:var(--surface);border:1px solid var(--line);
-      border-radius:11px;padding:12px 14px;color:var(--ink2);font-size:13.5px;
-      line-height:1.45}
-.card:hover{border-color:var(--line2)}
-.card b{display:block;font-size:11px;color:var(--dim2);text-transform:uppercase;
-        letter-spacing:.5px;margin-bottom:4px;font-weight:600}
+/* The old empty state - a centred title and four example cards - is gone.
+   Its text-align:center outlived the markup and was still centring the new
+   left-aligned home, which is why moving the panel left appeared to do
+   nothing. See the home rules further down. */
 
 /* ============ composer ============ */
 #composer{flex:none;padding:0 24px 20px;background:linear-gradient(
@@ -497,7 +493,7 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
    against the left edge of the content column and lets the space fall to the
    right - a centred card floats and reads as the page's subject, when it is
    really a status note above an empty conversation. */
-.hero{max-width:1040px;margin:0;padding:40px 0 0 34px}
+.hero{margin:0;padding:38px 0 0 34px;text-align:left}
 .hero h1{display:flex;align-items:center;gap:11px;margin:0 0 30px;
   font-size:25px;font-weight:600;letter-spacing:-.02em}
 .spark-mark{width:26px;height:26px;flex:none;border-radius:50%;
