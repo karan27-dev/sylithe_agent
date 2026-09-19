@@ -1,0 +1,67 @@
+{
+ "platform": "darwin",
+ "passed": 5,
+ "total": 5,
+ "results": [
+  {
+   "case": "direct network call",
+   "blocked": "network",
+   "timed_out": false,
+   "ok": false,
+   "exit_code": 1,
+   "leaked": false,
+   "expected": "network",
+   "passed": true,
+   "stdout": "",
+   "stderr": "ore/airgap.py\", line 152, in _patched_getaddrinfo\n    raise SovereigntyViolation(f\"Air-gap: DNS lookup for {host} blocked.\")\ncore.airgap.SovereigntyViolation: Air-gap: DNS lookup for 8.8.8.8 blocked.\n"
+  },
+  {
+   "case": "network via subprocess (child-of-child)",
+   "blocked": "filesystem",
+   "timed_out": false,
+   "ok": true,
+   "exit_code": 0,
+   "leaked": false,
+   "expected": "network-or-clean",
+   "passed": true,
+   "stdout": "",
+   "stderr": "/Cellar/python@3.11/3.11.15/Frameworks/Python.framework/Versions/3.11/lib/python3.11/socket.py\", line 848, in create_connection\n    sock.connect(sa)\nPermissionError: [Errno 1] Operation not permitted\n"
+  },
+  {
+   "case": "write outside the scratch dir",
+   "blocked": "filesystem",
+   "timed_out": false,
+   "ok": false,
+   "exit_code": 1,
+   "leaked": false,
+   "expected": "filesystem-or-clean",
+   "passed": true,
+   "stdout": "",
+   "stderr": ", in <module>\n    open('/tmp/sw_escape_test_marker', 'w').write('escaped')\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nPermissionError: [Errno 1] Operation not permitted: '/tmp/sw_escape_test_marker'\n"
+  },
+  {
+   "case": "infinite loop past the timeout",
+   "blocked": "timeout",
+   "timed_out": true,
+   "ok": false,
+   "exit_code": -1,
+   "leaked": false,
+   "expected": "timeout",
+   "passed": true,
+   "stdout": "",
+   "stderr": "Timed out after 6s and was killed."
+  },
+  {
+   "case": "allocate past the memory limit",
+   "blocked": "memory",
+   "timed_out": false,
+   "ok": false,
+   "exit_code": -9,
+   "leaked": false,
+   "expected": "memory",
+   "passed": true,
+   "stdout": "",
+   "stderr": "\nKilled by the sandbox watchdog: RSS exceeded 512 MB (RLIMIT_AS does not hold on this OS, so RSS polling is the backstop - see _watch_memory)."
+  }
+ ]
+}

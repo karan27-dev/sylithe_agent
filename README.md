@@ -388,10 +388,11 @@ different block underneath it.
 ### Why the router is the one lane we did not maximise
 
 The router emits 32 tokens of JSON to pick a lane. On tier-S, few-shot examples
-took a 0.8b model from 83% to **100%** on a held-out set — the accuracy came
-from the examples, not the parameters. Putting a trillion-parameter model on a
-classification a 2b model already gets right would add latency to every single
-request for nothing.
+took a 0.8b model from **79% to 92%** on the same 24-query held-out set
+(`python -m bench.run_router`, both runs in `bench/router_results.json`) — the
+accuracy came from the examples, not the parameters. Putting a
+trillion-parameter model on a classification a 2b model already gets right
+would add latency to every single request for nothing.
 
 The same logic caps the vision lane's job. `qwen3-vl:235b-a22b` is a far better
 model than anything on the laptop, and it still does not **count** symbols on a
@@ -667,8 +668,16 @@ over Server-Sent Events.
 
 The sandbox is separately sealed: `airgap.py` patches only the parent
 interpreter, so a subprocess would reach the network freely. Code execution
-runs under macOS Seatbelt with network denied, rlimits, a wall-clock timeout
-and a scrubbed environment.
+runs under macOS Seatbelt with network denied, rlimits, an RSS-polling memory
+watchdog and a scrubbed environment. Escape-tested end to end
+(`python -m bench.run_sandbox_escape`, results in
+`bench/sandbox_escape_results.json`): **5/5 contained on macOS** — network,
+filesystem-outside-scratch, timeout and memory. The memory result is worth
+spelling out: `RLIMIT_AS` (tried first, inside the child) is silently refused
+by macOS — a 2 GB allocation went through it undetected. The watchdog thread
+in the parent (`tools/sandbox.py:_watch_memory`) is the actual backstop that
+catches it, found and fixed by writing the escape test rather than assuming
+the rlimit worked.
 
 ---
 
@@ -711,6 +720,15 @@ docs/
 ## Measured results
 
 MacBook Air M1, 8 GB, `tier-S`. Every number measured, none estimated.
+
+### Full suite — 79.2% over 120 questions
+
+Every unit's documents in one index at once, unscoped, five difficulty tiers
+from single-fact retrieval to multi-hop governance. **95/120 strict, zero
+safety failures, 0 external calls, 76 minutes.** The dominant failure mode is
+retrieval recall, not the model: 14 of 25 failures are facts that sit in the
+index and were never surfaced. Method, per-tier scores, full failure analysis
+and threats to validity: **[docs/BENCHMARK-SUITE.md](docs/BENCHMARK-SUITE.md)**.
 
 ### Capability — 9 / 9
 
@@ -757,7 +775,7 @@ deterministic code.
   ─────────────────────────────────────────────────────────────────────────
   Capability suite  ███████████████████████ 9/9     YES · reason lane
   Industry suite    ██████████████████████░ 17/18   YES · reason lane
-  Router accuracy   ██████████████████████░ 93%     AT CEILING · see below
+  Router accuracy   ██████████████████████░ 92%     AT CEILING · see below
 ```
 
 **The top three do not contain a model.** Detection is a convolutional
@@ -769,8 +787,13 @@ it**; it needs better line tracing.
 
 **The bottom three are model-bound, and two are close to their ceiling.** The
 capability suite is already 9/9 — there is no headroom to buy. The router is at
-93% lane accuracy and few-shot examples took it from 83% to 100% on a held-out
-set, so the accuracy came from examples, not parameters.
+**92% (22/24)** on a held-out label set disjoint from the few-shot examples in
+`models/models.yaml` — reproducible with `python -m bench.run_router`, results
+in `bench/router_results.json`. Both misses are defensible edge cases, not
+random noise: "is the text on this nameplate legible?" (expected vision, got
+document — no image is actually named) and "what all can this tool do"
+(expected chitchat, got reason — it is phrased as a real question, and the
+router hint says a genuine question is not chitchat).
 
 That leaves the honest answer: **tier-L buys answer quality on hard,
 multi-document judgement questions — the one open failure and the class of
@@ -797,7 +820,7 @@ corpus. That is what tier-L is waiting for.
 
 | operation | result |
 |---|---|
-| Router classification | 0.9 s · 93% lane accuracy |
+| Router classification | 0.9 s · 92% lane accuracy (22/24, `bench/run_router.py`) |
 | Retrieval | 2.4–2.8 s |
 | Full question → answer | ~22 s |
 | Question → Word file | ~74 s |

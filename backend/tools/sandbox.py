@@ -53,6 +53,7 @@ import subprocess
 import sys
 import tempfile
 import textwrap
+import threading
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -61,6 +62,7 @@ _BACKEND_ROOT = Path(__file__).resolve().parent.parent
 
 DEFAULT_TIMEOUT = 20.0
 DEFAULT_MEMORY_MB = 512
+_MEM_POLL_S = 0.1
 MAX_OUTPUT = 20_000          # a runaway print loop must not fill the reply
 _TRUNCATED = "\n...[truncated]"
 
@@ -190,6 +192,35 @@ def _classify_block(stderr: str, exit_code: int, timed_out: bool) -> str | None:
     return None
 
 
+def _watch_memory(proc: subprocess.Popen, memory_mb: int, killed: threading.Event) -> None:
+    """
+    Kill `proc` if its RSS crosses memory_mb, by polling `ps` from the parent.
+
+    Exists because RLIMIT_AS (tried in _preamble, inside the child) silently
+    does not hold on macOS - bench/run_sandbox_escape.py proved a 2 GB
+    allocation goes through against a 512 MB rlimit, exit 0, no block. `ps`
+    is unsandboxed (it runs in the parent, not under Seatbelt) and works the
+    same way on macOS and Linux, so this is the backstop for the OS where the
+    "real" mechanism does not work, rather than a replacement for it anywhere
+    it does.
+    """
+    limit_kb = memory_mb * 1024
+    while proc.poll() is None:
+        try:
+            out = subprocess.run(
+                ["ps", "-o", "rss=", "-p", str(proc.pid)],
+                capture_output=True, text=True, timeout=1,
+            ).stdout.strip()
+            rss_kb = int(out) if out else 0
+        except Exception:
+            return          # process gone, or `ps` unavailable - nothing to do
+        if rss_kb > limit_kb:
+            killed.set()
+            proc.kill()
+            return
+        time.sleep(_MEM_POLL_S)
+
+
 def run(code: str, *, timeout: float = DEFAULT_TIMEOUT,
         memory_mb: int = DEFAULT_MEMORY_MB,
         files: dict[str, str] | None = None) -> Result:
@@ -202,6 +233,9 @@ def run(code: str, *, timeout: float = DEFAULT_TIMEOUT,
 
     What "isolated" actually means depends on the OS - see the module
     docstring. This function does not pretend Windows gets what macOS gets.
+    The memory cap specifically is enforced twice: RLIMIT_AS in the child
+    (_preamble) where the OS honours it, and an RSS-polling watchdog in the
+    parent (_watch_memory) everywhere else - see that function for why.
     """
     work = Path(tempfile.mkdtemp(prefix="sw-sandbox-"))
     t0 = time.perf_counter()
@@ -224,18 +258,34 @@ def run(code: str, *, timeout: float = DEFAULT_TIMEOUT,
 
         env = _scrubbed_env(work)
 
+        proc = subprocess.Popen(
+            cmd, cwd=work, env=env, stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE, text=True, encoding="utf-8", errors="replace",
+        )
+        mem_killed = threading.Event()
+        watchdog = threading.Thread(
+            target=_watch_memory, args=(proc, memory_mb, mem_killed), daemon=True)
+        watchdog.start()
+
         timed_out = False
         try:
-            p = subprocess.run(
-                cmd, cwd=work, env=env, capture_output=True, text=True,
-                encoding="utf-8", errors="replace", timeout=timeout,
-            )
-            out, err, rc = p.stdout, p.stderr, p.returncode
-        except subprocess.TimeoutExpired as exc:
+            out, err = proc.communicate(timeout=timeout)
+            rc = proc.returncode
+        except subprocess.TimeoutExpired:
             timed_out = True
-            out = exc.stdout or ""
+            proc.kill()
+            out, err = proc.communicate()
             err = f"Timed out after {timeout:.0f}s and was killed."
             rc = -1
+        watchdog.join(timeout=1)
+
+        if mem_killed.is_set() and not timed_out:
+            rc = -9        # SIGKILL, same code _classify_block already reads as "memory"
+            err = (err or "") + (
+                f"\nKilled by the sandbox watchdog: RSS exceeded {memory_mb} MB "
+                "(RLIMIT_AS does not hold on this OS, so RSS polling is the "
+                "backstop - see _watch_memory)."
+            )
 
         blocked = _classify_block(err, rc, timed_out)
 

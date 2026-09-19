@@ -1,0 +1,351 @@
+{
+ "total": 24,
+ "zero_shot": {
+  "passed": 19,
+  "accuracy_pct": 79.2,
+  "results": [
+   {
+    "question": "what did the last inspection report say about PSV-2041?",
+    "expected": "document",
+    "got": "reason",
+    "passed": false,
+    "seconds": 3.68
+   },
+   {
+    "question": "check if the vessel thickness meets the SOP requirement",
+    "expected": "document",
+    "got": "document",
+    "passed": true,
+    "seconds": 0.43
+   },
+   {
+    "question": "any open NCRs on E-2404?",
+    "expected": "document",
+    "got": "document",
+    "passed": true,
+    "seconds": 0.44
+   },
+   {
+    "question": "what's the deviation status for DEV-2026-017?",
+    "expected": "document",
+    "got": "reason",
+    "passed": false,
+    "seconds": 0.44
+   },
+   {
+    "question": "on this drawing, what feeds into TK-4102?",
+    "expected": "pid",
+    "got": "document",
+    "passed": false,
+    "seconds": 0.43
+   },
+   {
+    "question": "show me the isolation valves upstream of PSV-2041",
+    "expected": "pid",
+    "got": "pid",
+    "passed": true,
+    "seconds": 0.42
+   },
+   {
+    "question": "trace the line from V-2405 to the flare header",
+    "expected": "pid",
+    "got": "pid",
+    "passed": true,
+    "seconds": 0.42
+   },
+   {
+    "question": "which valve on the piping diagram do I shut to isolate the pump?",
+    "expected": "pid",
+    "got": "pid",
+    "passed": true,
+    "seconds": 0.42
+   },
+   {
+    "question": "what does this photo show?",
+    "expected": "vision",
+    "got": "vision",
+    "passed": true,
+    "seconds": 0.43
+   },
+   {
+    "question": "can you read the label in this picture?",
+    "expected": "vision",
+    "got": "vision",
+    "passed": true,
+    "seconds": 0.42
+   },
+   {
+    "question": "describe what's in the scanned image",
+    "expected": "vision",
+    "got": "vision",
+    "passed": true,
+    "seconds": 0.42
+   },
+   {
+    "question": "is the text on this nameplate legible?",
+    "expected": "vision",
+    "got": "document",
+    "passed": false,
+    "seconds": 0.42
+   },
+   {
+    "question": "write me a script to calculate remaining life from thickness readings",
+    "expected": "code",
+    "got": "code",
+    "passed": true,
+    "seconds": 0.42
+   },
+   {
+    "question": "can you code a function that computes corrosion rate",
+    "expected": "code",
+    "got": "code",
+    "passed": true,
+    "seconds": 0.42
+   },
+   {
+    "question": "generate python that plots the UT trend over time",
+    "expected": "code",
+    "got": "code",
+    "passed": true,
+    "seconds": 0.42
+   },
+   {
+    "question": "build a script to convert psi to barg",
+    "expected": "code",
+    "got": "code",
+    "passed": true,
+    "seconds": 0.41
+   },
+   {
+    "question": "what's the difference between a rupture disc and a PSV",
+    "expected": "reason",
+    "got": "reason",
+    "passed": true,
+    "seconds": 0.42
+   },
+   {
+    "question": "should we replace or repair this exchanger",
+    "expected": "reason",
+    "got": "reason",
+    "passed": true,
+    "seconds": 0.42
+   },
+   {
+    "question": "walk me through the shutdown sequence for a distillation column",
+    "expected": "reason",
+    "got": "reason",
+    "passed": true,
+    "seconds": 0.42
+   },
+   {
+    "question": "why do refineries nitrogen purge before maintenance",
+    "expected": "reason",
+    "got": "reason",
+    "passed": true,
+    "seconds": 0.45
+   },
+   {
+    "question": "hey there",
+    "expected": "chitchat",
+    "got": "chitchat",
+    "passed": true,
+    "seconds": 0.45
+   },
+   {
+    "question": "good morning",
+    "expected": "chitchat",
+    "got": "chitchat",
+    "passed": true,
+    "seconds": 0.44
+   },
+   {
+    "question": "what all can this tool do",
+    "expected": "chitchat",
+    "got": "reason",
+    "passed": false,
+    "seconds": 0.41
+   },
+   {
+    "question": "appreciate the help",
+    "expected": "chitchat",
+    "got": "chitchat",
+    "passed": true,
+    "seconds": 0.47
+   }
+  ]
+ },
+ "few_shot": {
+  "passed": 22,
+  "accuracy_pct": 91.7,
+  "results": [
+   {
+    "question": "what did the last inspection report say about PSV-2041?",
+    "expected": "document",
+    "got": "document",
+    "passed": true,
+    "seconds": 0.68
+   },
+   {
+    "question": "check if the vessel thickness meets the SOP requirement",
+    "expected": "document",
+    "got": "document",
+    "passed": true,
+    "seconds": 0.65
+   },
+   {
+    "question": "any open NCRs on E-2404?",
+    "expected": "document",
+    "got": "document",
+    "passed": true,
+    "seconds": 0.53
+   },
+   {
+    "question": "what's the deviation status for DEV-2026-017?",
+    "expected": "document",
+    "got": "document",
+    "passed": true,
+    "seconds": 0.67
+   },
+   {
+    "question": "on this drawing, what feeds into TK-4102?",
+    "expected": "pid",
+    "got": "pid",
+    "passed": true,
+    "seconds": 1.1
+   },
+   {
+    "question": "show me the isolation valves upstream of PSV-2041",
+    "expected": "pid",
+    "got": "pid",
+    "passed": true,
+    "seconds": 0.95
+   },
+   {
+    "question": "trace the line from V-2405 to the flare header",
+    "expected": "pid",
+    "got": "pid",
+    "passed": true,
+    "seconds": 0.98
+   },
+   {
+    "question": "which valve on the piping diagram do I shut to isolate the pump?",
+    "expected": "pid",
+    "got": "pid",
+    "passed": true,
+    "seconds": 0.54
+   },
+   {
+    "question": "what does this photo show?",
+    "expected": "vision",
+    "got": "vision",
+    "passed": true,
+    "seconds": 0.67
+   },
+   {
+    "question": "can you read the label in this picture?",
+    "expected": "vision",
+    "got": "vision",
+    "passed": true,
+    "seconds": 0.64
+   },
+   {
+    "question": "describe what's in the scanned image",
+    "expected": "vision",
+    "got": "vision",
+    "passed": true,
+    "seconds": 0.52
+   },
+   {
+    "question": "is the text on this nameplate legible?",
+    "expected": "vision",
+    "got": "document",
+    "passed": false,
+    "seconds": 0.52
+   },
+   {
+    "question": "write me a script to calculate remaining life from thickness readings",
+    "expected": "code",
+    "got": "code",
+    "passed": true,
+    "seconds": 0.64
+   },
+   {
+    "question": "can you code a function that computes corrosion rate",
+    "expected": "code",
+    "got": "code",
+    "passed": true,
+    "seconds": 0.66
+   },
+   {
+    "question": "generate python that plots the UT trend over time",
+    "expected": "code",
+    "got": "code",
+    "passed": true,
+    "seconds": 0.64
+   },
+   {
+    "question": "build a script to convert psi to barg",
+    "expected": "code",
+    "got": "code",
+    "passed": true,
+    "seconds": 0.65
+   },
+   {
+    "question": "what's the difference between a rupture disc and a PSV",
+    "expected": "reason",
+    "got": "reason",
+    "passed": true,
+    "seconds": 0.64
+   },
+   {
+    "question": "should we replace or repair this exchanger",
+    "expected": "reason",
+    "got": "reason",
+    "passed": true,
+    "seconds": 0.53
+   },
+   {
+    "question": "walk me through the shutdown sequence for a distillation column",
+    "expected": "reason",
+    "got": "reason",
+    "passed": true,
+    "seconds": 0.72
+   },
+   {
+    "question": "why do refineries nitrogen purge before maintenance",
+    "expected": "reason",
+    "got": "reason",
+    "passed": true,
+    "seconds": 0.55
+   },
+   {
+    "question": "hey there",
+    "expected": "chitchat",
+    "got": "chitchat",
+    "passed": true,
+    "seconds": 0.76
+   },
+   {
+    "question": "good morning",
+    "expected": "chitchat",
+    "got": "chitchat",
+    "passed": true,
+    "seconds": 0.7
+   },
+   {
+    "question": "what all can this tool do",
+    "expected": "chitchat",
+    "got": "reason",
+    "passed": false,
+    "seconds": 0.64
+   },
+   {
+    "question": "appreciate the help",
+    "expected": "chitchat",
+    "got": "chitchat",
+    "passed": true,
+    "seconds": 0.59
+   }
+  ]
+ }
+}
