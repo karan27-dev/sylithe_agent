@@ -4,6 +4,9 @@
 ./start.sh          # → http://127.0.0.1:8000
 ```
 
+One command starts everything - the backend also serves the frontend, so there
+is no separate frontend server to run.
+
 Upload with **Attach**, or drag onto the message box. Watch the activity panel
 above each answer - it shows which model was picked and why.
 
